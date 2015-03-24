@@ -27,10 +27,13 @@ var p = GameEvent.prototype;
 p._actor = null;
 p._eventType = null;
 p._damage = null;
+p._healAmount = null;
 // p._targets = null;
 
 GameEvent.ATTACK = "attacks";
 GameEvent.DAMAGE = "damage";
+GameEvent.HEAL = "heal";
+GameEvent.POISON = "poison";
 // GameEvent.DAMAGE_AND_DEATH = "damage_and_death"; // This is worked out in the actor/when resolving stuff
 
 //===================================================
@@ -52,6 +55,11 @@ p.getDamage = function()
 	return this._damage;
 }
 
+p.getHealAmount = function()
+{
+	return this._healAmount;
+}
+
 // This takes the actor involved and applies the GameEvent to them
 p.resolveGameEvent = function()
 {
@@ -64,6 +72,14 @@ p.resolveGameEvent = function()
 	else if(this._eventType === GameEvent.DAMAGE)
 	{
 		this._actor.damage( this.getDamage() );
+	}
+	else if(this._eventType === GameEvent.POISON)
+	{
+		this._actor.damage( this.getDamage() );
+	}
+	else if(this._eventType === GameEvent.HEAl)
+	{
+		this._actor.heal( this.getHealAmount() );
 	}
 	
 	this._actor.removeGameEvent();
@@ -78,11 +94,20 @@ p._init = function(_eventType, _args)
 {	
 	if(_eventType === GameEvent.ATTACK)
 	{
-		// Don't need any variables for the attacker
+		// Don't need any variables for the these events
+	}
+	else if(_eventType === GameEvent.POISON)
+	{
+		// Shouldn't be hard coded really
+		this._damage = 1;
 	}
 	else if(_eventType === GameEvent.DAMAGE)
 	{
 		this._damage = _args[0];
+	}
+	else if(_eventType === GameEvent.HEAL)
+	{
+		this._healAmount = _args[0];
 	}
 }
 

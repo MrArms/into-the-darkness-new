@@ -23,8 +23,10 @@ var p = Action.prototype;
 p._actor = null;
 p._targets = null;
 p._actionType = null;
+p._statusType = null;
 
 Action.ATTACK = "attack";
+Action.STATUS = "status";
 
 //===================================================
 // Public Methods
@@ -45,15 +47,24 @@ p.getTargets = function()
 	return this._targets;
 }
 
+p.getStatusType = function()
+{
+	return this._statusType;
+}
+
 //===================================================
 // Private Methods
 //===================================================
 
 p._init = function(_actionType, _args)
-{	
+{		
 	if(_actionType === Action.ATTACK)
 	{
 		this._targets = _args[0];
+	}
+	else if(_actionType === Action.STATUS)
+	{
+		this._statusType = _args[1];
 	}
 }
 

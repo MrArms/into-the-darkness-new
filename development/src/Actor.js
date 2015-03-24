@@ -10,6 +10,7 @@ Actor = function(_col, _row, _health, _hasCounterAttack)
 	this._col = _col;
 	this._row = _row;
 	
+	this._maxHP = _health;
 	this._currentHP = _health;
 	
 	this._hasCounterAttack = _hasCounterAttack;
@@ -26,6 +27,7 @@ var p = Actor.prototype;
 p._col = null;
 p._row = null;
 
+p._maxHP = null;
 p._currentHP = null;
 p._isAlive = null;
 p._hasCounterAttack = null;
@@ -35,6 +37,24 @@ p._currentGameEvent = null;
 //===================================================
 // Public Methods
 //===================================================
+
+// A hard coded tester function for the moment
+p.getCurrentStatusActions = function()
+{
+	// DON'T WANT HARDCODED "poison", "regen" eventually ***
+	var regenStatusAction = new Action(this, Action.STATUS, [[this], "regen"]);
+	var poisonStatusAction = new Action(this, Action.STATUS, [[this], "poison"]);
+	
+	return [regenStatusAction, poisonStatusAction];
+}
+
+p.afterTurnAction = function()
+{
+	// Update status and effects here
+	
+	
+
+}
 
 p.isHasCounterAttack = function()
 {
@@ -79,6 +99,12 @@ p.damage = function(_amount)
 	
 	if(this._currentHP <= 0)
 		this._kill();
+}
+
+// Called by the game event
+p.heal = function(_amount)
+{
+	this._currentHP = Math.min(this._maxHP, this._currentHP + _amount);
 }
 
 //===================================================

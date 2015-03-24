@@ -42,6 +42,13 @@ p.update = function(_actors)
 				// Draw the number over the defenders head here
 				else if(gameEvent.getEventType() === GameEvent.DAMAGE)
 					this._display.draw(position[0], position[1], gameEvent.getDamage(), "#F00", "#000");
+				
+				// Draw the number over the actors head here
+				else if(gameEvent.getEventType() === GameEvent.HEAL)
+					this._display.draw(position[0], position[1], gameEvent.getHealAmount(), "#8F8", "#000");
+					
+				else if(gameEvent.getEventType() === GameEvent.POISON)
+					this._display.draw(position[0], position[1], gameEvent.getDamage(), "#0B0", "#000");
 			}	
 			// No game event so just draw the actor as usual
 			else

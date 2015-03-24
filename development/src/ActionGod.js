@@ -1,5 +1,5 @@
 
-goog.provide( "tt.TurnGod" );
+goog.provide( "tt.ActionGod" );
 
 goog.require( "tt.Attack" );
 goog.require( "tt.GameEvent" );
@@ -9,21 +9,18 @@ goog.require( "tt.GameEvent" );
 //===================================================
 
 
-TurnGod = function(_game)
+ActionGod = function()
 {
-	this._game = _game;
+	// this._game = _game;
 
 	this._init();
 }
 
-var p = TurnGod.prototype;
+var p = ActionGod.prototype;
 
 //===================================================
 // Variables
 //===================================================
-
-p._turnInProgress = null;
-
 
 p._processingAction = null;
 p._actionQueue = null;
@@ -39,21 +36,23 @@ p._actionQueue = null;
 // Game events contain the actor that the event is on
 p._gameEventList = null;
 
+// p._endCallback = null;
+
 
 //===================================================
 // Public Methods
 //===================================================
 
-p.startTurn = function(_action)
+p.startAction = function(_endCallback)
 {
-	this._turnInProgress = true;
-	
-	this._actionQueue = [];
-	// this._actorAnimationList = [];
-	this._gameEventList = [];
-	
 	// Add the action to the action queue
-	this._actionQueue.push(_action);
+	//this._actionQueue.push(_action);
+
+	this._endCallback = _endCallback;
+
+	//this._actionQueue = [];
+	// this._actorAnimationList = [];
+	this._gameEventList = [];		
 	
 	// Processes the first action in the list (there's only one at the moment)
 	this._processAction();
@@ -69,6 +68,11 @@ p.addAction = function(_action)
 //===================================================
 // Private Methods
 //===================================================
+
+p._reset = function()
+{
+	this._actionQueue = [];
+}
 
 p._processAction = function()
 {
@@ -107,6 +111,22 @@ p._processAction = function()
 		
 		// If it is a double blow then add the original attack again here
 	}
+	else if(currentAction.getActionType() === Action.STATUS)
+	{		
+		// Need to stop these being hard coded - perhaps move to STATUS.POISON/REGEN or something (and combine with GameEvent.POISON/REGEN TOO)
+		if(currentAction._statusType === "regen")
+		{
+			var newRegenGameEvent = new GameEvent(currentAction.getActor(), GameEvent.HEAL, [2]);
+			currentAction.getActor().addGameEvent(newRegenGameEvent);
+			this._gameEventList.push( newRegenGameEvent );	
+		}
+		else if(currentAction._statusType === "poison")
+		{
+			var newPoisonGameEvent = new GameEvent(currentAction.getActor(), GameEvent.POISON, [2]);
+			currentAction.getActor().addGameEvent(newPoisonGameEvent);
+			this._gameEventList.push( newPoisonGameEvent );
+		}
+	}
 	
 	// Need a callback here for when the animations have been completed, for now we are going to use a tween with a standard animation delay
 	//				but eventually we might want a more custom method for each animation type 
@@ -142,13 +162,18 @@ p._resolveAction = function()
 	}
 	// Otherwise tell the game that the turn has completely finished
 	else
-		this._game.turnFinished();	
+	{
+		this._reset();
+		this._endCallback();	
+		//this._game.turnFinished();	
+		
+	}
 }
 
 
 p._init = function()
 {	
-	this._turnInProgress = false;
+	this._reset();
 }
 
 //===================================================

@@ -1,2 +1,71 @@
 
-Create a new repository for the game on your PC
+
+NEED TO tidy up the status code 
+	Probably create a status class (with timer)  
+	see below for other tidy ups needed
+	Go through all the code and improve it
+	
+	Then check in
+	
+	Then add a turnSystem
+
+
+What to do next?
+	Could create a proper turn system for all the actors in the game LEAVE FOR NOW - do we want to use the Rot.js one?	
+		Need an intelligent one that moves monsters nearest the player first
+	
+	
+Create statuses and add poison and get it to create a poison GameEvent at the end of the player turn - can we tie it into the ActionGod?	
+	
+1) Look at how you did status and effects in the 7DRL version and design a new status system
+	Effects and statuses the same thing?
+	For "1 turn" effects want them to last until the start of the following turn
+		Effect is just a flag on a status effect that says that they are reduced at the start and end of the turn
+	"normal" status effects last as long as necessary
+		CREATE A STATUS CLASS
+	Need a preAction function in Actor to deal with the above
+
+
+2) Think about how the status system works with the ActionGod if at all
+	Eventually the renderer will grab the actors status values and can pulse if necessary
+	
+	When an actor turn ends if it has poison it creates a GameEvent 
+		Create an animationGroup class and use it for this and stuff in action God?
+		
+	What if we want animations for several status effects at the end of the turn?
+		Say poison, regen etc. - CREATE THESE TO TEST
+		
+	COULD MAKE A BUNCH OF ACTIONS and add them in order to the ActionGod
+		But is that an action? An action is what an actor does to something
+			The status of the actor does the status to the actor (if you see what I mean)
+				The damage or health regen are the subsequent effects
+				
+	ActionGod callback is different depending on whether it is the actual turn or a status effect
+		Do we want status effects in there?
+		
+	After actor turn is completed in ActionGod ---> goes to actor afterTurn() which creates any status effects and then starts the next Action list
+		HOW ARE WE GOING TO GET TO THE ACTIONGOD from the actor? Need to think about keeping the actor dumb here
+		 Is actor still dumb if it has a link and callback for the ActorGod
+			
+	Hang on the ActionGod already has a callback to the Game
+		It could call GetStatusActions from the actor and then return to the Game itself
+			DUNNO you're mixing the Action with the entire TURN for the actor here - it should really deal with the former
+			
+		The TURN logic is done in the Game class
+			
+		
+	DON'T WANT HARDCODED "poison" eventually *** Do we want a status class? What would it contain? It could have the timer in it and get updated nicely (with flags for 1 turn effects)
+		YES WE WANT A STATUS CLASS AT SOME POINT!!!!
+	
+Need a "currentActor" variable in Game when we do the proper turn manager
+	Could have turnManger.getNextActor(); for the next actor
+
+Need to remove poison hard coded damage 
+	this._actor.damage(1); - could put it in the status effect perhaps? Tidy it up a bit
+
+	Store "poison" the same place as GameEvents.POISON - perhaps move it to Status.POISON
+		SAme with "regen"
+		
+Clunky the way effects are created and lined up - need a more elegant solution
+
+
