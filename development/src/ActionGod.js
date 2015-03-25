@@ -11,8 +11,6 @@ goog.require( "tt.GameEvent" );
 
 ActionGod = function()
 {
-	// this._game = _game;
-
 	this._init();
 }
 
@@ -22,22 +20,12 @@ var p = ActionGod.prototype;
 // Variables
 //===================================================
 
-p._processingAction = null;
 p._actionQueue = null;
 
-// 		need the actor/animation pairs so we can test to see if the actors have finished the animation
-// p._animationList = null; 
-
-// This is an array of actors that currently have animations on them
-// p._actorAnimationList = null;
-
-// A list of gameEvents and actor pairs, things like damage to actor2, actor 3 damged for 2 and dies etc.
+// A list of gameEvents which are things that happen to an actor that also can be grabbed by the renderer to animate
 // When the animations have played on the actors then the actors get updated with the event
 // Game events contain the actor that the event is on
 p._gameEventList = null;
-
-// p._endCallback = null;
-
 
 //===================================================
 // Public Methods
@@ -45,18 +33,12 @@ p._gameEventList = null;
 
 p.startAction = function(_endCallback)
 {
-	// Add the action to the action queue
-	//this._actionQueue.push(_action);
-
 	this._endCallback = _endCallback;
 
-	//this._actionQueue = [];
-	// this._actorAnimationList = [];
 	this._gameEventList = [];		
 	
 	// Processes the first action in the list (there's only one at the moment)
-	this._processAction();
-		
+	this._processAction();		
 }
 
 p.addAction = function(_action)
@@ -76,9 +58,7 @@ p._reset = function()
 
 p._processAction = function()
 {
-	this._processingAction = true;
-
-	// Get the aciton and remove it from the queue
+	// Get the action and remove it from the queue
 	var currentAction = this._actionQueue.splice(0, 1)[0];
 	
 	// Need to get the event list for the action and any subsequent actions need to be added to the action queue	
@@ -112,20 +92,10 @@ p._processAction = function()
 		// If it is a double blow then add the original attack again here
 	}
 	else if(currentAction.getActionType() === Action.STATUS)
-	{		
-		// Need to stop these being hard coded - perhaps move to STATUS.POISON/REGEN or something (and combine with GameEvent.POISON/REGEN TOO)
-		if(currentAction._statusType === "regen")
-		{
-			var newRegenGameEvent = new GameEvent(currentAction.getActor(), GameEvent.HEAL, [2]);
-			currentAction.getActor().addGameEvent(newRegenGameEvent);
-			this._gameEventList.push( newRegenGameEvent );	
-		}
-		else if(currentAction._statusType === "poison")
-		{
-			var newPoisonGameEvent = new GameEvent(currentAction.getActor(), GameEvent.POISON, [2]);
-			currentAction.getActor().addGameEvent(newPoisonGameEvent);
-			this._gameEventList.push( newPoisonGameEvent );
-		}
+	{			
+		var newGameEvent = currentAction.getStatus().getGameEventFromStatus(currentAction.getActor());
+		currentAction.getActor().addGameEvent(newGameEvent);
+		this._gameEventList.push( newGameEvent );	
 	}
 	
 	// Need a callback here for when the animations have been completed, for now we are going to use a tween with a standard animation delay
@@ -138,15 +108,14 @@ p._processAction = function()
 p._resolveAction = function()
 {
 	for(var i=0; i<this._gameEventList.length; i++)
-	{
-		// this._gameEventList[i].getActor().applyGameEvent();	
+	{		
 		this._gameEventList[i].resolveGameEvent();	
 	}
 	
 	this._gameEventList = [];
 
 	// Need to check the remaining actors in the actionQueue events are still alive (the previous action may have killed them)	
-	// If we ever want to add an action that is performed after the death of an actor then we'll need to change this part here
+	// If we ever want to add an action that is performed after the death of an actor (eg. resurrect, explode) then we'll need to change this part here
 	for(var j=this._actionQueue.length - 1; j>=0; j--)
 	{
 		if(this._actionQueue[j].getActor().isActorAlive() === false)		
@@ -160,16 +129,13 @@ p._resolveAction = function()
 		// We put a slight delay between actions
 		TweenMax.delayedCall(0.1, this._processAction, [], this);		
 	}
-	// Otherwise tell the game that the turn has completely finished
+	// Otherwise tell the game that the "turn" that contained all the actions in the actionQueue (and any ones subsequently added to it) has completely finished
 	else
 	{
 		this._reset();
-		this._endCallback();	
-		//this._game.turnFinished();	
-		
+		this._endCallback();					
 	}
 }
-
 
 p._init = function()
 {	

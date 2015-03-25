@@ -1,8 +1,10 @@
 
 Action - an action that an actor performs - eg. attack, move etc. The command the actor wants to do
+		note that status effects are counted as an Action as they happen (eg. you are poisoned and take damage)
+			perhaps a better definition of an Action is of a timing where animations take place (at once) where other actions have to wait
+				So when an actor attacks multiple enemies that is one action
+				
 GameEvent - something that happens to an actor eg. Take damage, die, movement - this is the effect on the actor
-
-
 
 You create an action and associate it with an actor - eg. Actor 1 attacks actors 2,3,4
 
@@ -21,7 +23,7 @@ actionGod.processAction()
 	This creates GameEvents for these effects and adds them to this._gameEventList and the relevant actors themselves
 	At the same time it calculates whether any other Actions are created as a response and adds them to the actionGod._actionQueue
 	
-	NOTE the gameEvents are just stored in the actors, but it hasn't actually affected them just yet
+	NOTE the gameEvents are stored in the actors, but it hasn't actually affected them just yet
 	
 	The gameEvents on the actors are picked up by the renderer and animated if necessary
 		We could add a timer to the GameEvents if we want to add more complex animations

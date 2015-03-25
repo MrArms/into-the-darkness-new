@@ -28,13 +28,11 @@ p._actor = null;
 p._eventType = null;
 p._damage = null;
 p._healAmount = null;
-// p._targets = null;
 
-GameEvent.ATTACK = "attacks";
+GameEvent.ATTACK = "attack";
 GameEvent.DAMAGE = "damage";
 GameEvent.HEAL = "heal";
-GameEvent.POISON = "poison";
-// GameEvent.DAMAGE_AND_DEATH = "damage_and_death"; // This is worked out in the actor/when resolving stuff
+GameEvent.POISON_DAMAGE = "poison_damage";
 
 //===================================================
 // Public Methods
@@ -64,7 +62,9 @@ p.getHealAmount = function()
 p.resolveGameEvent = function()
 {
 	if(this._eventType === null)
+	
 		Utils.console("Error - gameEvent._eventType is null so cannot apply it");
+		
 	else if(this._eventType === GameEvent.ATTACK)
 	{
 		// Do nothing as the actor hasn't changed after attacking
@@ -73,7 +73,8 @@ p.resolveGameEvent = function()
 	{
 		this._actor.damage( this.getDamage() );
 	}
-	else if(this._eventType === GameEvent.POISON)
+	// The difference between this and normal damage is purely graphical
+	else if(this._eventType === GameEvent.POISON_DAMAGE)
 	{
 		this._actor.damage( this.getDamage() );
 	}
@@ -83,7 +84,6 @@ p.resolveGameEvent = function()
 	}
 	
 	this._actor.removeGameEvent();
-
 }
 
 //===================================================
@@ -96,7 +96,7 @@ p._init = function(_eventType, _args)
 	{
 		// Don't need any variables for the these events
 	}
-	else if(_eventType === GameEvent.POISON)
+	else if(_eventType === GameEvent.POISON_DAMAGE)
 	{
 		// Shouldn't be hard coded really
 		this._damage = 1;

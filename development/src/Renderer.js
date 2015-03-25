@@ -47,7 +47,7 @@ p.update = function(_actors)
 				else if(gameEvent.getEventType() === GameEvent.HEAL)
 					this._display.draw(position[0], position[1], gameEvent.getHealAmount(), "#8F8", "#000");
 					
-				else if(gameEvent.getEventType() === GameEvent.POISON)
+				else if(gameEvent.getEventType() === GameEvent.POISON_DAMAGE)
 					this._display.draw(position[0], position[1], gameEvent.getDamage(), "#0B0", "#000");
 			}	
 			// No game event so just draw the actor as usual

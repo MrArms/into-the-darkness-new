@@ -1,7 +1,9 @@
 
+Check out what is causing that error message!!! SORTED
+	Do we want multiple gameEvents working on the same actor at the same time? I'd say no for the moment. 
 
 NEED TO tidy up the status code 
-	Probably create a status class (with timer)  
+	Probably create a status class (with timer)  DONE
 	see below for other tidy ups needed
 	Go through all the code and improve it
 	

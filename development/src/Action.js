@@ -23,7 +23,7 @@ var p = Action.prototype;
 p._actor = null;
 p._targets = null;
 p._actionType = null;
-p._statusType = null;
+p._status = null;
 
 Action.ATTACK = "attack";
 Action.STATUS = "status";
@@ -47,9 +47,9 @@ p.getTargets = function()
 	return this._targets;
 }
 
-p.getStatusType = function()
+p.getStatus = function()
 {
-	return this._statusType;
+	return this._status;
 }
 
 //===================================================
@@ -63,8 +63,9 @@ p._init = function(_actionType, _args)
 		this._targets = _args[0];
 	}
 	else if(_actionType === Action.STATUS)
-	{
-		this._statusType = _args[1];
+	{		
+		this._targets = _args[0];
+		this._status = _args[1];
 	}
 }
 
