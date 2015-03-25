@@ -85,7 +85,7 @@ p._processAction = function()
 			this._gameEventList.push( newDamageGameEvent );											
 			
 			// If the target has a counter attack then add it here 
-			if( currentTarget.isHasCounterAttack() )
+			if( currentTarget.isActorAlive() === true && currentTarget.isHasCounterAttack() )
 				this.addAction(new Action(currentTarget, Action.ATTACK, [[ currentAction.getActor() ]]) ); 					
 		}	
 		
@@ -100,7 +100,7 @@ p._processAction = function()
 	
 	// Need a callback here for when the animations have been completed, for now we are going to use a tween with a standard animation delay
 	//				but eventually we might want a more custom method for each animation type 
-	TweenMax.delayedCall(0.3, this._resolveAction, [], this);
+	TweenMax.delayedCall(Globals.GAME_EVENT_ANIM_LENGTH, this._resolveAction, [], this);
 
 }
 
@@ -127,7 +127,7 @@ p._resolveAction = function()
 	if(this._actionQueue.length > 0)
 	{
 		// We put a slight delay between actions
-		TweenMax.delayedCall(0.1, this._processAction, [], this);		
+		TweenMax.delayedCall(Globals.DELAY_BETWEEN_ACTIONS, this._processAction, [], this);		
 	}
 	// Otherwise tell the game that the "turn" that contained all the actions in the actionQueue (and any ones subsequently added to it) has completely finished
 	else

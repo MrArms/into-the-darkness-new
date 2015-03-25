@@ -1,8 +1,9 @@
 
 goog.provide( "tt.GameEvent" );
 
-// These are events in game that are performed on an actor/when
+// These are events in game that are performed on an actor
 // So for example damage, death (not currently implemented), poison damage etc.
+// They are grabbed by the renderer to show anamations, actor states etc.
 // You could add a timer to them and add the timer functionality to the TurnGod if you wanted more complex animations 
 
 //===================================================

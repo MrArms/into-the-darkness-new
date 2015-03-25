@@ -5,7 +5,7 @@ goog.provide( "tt.Actor" );
 // Constructor
 //===================================================
 
-Actor = function(_col, _row, _health, _hasCounterAttack)
+Actor = function(_col, _row, _health, _speed, _hasCounterAttack, _isPlayer)
 {
 	this._col = _col;
 	this._row = _row;
@@ -13,7 +13,12 @@ Actor = function(_col, _row, _health, _hasCounterAttack)
 	this._maxHP = _health;
 	this._currentHP = _health;
 	
+	this._baseSpeed = _speed;
+	this._currentSpeed = _speed;
+	
 	this._hasCounterAttack = _hasCounterAttack;
+	
+	this._isPlayer = _isPlayer;
 
 	this._init();
 }
@@ -24,6 +29,21 @@ var p = Actor.prototype;
 // Variables
 //===================================================
 
+Actor.FAST_SPEED = 4;
+Actor.NORMAL_SPEED = 2;
+Actor.SLOW_SPEED = 1;
+Actor.NO_SPEED = 0;
+
+Actor.TIMER_MAX = 100;
+Actor.TIMER_TICK = 1;
+
+/*Actor.TIMER_SLOW = 5;
+Actor.TIMER_NORMAL = 10;
+Actor.TIMER_FAST = 20;*/
+
+Actor.TIMER_MONSTER_START = 1;
+Actor.TIMER_PLAYER_START = 100;
+
 p._col = null;
 p._row = null;
 
@@ -32,6 +52,12 @@ p._currentHP = null;
 p._isAlive = null;
 p._hasCounterAttack = null;
 
+p._isPlayer = null;
+
+p._moveTimer = null;
+p._baseSpeed = null;
+p._currentSpeed = null;
+
 p._statusArray = null;
 
 p._currentGameEvent = null;
@@ -39,6 +65,41 @@ p._currentGameEvent = null;
 //===================================================
 // Public Methods
 //===================================================
+
+p.isPlayer = function()
+{
+	return this._isPlayer;
+}
+
+p.setMoveTimerToPlayerStart = function()
+{
+	this._moveTimer = Actor.TIMER_PLAYER_START;
+}
+
+p.setMoveTimerToMonsterStart = function()
+{
+	this._moveTimer = Actor.TIMER_MONSTER_START;
+}
+
+p.increaseMoveTimerTick = function()
+{
+	this._moveTimer += (this._currentSpeed * Actor.TIMER_TICK);
+}
+
+/*p.getCurrentSpeed = function()  // NOT USED YET
+{
+	return this._currentSpeed;
+}*/
+
+p.isReadyToMove = function()
+{
+	return (this._isAlive === true && this._moveTimer >= Actor.TIMER_MAX);
+}
+
+/*p.resetMoveCounter = function()  // NOT USED YET DO IN END TURN STUFF ****
+{
+	this._moveTimer = 0;
+}*/
 
 p.addStatus = function(_statusType, _timer)
 {
@@ -72,7 +133,7 @@ p.getEndTurnStatusActions = function()
 		var newAction = this._statusArray[i].getAction(this);
 	
 		// Regen should always be before poison etc.
-		if(this._statusArray[i] === Status.REGEN)		
+		if(this._statusArray[i].getStatusType() === Status.REGEN)		
 			returnActionArray.unshift(newAction);
 		// Other status' go on at the end
 		else
@@ -108,6 +169,9 @@ p.turnFinished = function()
 		if(this._statusArray[i].isActive() === false)
 			this._statusArray.splice(i, 1);		
 	}		
+	
+	// Reset the move counter
+	this._moveTimer = 0;
 }
 
 p.isHasCounterAttack = function()
@@ -185,6 +249,8 @@ p._kill = function()
 p._init = function()
 {		
 	this._isAlive = true;
+	
+	this._moveTimer = 0;
 	
 	this._statusArray = [];
 }

@@ -38,7 +38,8 @@ p.update = function(_actors)
 			{
 				// Just draw the attacker as normal here
 				if(gameEvent.getEventType() === GameEvent.ATTACK)
-					this._display.draw(position[0], position[1], "@", "#FFF", "#000");
+					this._display.draw(position[0], position[1], "@", "#000", "#FFF");
+					
 				// Draw the number over the defenders head here
 				else if(gameEvent.getEventType() === GameEvent.DAMAGE)
 					this._display.draw(position[0], position[1], gameEvent.getDamage(), "#F00", "#000");
