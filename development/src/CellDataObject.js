@@ -27,40 +27,69 @@ var p = CellDataObject.prototype;
 //===================================================
 
 p._data = null;
+p._numberElements = null;
 
 //===================================================
 // Public Methods
 //===================================================
 
-// Returns a random element - it is a little clunky
-p.getRandomElement = function()
+p.getNumberElements = function()
 {
-	var count = 0;
+	return this._numberElements;
+}
 
-	for (var key in this._data)	
-		count = count + 1;
-		
-	var randomIndex = Math.floor(Math.random() * count);
+// Returns a random element - it is a little clunky
+p.getRandomElementKey = function()
+{
+	this._setNumberElements();
 	
-	count = 0;
+	// There are no elements to return
+	if(this._numberElements === 0)
+	{
+		Utils.console("WARNING! Trying to get a random element, but there are none in the object");
+		return null;		
+	}
+
+	var randomIndex = Math.floor(Math.random() * this._numberElements);
+	
+	var count = 0;
 	
 	for (var key in this._data)	
 	{
-		if(count === randomIndex)
-		{
-			return this.getIndicesFromKey(key);
-		}
-			//return this._data[key];	
+		if(count === randomIndex)	
+			return key;
+			// return this.getIndicesFromKey(key);
+		
 		count = count + 1;
 	}
 	
+	Utils.console("ERROR! Trying to get a random element, but didn't return one. Perhaps there's a bug when getting the random index?");	
 	return null;
+}
 
+p.getRandomElement = function()
+{
+	var tempElement = this.getRandomElement();
+	
+	return this._data[key];
+}
+
+p.getRandomElementPosition = function()
+{
+	var tempKey = this.getRandomElementKey();
+	
+	return this.getIndicesFromKey(tempKey);
 }
 
 p.setElement = function(_element, _x, _y)
 {
+	if(this.getElementFromValues(_x, _y) !== null)
+		Utils.console("WARNING! Setting element on top of an old one");
+
 	this._data[this._getKeyFromValues(_x, _y)] = _element;
+	
+	this._setNumberElements();
+	
 }
 
 /*p.removeElementByKey = function(_key)
@@ -71,8 +100,14 @@ p.setElement = function(_element, _x, _y)
 
 p.removeElementFromValues = function(_x, _y)
 {
-	if(this._data[this._getKeyFromValues(_x, _y)])
-		delete this._data[this._getKeyFromValues(_x, _y)];
+	if(this._data[this._getKeyFromValues(_x, _y)] !== null)
+	{			
+		delete this._data[this._getKeyFromValues(_x, _y)];	
+	}
+	else
+		Utils.console("Error, trying to delete an element that doesn't exist");
+	
+	this._setNumberElements();
 }
 
 p.getElementFromValues = function(_x, _y)
@@ -83,13 +118,24 @@ p.getElementFromValues = function(_x, _y)
 		return null;
 }
 
+p.getElementFromKey = function(key)
+{
+	return this._data[key]
+}
+
 p.moveElement = function(_oldX, _oldY, _newX, _newY)
 {
 	var tempElement = this.getElementFromValues(_oldX, _oldY);
 	
+	if(tempElement !== null && this.getElementFromValues(_newX, _newY) !== null)	
+		Utils.console("WARNING! Overwriting old element when moving an element");				
+		
 	this.setElement(tempElement, _newX, _newY);
 
 	this.removeElementFromValues(_oldX, _oldY);
+	
+	this._setNumberElements();
+	
 }
 
 p.hasElement = function(_x, _y)
@@ -126,6 +172,16 @@ p.getIndicesFromKey = function(_key)
 // Private Methods
 //===================================================
 
+p._setNumberElements = function()
+{
+	var count = 0;
+
+	for (var key in this._data)	
+		count = count + 1;
+
+	this._numberElements = count;
+}
+
 p._getKeyFromValues = function(_x, _y)
 {
 	var key = _x + "," + _y;	
@@ -135,6 +191,8 @@ p._getKeyFromValues = function(_x, _y)
 p._init = function()
 {	
 	this._data = {};
+	
+	this._numberElements = 0;
 }
 
 //===================================================

@@ -1,11 +1,11 @@
 
-Levels? Need all nice neat logic for this 
-	
-	LEVEL is DUMB all game logic goes in Game.js
-	
-CURRENTLY DOING level and map stuff (and camera stuff)
+Convert the level._actors array into a CellDataObject
+	It will be easier to render and compare positions for calculations etc.
 
 I want just the player wandering around the map
+
+	Need to interpret player controls and create action for "move" and the logic behind it
+
 
 Put the los functions in the map and update the viewed cells in there - send it the position of the player
 	Renderer should just grab the map and render it

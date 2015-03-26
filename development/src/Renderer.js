@@ -31,7 +31,7 @@ p.update = function(_map, _actors)
 {
 	this._display.clear();
 
-	this._renderMap(_map, _actors);
+	this._renderAll(_map, _actors);
 
 	//this._renderActors(_actors);
 }
@@ -69,75 +69,74 @@ p._inWindowBounds = function(_col, _row)
 
 }
 
-p._renderMap = function(_map, _actors)
+p._renderMapCell = function(_map, _col, _row)
 {
 	var currentViewableCells = _map.getCurrentViewableMapCells();
 	var viewedMapCells = _map.getViewedMapCells();
-	
-	// Get the viewed map here and go through and draw currently viewable cells and if there aren't there draw viewed cells
-	for(var i=0; i < Globals.MAP_WINDOW_WIDTH; i++)
-	{
-		for(var j=0; j < Globals.MAP_WINDOW_HEIGHT; j++)
-		{								
-			var viewedValue = viewedMapCells.getElementFromValues(this._map_camera_col + i, this._map_camera_row + j);
-			var viewableValue = currentViewableCells.getElementFromValues(this._map_camera_col + i, this._map_camera_row + j);
-		
-			if(viewableValue && viewableValue !== null)
-			{
-				if(viewableValue === "#")
-					this._drawCell(i,j, "", "#BBB", "#BBB");
-				else
-					this._drawCell(i,j, viewableValue, "#999");
-			
-			}
-			else if(viewedValue && viewedValue !== null)
-			{
-				if(viewedValue === "#")
-					this._drawCell(i,j, "", "#4B3", "#666");
-				else
-					this._drawCell(i,j, viewedValue, "#444");			
-			}					
-		}
-	}	
 
-	// Draws the actors on top of the map cells
-	for(var i=0; i<_actors.length; i++)
+	//var viewedValue = viewedMapCells.getElementFromValues(this._map_camera_col + i, this._map_camera_row + j);
+	var viewedValue = viewedMapCells.getElementFromValues(_col, _row);
+	//var viewableValue = currentViewableCells.getElementFromValues(this._map_camera_col + i, this._map_camera_row + j);
+	var viewableValue = currentViewableCells.getElementFromValues(_col, _row);
+
+	if(viewableValue && viewableValue !== null)
 	{
-		var position = _actors[i].getPosition();
-	
-		if(_actors[i].isActorAlive() && this._inWindowBounds(position[0], position[1]) )
-		{			
-			var gameEvent = _actors[i].getGameEvent();
-							
-			var screenPos = [position[0] - this._map_camera_col, position[1] - this._map_camera_row];				
-							
-			if(gameEvent !== null)
-			{
-				// Just draw the attacker as normal here
-				if(gameEvent.getEventType() === GameEvent.ATTACK)
-					this._drawCell(screenPos[0], screenPos[1], "@", "#000", "#FFF");
-					
-				// Draw the number over the defenders head here
-				else if(gameEvent.getEventType() === GameEvent.DAMAGE)
-					this._drawCell(screenPos[0], screenPos[1], gameEvent.getDamage(), "#F00", "#000");
-				
-				// Draw the number over the actors head here
-				else if(gameEvent.getEventType() === GameEvent.HEAL)
-					this._drawCell(screenPos[0], screenPos[1], gameEvent.getHealAmount(), "#8F8", "#000");
-					
-				else if(gameEvent.getEventType() === GameEvent.POISON_DAMAGE)
-					this._drawCell(screenPos[0], screenPos[1], gameEvent.getDamage(), "#0B0", "#000");
-			}	
-			// No game event so just draw the actor as usual
-			else
-				this._drawCell(screenPos[0], screenPos[1], "@", "#FFF", "#000");						
-		}	
+		if(viewableValue === "#")
+			this._drawCell(_col,_row, "", "#BBB", "#BBB");
 		else
-		{
-			// Clear killed actors for the moment
-			this._drawCell.draw(screenPos[0], screenPos[1], "", "#FFF", "#000");
-		}
+			this._drawCell(_col,_row, viewableValue, "#999");
+	
 	}
+	else if(viewedValue && viewedValue !== null)
+	{
+		if(viewedValue === "#")
+			this._drawCell(_col,_row, "", "#4B3", "#666");
+		else
+			this._drawCell(_col,_row, viewedValue, "#444");			
+	}	
+}
+
+p._renderActorCell = function(_actorsCellObject, _col, _row) 
+{
+	//var tempActor = _actorsCellObject.getElementFromValues(this._map_camera_col + i, this._map_camera_row + j);
+	var tempActor = _actorsCellObject.getElementFromValues(_col, _row);
+	
+	if(tempActor !== null && tempActor.isActorAlive() === true)
+	{
+		var gameEvent = tempActor.getGameEvent();
+	
+		if(gameEvent !== null)
+		{
+			// Just draw the attacker as normal here
+			if(gameEvent.getEventType() === GameEvent.ATTACK)
+				this._drawCell(_col, _row, "@", "#000", "#FFF");
+				
+			// Draw the number over the defenders head here
+			else if(gameEvent.getEventType() === GameEvent.DAMAGE)
+				this._drawCell(_col, _row, gameEvent.getDamage(), "#F00", "#000");
+			
+			// Draw the number over the actors head here
+			else if(gameEvent.getEventType() === GameEvent.HEAL)
+				this._drawCell(_col, _row, gameEvent.getHealAmount(), "#8F8", "#000");
+				
+			else if(gameEvent.getEventType() === GameEvent.POISON_DAMAGE)
+				this._drawCell(_col, _row, gameEvent.getDamage(), "#0B0", "#000");
+		}	
+		// No game event so just draw the actor as usual
+		else
+			this._drawCell(_col, _row, "@", "#FFF", "#000");		
+	}	
+}
+
+p._renderAll = function(_map, _actorsCellObject)
+{		
+	// Get the viewed map here and go through and draw currently viewable cells and if there aren't there draw viewed cells
+	for(var i=0; i < Globals.MAP_WINDOW_WIDTH; i++)	
+		for(var j=0; j < Globals.MAP_WINDOW_HEIGHT; j++)
+		{						
+			this._renderMapCell(_map, this._map_camera_col + i, this._map_camera_row + j)		
+			this._renderActorCell(_actorsCellObject, this._map_camera_col + i, this._map_camera_row + j)				
+		}	
 }
 
 p._init = function()

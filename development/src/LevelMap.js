@@ -114,7 +114,7 @@ p.canDraw = function()
 // Eventually may specify general position and whether to delete the cell afterwards
 p.getFreeCell = function()
 {
-	return this._freeCells.getRandomElement();
+	return this._freeCells.getRandomElementPosition();
 }
 
 //===================================================

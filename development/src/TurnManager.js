@@ -8,7 +8,7 @@ goog.provide( "tt.TurnManager" );
 // _args is an array of arguments
 TurnManager = function()
 {
-	//this._init();
+
 }
 
 var p = TurnManager.prototype;
@@ -17,19 +17,19 @@ var p = TurnManager.prototype;
 // Variables
 //===================================================
 
-
 //===================================================
 // Public Methods
 //===================================================
 
-TurnManager.getNextActor = function(_player, _actors)
+TurnManager.getNextActor = function(_player, _actorsCellObject)
 {		
 	// Make sure we have some actors existing
-	if(_actors.length > 0)
+	//if(_actors.length > 0)
+	if(_actorsCellObject.getNumberElements() > 0)
 	{
 		while(1)
 		{		
-			var readyReturnObject = this._getActorsReadyToMove(_actors);
+			var readyReturnObject = this._getActorsReadyToMove(_actorsCellObject);
 		
 			// If the player is in the actors who are ready then return the player as the next to move
 			if(readyReturnObject.player !== null)		
@@ -41,20 +41,15 @@ TurnManager.getNextActor = function(_player, _actors)
 			}		
 
 			// Need to increase actor timers here
-			for(var i=0; i<_actors.length; i++)
+			for(var key in _actorsCellObject.getData())
 			{
-				_actors[i].increaseMoveTimerTick();
+				_actorsCellObject.getElementFromKey(key).increaseMoveTimerTick();
 			}			
 		}
 	}
 	else
 		Utils.console("Error, no actors so cannot find next one to move");
 }
-
-/*TurnManager.actorMoved = function(_actor)
-{
-	_actor.
-}*/
 
 //===================================================
 // Private Methods
@@ -67,23 +62,25 @@ TurnManager._getClosestActorToPlayer = function(_player, _readyActorArray)
 }
 
 // Goes through the actors and get an array of those that have timer >= 100
-TurnManager._getActorsReadyToMove = function(_actors)
+TurnManager._getActorsReadyToMove = function(_actorsCellObject)
 {
 	var returnObject = {};
 	returnObject.player = null;
 
 	returnObject.actorsReadyArray = [];
-	
-	for(var i=0; i<_actors.length; i++)
+			
+	for(var key in _actorsCellObject.getData()) 
 	{
-		if(_actors[i].isReadyToMove())	
+		var tempActor = _actorsCellObject.getElementFromKey(key);
+	
+		if(tempActor.isReadyToMove())	
 		{
 			// If the player is one of the actors then add it separately here
-			if(_actors[i].isPlayer() === true)
-				returnObject.player = _actors[i];
+			if(tempActor.isPlayer() === true)
+				returnObject.player = tempActor;
 			// Don't bother to add the player to the ready actors 
 			else
-				returnObject.actorsReadyArray.push(_actors[i]);														
+				returnObject.actorsReadyArray.push(tempActor[key]);														
 		}
 	}
 
