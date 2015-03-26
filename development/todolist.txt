@@ -1,23 +1,27 @@
 
-NEED TO FIX THE AI SO IT WORKS!!! DONE
+Levels? Need all nice neat logic for this 
+	
+	LEVEL is DUMB all game logic goes in Game.js
+	
+CURRENTLY DOING level and map stuff (and camera stuff)
 
-Turn system
+I want just the player wandering around the map
 
-Needs to deal with speed (fast, slow, normal)
-Player starts each level with 100 timer, monsters start with 10
-When the player has the same timing as a monster then move the player first
-When more than one monster have the same timer then move the ones nearest the player first
+Put the los functions in the map and update the viewed cells in there - send it the position of the player
+	Renderer should just grab the map and render it
+
+Put free cell functions (ie positioning monsters etc.) in map? Or level?
+
+(think about saving/loading and recording before doing this)
 
 
-100 timer you get to move
-All actors with 100 or more treated the same
-move and it goes down to 0
-Each "tick" it increases by 10 for normal speed
-Slow and it increases by 5
-Fast and it increases by 20
+What is next? The map and moving about? Camera? These two first.
 
-Actors need a speed parameter
-And a basic AI function (attack the player for now - keep it in the game class for the moment)
+
+
+
+
+
 
 COMMIT AND PUSH YOUR CHANGES TO GITHUB!!!!
 

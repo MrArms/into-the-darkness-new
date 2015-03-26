@@ -5,10 +5,10 @@ goog.provide( "tt.Actor" );
 // Constructor
 //===================================================
 
-Actor = function(_col, _row, _health, _speed, _hasCounterAttack, _isPlayer)
+Actor = function(_health, _speed, _hasCounterAttack, _isPlayer)
 {
-	this._col = _col;
-	this._row = _row;
+	/*this._col = _col;
+	this._row = _row;*/
 	
 	this._maxHP = _health;
 	this._currentHP = _health;
@@ -36,10 +36,6 @@ Actor.NO_SPEED = 0;
 
 Actor.TIMER_MAX = 100;
 Actor.TIMER_TICK = 1;
-
-/*Actor.TIMER_SLOW = 5;
-Actor.TIMER_NORMAL = 10;
-Actor.TIMER_FAST = 20;*/
 
 Actor.TIMER_MONSTER_START = 1;
 Actor.TIMER_PLAYER_START = 100;
@@ -220,6 +216,12 @@ p.isActorAlive = function()
 p.getPosition = function()
 {		
 	return [this._col, this._row];
+}
+
+p.setPosition = function(_col, _row)
+{		
+	this._col = _col;
+	this._row = _row;
 }
 
 // Called by using a gameEvent from ActionGod

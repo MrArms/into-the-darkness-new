@@ -22,6 +22,19 @@ Globals.END_TURN_DELAY = 1.0;
 Globals.GAME_EVENT_ANIM_LENGTH = 0.35;
 Globals.DELAY_BETWEEN_ACTIONS = 0.25;
 
+Globals.MAP_START_COL = 5;
+Globals.MAP_START_ROW = 5;
+
+Globals.MAP_WINDOW_WIDTH = 80;
+Globals.MAP_WINDOW_HEIGHT = 36;
+
+Globals.SCREEN_WIDTH = 120;
+Globals.SCREEN_HEIGHT = 40;
+
+Globals.FONT_SIZE = 18;
+
+
+
 //===================================================
 // Variables
 //===================================================

@@ -58,11 +58,11 @@ Utils.shuffleArray = function(o)
     return o;
 }
 
-Utils.arrayContainsNumber = function(_array, _number)
+Utils.arrayContainsElement = function(_array, _element)
 {
 	for(var i=0; i<_array.length; i++)
 	{
-		if(_array[i] === _number)
+		if(_array[i] === _element)
 			return i;
 	}
 	
