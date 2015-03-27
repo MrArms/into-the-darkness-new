@@ -121,6 +121,12 @@ p._renderActorCell = function(_actorsCellObject, _col, _row)
 				
 			else if(gameEvent.getEventType() === GameEvent.POISON_DAMAGE)
 				this._drawCell(_col, _row, gameEvent.getDamage(), "#0B0", "#000");
+				
+			// Just showing a blue background for actors "animating" their move for the moment
+			// Note you can get the new position be calling gameEvent.getNewPosition() if needed
+			else if(gameEvent.getEventType() === GameEvent.MOVEMENT)
+				this._drawCell(_col, _row, "@", "#FFF", "#00F");
+	
 		}	
 		// No game event so just draw the actor as usual
 		else

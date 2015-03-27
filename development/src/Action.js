@@ -24,9 +24,12 @@ p._actor = null;
 p._targets = null;
 p._actionType = null;
 p._status = null;
+p._newPositions = null;
+p._level = null;
 
 Action.ATTACK = "attack";
 Action.STATUS = "status";
+Action.MOVE = "move";
 
 //===================================================
 // Public Methods
@@ -52,6 +55,16 @@ p.getStatus = function()
 	return this._status;
 }
 
+p.getNewPositions = function()
+{
+	return this._newPositions;
+}
+
+p.getLevel = function()
+{
+	return this._level;
+}
+
 //===================================================
 // Private Methods
 //===================================================
@@ -66,6 +79,12 @@ p._init = function(_actionType, _args)
 	{		
 		this._targets = _args[0];
 		this._status = _args[1];
+	}
+	else if(_actionType === Action.MOVE)
+	{		
+		this._targets = _args[0];
+		this._newPositions = _args[1];
+		this._level = _args[2];
 	}
 }
 

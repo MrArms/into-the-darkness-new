@@ -29,11 +29,14 @@ p._actor = null;
 p._eventType = null;
 p._damage = null;
 p._healAmount = null;
+p._newPosition = null;
+p._level = null;
 
 GameEvent.ATTACK = "attack";
 GameEvent.DAMAGE = "damage";
 GameEvent.HEAL = "heal";
 GameEvent.POISON_DAMAGE = "poison_damage";
+GameEvent.MOVEMENT = "movement";
 
 //===================================================
 // Public Methods
@@ -59,6 +62,16 @@ p.getHealAmount = function()
 	return this._healAmount;
 }
 
+p.getNewPosition = function()
+{
+	return this._newPosition;
+}
+
+p.getLevel = function()
+{
+	return this._level;
+}
+
 // This takes the actor involved and applies the GameEvent to them
 p.resolveGameEvent = function()
 {
@@ -82,6 +95,10 @@ p.resolveGameEvent = function()
 	else if(this._eventType === GameEvent.HEAl)
 	{
 		this._actor.heal( this.getHealAmount() );
+	}
+	else if(this._eventType === GameEvent.MOVEMENT)
+	{
+		this._level.moveActor(this._actor, this._newPosition);
 	}
 	
 	this._actor.removeGameEvent();
@@ -109,6 +126,11 @@ p._init = function(_eventType, _args)
 	else if(_eventType === GameEvent.HEAL)
 	{
 		this._healAmount = _args[0];
+	}
+	else if(_eventType === GameEvent.MOVEMENT)
+	{
+		this._newPosition = _args[0];
+		this._level = _args[1];
 	}
 }
 

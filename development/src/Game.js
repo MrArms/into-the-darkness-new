@@ -47,6 +47,23 @@ p._renderer = null;
 
 p.FPS = 60;
 
+
+p.CONTROL_MOVEMENT = "movement";
+p.CONTROL_NO_MOVE = "no_move";
+
+p._keyMap = {};
+
+p._keyMap[ROT.VK_NUMPAD8] = {controlType:p.CONTROL_MOVEMENT, direction:0};
+p._keyMap[ROT.VK_NUMPAD9] = {controlType:p.CONTROL_MOVEMENT, direction:1};
+p._keyMap[ROT.VK_NUMPAD6] = {controlType:p.CONTROL_MOVEMENT, direction:2}; 
+p._keyMap[ROT.VK_NUMPAD3] = {controlType:p.CONTROL_MOVEMENT, direction:3};
+p._keyMap[ROT.VK_NUMPAD2] = {controlType:p.CONTROL_MOVEMENT, direction:4}; 
+p._keyMap[ROT.VK_NUMPAD1] = {controlType:p.CONTROL_MOVEMENT, direction:5};
+p._keyMap[ROT.VK_NUMPAD4] = {controlType:p.CONTROL_MOVEMENT, direction:6}; 
+p._keyMap[ROT.VK_NUMPAD7] = {controlType:p.CONTROL_MOVEMENT, direction:7}; 
+
+p._keyMap[ROT.VK_NUMPAD5] = {controlType:p.CONTROL_MOVEMENT, direction:p.CONTROL_NO_MOVE}; 
+
 //===================================================
 // Public Methods
 //===================================================
@@ -128,14 +145,72 @@ p._nextTurn = function()
 	}					
 }	
 
-p._interpretPlayerMove = function()
-{
-	// Will need a test for this eventually
+p._interpretPlayerMove = function(_keyCode)
+{			
+	// Lock the controls while we resolve this command first
 	this._controlsLocked = true;
 
+	if(_keyCode.controlType === this.CONTROL_MOVEMENT)
+	{					
+		if(_keyCode.direction == this.CONTROL_NO_MOVE)
+		{
+			this._turnFinished();
+		}
+		else
+		{
+			// Eventually we're going to test for attacking monsters in here too *******
+		
+			var diff = ROT.DIRS[8][_keyCode.direction];			
+
+			var oldPos = this._player.getPosition();
+	
+			var newCol = oldPos[0] + diff[0];
+			var newRow = oldPos[1] + diff[1];
+			
+			var tempActors = this._getCurrentLevel().getActors();
+			
+			// Check the new position is walkable and if so check whether there is an enemy there instead
+			// Check the new position is walkable and if so check whether there is an enemy there instead
+			if(this._getCurrentLevel().getMap().canWalk(newCol, newRow))
+			{
+				var actor = tempActors.getElementFromValues(newCol, newRow);
+			
+				if(actor !== null)
+				{
+					// Do enemy stuff in here, will need to add alignment stuff first *****
+					
+					// Just unlock controls for the moment *****
+					this._controlsLocked = false;
+					
+				}
+				// Here the cell is empty and walkable and so we can move into it
+				else
+				{
+					// Need to create an action and gameEvent here somehow :/
+					this._actionGod.addAction(new Action(this._currentActor, Action.MOVE, [[ this._player ], [[newCol, newRow]], this._getCurrentLevel()] ) );	
+					this._actionGod.startAction(this._turnActionFinished.bind(this) );	
+				}
+			}			
+			else
+			{
+				// Can create an animation that does not end the actors turn here
+				
+				// Just unlock controls for the moment *****
+				this._controlsLocked = false;
+			}
+			
+			// this._getCurrentLevel().interpretPlayerMove(this._player, diff);					
+		}			
+	}
+	// Command not recognised, so set the controls to unlocked to wait for player command again
+	else
+	{
+		this._controlsLocked = false;
+	}
+
 	// Need to create an action here - temporary - will eventually poll the controls to determine this *****
-	this._actionGod.addAction(new Action(this._currentActor, Action.ATTACK, [[ this._getCurrentLevel().getActors[1]]] ) );	
-	this._actionGod.startAction(this._turnActionFinished.bind(this) );	
+	// this._actionGod.addAction(new Action(this._currentActor, Action.ATTACK, [[ this._getCurrentLevel().getActors[1]]] ) );	
+	// this._actionGod.startAction(this._turnActionFinished.bind(this) );	
 }
 
 // This says the action the actor performed during their turn has finished
@@ -192,6 +267,10 @@ p._keydownHandler = function(e)
 {
 	if(this._controlsLocked === false)
 	{
-		this._interpretPlayerMove();
+		var code = e.keyCode;		
+ 
+		if (!(code in this._keyMap)) { return; }
+		else	
+			this._interpretPlayerMove(this._keyMap[code]);
 	}
 }

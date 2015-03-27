@@ -1,10 +1,44 @@
 
-Convert the level._actors array into a CellDataObject
-	It will be easier to render and compare positions for calculations etc.
 
-I want just the player wandering around the map
+1) I want the player wandering around the map DONE
+	Need to interpret player controls and create action for "move" and the logic behind it (and a game event too?) DONE
+	
+Need to update the map los when the player moves 
 
-	Need to interpret player controls and create action for "move" and the logic behind it
+	
+Want to improve the animation system and give them timings that can last different lengths of time (eg. movement is faster than say an attack)
+	Then need to test the actors to see if all the animations have finished
+Also perhaps need an array of GameEvents possible on an actor rather than just one	
+Then need to implement knockback with damage and see if it all holds up
+	
+Need to create an action and gameEvent here somehow	for movement (remember all that shit?)
+
+Add attacking monsters (also need to add to them an alignment in case we want to add friendly units or tribes)
+	
+
+PUSH IT FIRST THING WHEN FINISHED THE ABOVE!!!!!!!
+Review level logic in Game.js - should it be moved to the level? Think of the role of each class
+Should CellDataObject.getData() stuff be simplified to be easier to use?
+
+2) Get the actors data from the GameConstants again
+3) Get monsters moving around the map too (using pathfinding as before)
+4) Check in
+5) Implement attacking monsters and them attacking you
+
+Create screen manager, menu, game over and instruction screens and send the game controls to each one (like before)
+	Also think about whether we want 1 renderer or one for each screen
+		SHOULD INSTRUCTIONS EVEN BE A SCREEN? Need them in game too? Or separate help system?
+
+
+
+
+THINK ABOUT SAVING/LOADING, RECORDING and REPLAYING THE GAME TURNS - find out how brogue does it
+
+
+Convert the level._actors array into a CellDataObject DONE
+	It will be easier to render and compare positions for calculations etc. DONE
+
+
 
 
 Put the los functions in the map and update the viewed cells in there - send it the position of the player
@@ -25,7 +59,7 @@ What is next? The map and moving about? Camera? These two first.
 
 COMMIT AND PUSH YOUR CHANGES TO GITHUB!!!!
 
-THINK ABOUT SAVING/LOADING, RECORDING and REPLAYING THE GAME TURNS 
+
 
 THINK ABOUT SECURITY!!!
 	

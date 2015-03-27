@@ -60,6 +60,22 @@ p.getMap = function()
 	return this._map;
 }
 
+p.moveActor = function(_actor, _newPosition)
+{
+	if(this._actors.hasElement(_newPosition[0], _newPosition[1]) === false)
+	{
+		var oldPos = _actor.getPosition();
+	
+		this._actors.setElement(_actor, _newPosition[0], _newPosition[1]);
+		this._actors.removeElementFromValues(oldPos[0], oldPos[1]);
+		
+		_actor.setPosition(_newPosition[0], _newPosition[1]);
+	}
+	else
+		Utils.console("ERROR! Moving an actor but there is already something in the destination cell");
+
+}
+
 //===================================================
 // Private Methods
 //===================================================

@@ -69,14 +69,16 @@ p.getViewedMapCells = function()
 
 p.canWalk = function(_x, _y)
 {
-	var tempChar = this.getCellChar(_x, _y);
+	// var tempChar = this.getCellChar(_x, _y);
+	var tempChar = this._mapCells.getElementFromValues(_x, _y);
 	
 	return (Utils.arrayContainsElement(GameGlobals.walkableTiles, tempChar) !== null);
 }
 
 p.isStairs = function(_x, _y)
 {
-	var tempChar = this.getCellChar(_x, _y);
+	// var tempChar = this.getCellChar(_x, _y);
+	var tempChar = this._mapCells.getElementFromValues(_x, _y);
 	
 	return (tempChar === '>');
 }

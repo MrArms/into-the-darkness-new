@@ -11,7 +11,7 @@ function Main () // data, devices, canvasID, wrapperDivID )
 var p = Main.prototype;
 
 p.init = function() //data) 
-{
+{	
 	this._game = new Game();
 }
 

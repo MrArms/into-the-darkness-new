@@ -97,6 +97,23 @@ p._processAction = function()
 		currentAction.getActor().addGameEvent(newGameEvent);
 		this._gameEventList.push( newGameEvent );	
 	}
+	// The targets are what moves here and not the actor making the action (it could be knockback for example)
+	else if(currentAction.getActionType() === Action.MOVE)
+	{
+		for(var i=0; i<currentAction.getTargets().length; i++)
+		{
+			var currentTarget = currentAction.getTargets()[i];
+			var newPosition = currentAction.getNewPositions()[i];
+	
+			// We should have already checked that the destination position is vacant before we even created the action, so no need to check it here
+			var newMovementGameEvent = new GameEvent(currentTarget, GameEvent.MOVEMENT, [newPosition, currentAction.getLevel()]);
+			
+			// Add it to the actor so the renderer can display the gameEvent
+			currentTarget.addGameEvent(newMovementGameEvent);				
+			this._gameEventList.push( newMovementGameEvent );	
+		}
+	
+	}
 	
 	// Need a callback here for when the animations have been completed, for now we are going to use a tween with a standard animation delay
 	//				but eventually we might want a more custom method for each animation type 
