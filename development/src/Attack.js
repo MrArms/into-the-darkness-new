@@ -28,13 +28,13 @@ Attack.resolve = function(_attacker, _defender)
 	return 3;		
 }
 
-Attack.getAttackTargets = function(_attacker, _actors, _direction, _attackType)
+Attack.getAttackTargets = function(_attacker, _actors, _targetCell, _attackType)
 {
 	var targets = null;
 
 	if(_attackType === Attack.SINGLE_TARGET_PATTERN)
 	{	
-		return Attack.getSingleTarget(_attacker, _actors, _direction);
+		return Attack.getSingleTarget(_attacker, _actors, _targetCell);
 	}
 	else if(_attackType === Attack.SURROUND_PATTERN)
 	{
@@ -42,12 +42,14 @@ Attack.getAttackTargets = function(_attacker, _actors, _direction, _attackType)
 	}
 }
 
-Attack.getSingleTarget = function(_attacker, _actors, _direction)
+Attack.getSingleTarget = function(_attacker, _actors, _targetCell)
 {
 	var targets = [];
 	
-	var targetCol = _attacker.getPosition()[0] + _direction[0];
-	var targetRow = _attacker.getPosition()[1] + _direction[1];
+	/*var targetCol = _targetCell[0]_attacker.getPosition()[0] + _direction[0];
+	var targetRow = _attacker.getPosition()[1] + _direction[1];*/
 	
+	targets.push( _actors.getElementFromValues(_targetCell[0], _targetCell[1]) );
+		
 	return targets;
 }

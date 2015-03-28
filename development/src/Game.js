@@ -282,10 +282,16 @@ p._turnFinished = function()
 
 p._removeDeadActors = function()
 {
-	for(var i=this._getCurrentLevel().getActors().length - 1; i>= 0; i--)
+	// for(var i=this._getCurrentLevel().getActors().length - 1; i>= 0; i--)
+			
+	for( var key in this._getCurrentLevel().getActors().getData() )
 	{
-		if(this._getCurrentLevel().getActors()[i].isActorAlive() === false)		
-			this._getCurrentLevel().getActors().splice(i, 1);		
+		var actors = this._getCurrentLevel().getActors();
+	
+		//var test = actors.getElementFromKey(key);
+		
+		if(actors.getElementFromKey(key).isActorAlive() === false)		
+			actors.removeElementByKey(key);	
 	}
 }
 

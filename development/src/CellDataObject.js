@@ -92,11 +92,11 @@ p.setElement = function(_element, _x, _y)
 	
 }
 
-/*p.removeElementByKey = function(_key)
+p.removeElementByKey = function(_key)
 {	
 	if(this._data[_key])
 		delete this._data[_key];
-}*/
+}
 
 p.removeElementFromValues = function(_x, _y)
 {

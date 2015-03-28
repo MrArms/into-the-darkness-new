@@ -1,5 +1,5 @@
 
-
+Actors not being removed after being killed FIXED
 
 Need to create an animation system that waits for gameEvents a different amount of time depending on what they are 
 	(it also wait for the longest one to finish)
