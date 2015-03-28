@@ -20,12 +20,25 @@ var p = ActionGod.prototype;
 // Variables
 //===================================================
 
+p._currentState = null;
+
+// This stores whether to wait for an animation or not (if it is more than 0)
+// If you just let it run to 0 frames then it takes an extra frame to process the next stage causing a nasty flicker
+p._waitForAnim = null;
+
+p._afterAnimWaitTime = null;
+
 p._actionQueue = null;
 
 // A list of gameEvents which are things that happen to an actor that also can be grabbed by the renderer to animate
 // When the animations have played on the actors then the actors get updated with the event
 // Game events contain the actor that the event is on
 p._gameEventList = null;
+
+p.STATE_IDLE = "idle";
+p.STATE_PROCESSING = "processing";
+p.STATE_WAITING_FOR_ANIM = "waiting_for_anim";
+p.STATE_WAITING_AFTER_ACTION = "waiting_after_action";
 
 //===================================================
 // Public Methods
@@ -47,13 +60,65 @@ p.addAction = function(_action)
 	this._actionQueue.push(_action);
 }
 
+p.update = function()
+{
+	if(this._currentState === this.STATE_IDLE || this._currentState === this.STATE_PROCESSING
+														|| this._currentState === this.STATE_WAITING_AFTER_ACTION)
+		return;
+		
+	else if(this._currentState === this.STATE_WAITING_FOR_ANIM)
+	{		
+		var animRunning = false;
+	
+		for(var i=0; i<this._gameEventList.length; i++)
+		{
+			this._gameEventList[i].updateAnimation();
+			
+			if(this._gameEventList[i].animationActive())
+				animRunning = true;
+		}
+		
+		if(animRunning === false)
+		{
+			this._currentState = this.STATE_WAITING_AFTER_ACTION;
+			this._resolveAction();
+		}
+		
+	}
+}
+
+p.getAfterAnimWaitTime = function()
+{
+	return this._afterAnimWaitTime;
+
+}
+
 //===================================================
 // Private Methods
 //===================================================
 
 p._reset = function()
 {
+	this._currentState = this.STATE_IDLE;
+	
+	this._waitForAnim = false; // This tells us whether to wait for an animation
+	this._afterAnimWaitTime = 0; // This tells us whether to pause at the end of the animation before another action or next turn is called
+
 	this._actionQueue = [];
+}
+
+p._addGameEvent = function(_gameEvent)
+{
+	this._gameEventList.push( _gameEvent );
+	this._setMaxAnimTime( _gameEvent );
+}
+
+// Takes the maximum anim time from all the game events (they can all be different length animations)
+p._setMaxAnimTime = function(_gameEvent)
+{
+	this._waitForAnim = this._waitForAnim || (_gameEvent.getTimer() > 0);	
+
+	this._afterAnimWaitTime = Math.max(this._afterAnimWaitTime, _gameEvent.getAfterAnimWaitTime());	
 }
 
 p._processAction = function()
@@ -74,15 +139,20 @@ p._processAction = function()
 			var newAttackGameEvent = new GameEvent(currentAction.getActor(), GameEvent.ATTACK, []);
 			
 			// Add it to the actor so the renderer can display the gameEvent 
-			currentAction.getActor().addGameEvent(newAttackGameEvent);			
-			this._gameEventList.push( newAttackGameEvent );
+			currentAction.getActor().addGameEvent(newAttackGameEvent);		
+			
+			this._addGameEvent( newAttackGameEvent );
+			
+			//this._gameEventList.push( newAttackGameEvent );
 			
 			// Show the target is hit
 			var newDamageGameEvent = new GameEvent(currentTarget, GameEvent.DAMAGE, [damage]);
 						
 			// Add it to the actor so the renderer can display the gameEvent 			
-			currentTarget.addGameEvent(newDamageGameEvent);				
-			this._gameEventList.push( newDamageGameEvent );											
+			currentTarget.addGameEvent(newDamageGameEvent);	
+
+			this._addGameEvent( newDamageGameEvent );
+			// this._gameEventList.push( newDamageGameEvent );											
 			
 			// If the target has a counter attack then add it here 
 			if( currentTarget.isActorAlive() === true && currentTarget.isHasCounterAttack() )
@@ -95,7 +165,8 @@ p._processAction = function()
 	{			
 		var newGameEvent = currentAction.getStatus().getGameEventFromStatus(currentAction.getActor());
 		currentAction.getActor().addGameEvent(newGameEvent);
-		this._gameEventList.push( newGameEvent );	
+		this._addGameEvent( newGameEvent );
+		// this._gameEventList.push( newGameEvent );	
 	}
 	// The targets are what moves here and not the actor making the action (it could be knockback for example)
 	else if(currentAction.getActionType() === Action.MOVE)
@@ -110,14 +181,24 @@ p._processAction = function()
 			
 			// Add it to the actor so the renderer can display the gameEvent
 			currentTarget.addGameEvent(newMovementGameEvent);				
-			this._gameEventList.push( newMovementGameEvent );	
+			// this._gameEventList.push( newMovementGameEvent );	
+			this._addGameEvent( newMovementGameEvent );	
 		}
 	
 	}
 	
+	// If we need to wait for an animation then do it here
+	if(this._waitForAnim === true)	
+		this._currentState = this.STATE_WAITING_FOR_ANIM;
+	
+	// Otherwise go straight to the next part
+	else	
+		this._resolveAction();
+	
+	
 	// Need a callback here for when the animations have been completed, for now we are going to use a tween with a standard animation delay
 	//				but eventually we might want a more custom method for each animation type 
-	TweenMax.delayedCall(Globals.GAME_EVENT_ANIM_LENGTH, this._resolveAction, [], this);
+	// TweenMax.delayedCall(Globals.GAME_EVENT_ANIM_LENGTH, this._resolveAction, [], this);
 
 }
 

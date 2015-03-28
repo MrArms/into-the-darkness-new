@@ -1,9 +1,12 @@
 
-Actors not being removed after being killed FIXED
 
-Need to create an animation system that waits for gameEvents a different amount of time depending on what they are 
-	(it also wait for the longest one to finish)
-		Perhaps it should use frames rather than a TweenMax delay
+
+Why is there still a delay of a frame or so after the player moves and the enemies move? FIXED (took two frames previously)
+
+
+Need to create an animation system that waits for gameEvents a different amount of time depending on what they are DONE
+	(it also wait for the longest one to finish) DONE
+		Perhaps it should use frames rather than a TweenMax delay DONE
 
 
 Need a function for determining the actors that get hit by an attack DONE (although only for the normal single cell attack) DONE

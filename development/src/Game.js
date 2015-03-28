@@ -232,9 +232,7 @@ p._interpretPlayerMove = function(_keyCode)
 				
 				// Just unlock controls for the moment *****
 				this._controlsLocked = false;
-			}
-			
-			// this._getCurrentLevel().interpretPlayerMove(this._player, diff);					
+			}			
 		}			
 	}
 	// Command not recognised, so set the controls to unlocked to wait for player command again
@@ -242,10 +240,6 @@ p._interpretPlayerMove = function(_keyCode)
 	{
 		this._controlsLocked = false;
 	}
-
-	// Need to create an action here - temporary - will eventually poll the controls to determine this *****
-	// this._actionGod.addAction(new Action(this._currentActor, Action.ATTACK, [[ this._getCurrentLevel().getActors[1]]] ) );	
-	// this._actionGod.startAction(this._turnActionFinished.bind(this) );	
 }
 
 // This says the action the actor performed during their turn has finished
@@ -274,10 +268,15 @@ p._turnFinished = function()
 	// Need to update the map viewable tiles here
 	this._updateVisibleMapFromPlayerPosition();
 	
-	// Slight delay before letting the next character move
-	// At the moment this is set to 0 as it is annoying, perhaps we will have a delay only after certain actions that we want a pause afterwards
-	//						so that the player can see what is going on more clearly
-	TweenMax.delayedCall(Globals.END_TURN_DELAY, this._nextTurn, [], this);
+	// Need to set the renderer camera position to the player position in case it has changed
+	this._renderer.setMapCameraPosition(this._player.getPosition()[0], this._player.getPosition()[1]);
+	
+	// Check for delay after the actions have been resolved - only have a delay for some actions (not move as it would be too annoying)
+	if(this._actionGod.getAfterAnimWaitTime() > 0)
+		TweenMax.delayedCall(this._actionGod.getAfterAnimWaitTime(), this._nextTurn, [], this);	
+	else
+		this._nextTurn();
+	
 }
 
 p._removeDeadActors = function()
@@ -304,8 +303,13 @@ p._onTimerTick = function(e)
 	if(this._doRenderMap === true)
 	{
 		// Make sure we aren't in the middle of recalculating fov 
-		if(this._getCurrentLevel().getMap().canDraw() === true)
+		if(this._getCurrentLevel().getMap().canDraw() === true)		
+		{
 			this._renderer.update(this._getCurrentLevel().getMap(), this._getCurrentLevel().getActors());
+		}
+		
+		this._actionGod.update();
+		
 	}
 }
 

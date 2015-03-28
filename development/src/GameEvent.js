@@ -32,11 +32,23 @@ p._healAmount = null;
 p._newPosition = null;
 p._level = null;
 
+p._timer = null;
+p._afterAnimWaitTime = null;
+
 GameEvent.ATTACK = "attack";
 GameEvent.DAMAGE = "damage";
 GameEvent.HEAL = "heal";
 GameEvent.POISON_DAMAGE = "poison_damage";
 GameEvent.MOVEMENT = "movement";
+
+GameEvent.ANIM_ATTACK = 5;
+GameEvent.ANIM_TIME_DAMAGE = 20;
+
+GameEvent.ANIM_TIME_HEAL = 20;
+GameEvent.ANIM_TIME_POISON_DAMAGE = 20;
+GameEvent.ANIM_TIME_MOVEMENT = 0; //5;
+
+GameEvent.ANIM_AFTER_ACTION_WAIT_TIME = 20;
 
 //===================================================
 // Public Methods
@@ -84,7 +96,7 @@ p.resolveGameEvent = function()
 		// Do nothing as the actor hasn't changed after attacking
 	}
 	else if(this._eventType === GameEvent.DAMAGE)
-	{
+	{		
 		this._actor.damage( this.getDamage() );
 	}
 	// The difference between this and normal damage is purely graphical
@@ -104,6 +116,26 @@ p.resolveGameEvent = function()
 	this._actor.removeGameEvent();
 }
 
+p.getTimer = function()
+{
+	return this._timer;
+}
+
+p.updateAnimation = function()
+{
+	this._timer = Math.max(0, this._timer - 1);
+}
+
+p.animationActive = function()
+{
+	return (this._timer && this._timer >= 0);
+}
+
+p.getAfterAnimWaitTime = function()
+{
+	return this._afterAnimWaitTime;
+}
+
 //===================================================
 // Private Methods
 //===================================================
@@ -113,22 +145,35 @@ p._init = function(_eventType, _args)
 	if(_eventType === GameEvent.ATTACK)
 	{
 		// Don't need any variables for the these events
+		
+		// Set anim timer
+		this._timer = GameEvent.ANIM_ATTACK;
+		this._afterAnimWaitTime = GameEvent.ANIM_AFTER_ACTION_WAIT_TIME;
 	}
 	else if(_eventType === GameEvent.POISON_DAMAGE)
-	{
-		// Shouldn't be hard coded really
+	{	
+		this._timer = GameEvent.ANIM_TIME_POISON_DAMAGE;
+		this._afterAnimWaitTime = GameEvent.ANIM_AFTER_ACTION_WAIT_TIME;
+	
+		// Shouldn't be hard coded really		
 		this._damage = 1;
 	}
 	else if(_eventType === GameEvent.DAMAGE)
 	{
+		this._timer = GameEvent.ANIM_TIME_DAMAGE;
+		this._afterAnimWaitTime = GameEvent.ANIM_AFTER_ACTION_WAIT_TIME;
 		this._damage = _args[0];
 	}
 	else if(_eventType === GameEvent.HEAL)
 	{
+		this._timer = GameEvent.ANIM_TIME_HEAL;
+		this._afterAnimWaitTime = GameEvent.ANIM_AFTER_ACTION_WAIT_TIME;
 		this._healAmount = _args[0];
 	}
 	else if(_eventType === GameEvent.MOVEMENT)
 	{
+		this._timer = GameEvent.ANIM_TIME_MOVEMENT;
+		this._afterAnimWaitTime = 0; // Don't want to wait after the turn has finished (too annoying)
 		this._newPosition = _args[0];
 		this._level = _args[1];
 	}

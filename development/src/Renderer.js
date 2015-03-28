@@ -75,9 +75,9 @@ p._renderMapCell = function(_map, _col, _row)
 	var viewedMapCells = _map.getViewedMapCells();
 
 	//var viewedValue = viewedMapCells.getElementFromValues(this._map_camera_col + i, this._map_camera_row + j);
-	var viewedValue = viewedMapCells.getElementFromValues(_col, _row);
+	var viewedValue = viewedMapCells.getElementFromValues(this._map_camera_col + _col, this._map_camera_row + _row);
 	//var viewableValue = currentViewableCells.getElementFromValues(this._map_camera_col + i, this._map_camera_row + j);
-	var viewableValue = currentViewableCells.getElementFromValues(_col, _row);
+	var viewableValue = currentViewableCells.getElementFromValues(this._map_camera_col + _col, this._map_camera_row + _row);
 
 	if(viewableValue && viewableValue !== null)
 	{
@@ -96,12 +96,16 @@ p._renderMapCell = function(_map, _col, _row)
 	}	
 }
 
-p._renderActorCell = function(_actorsCellObject, _col, _row) 
+p._renderActorCell = function(_map, _actorsCellObject, _col, _row) 
 {
-	//var tempActor = _actorsCellObject.getElementFromValues(this._map_camera_col + i, this._map_camera_row + j);
-	var tempActor = _actorsCellObject.getElementFromValues(_col, _row);
+	var currentViewableCells = _map.getCurrentViewableMapCells();
+	var viewedCellValue = currentViewableCells.getElementFromValues(this._map_camera_col + _col, this._map_camera_row + _row);
+
+	var tempActor = _actorsCellObject.getElementFromValues(this._map_camera_col + _col, this._map_camera_row + _row);
+	//var tempActor = _actorsCellObject.getElementFromValues(_col, _row);
 	
-	if(tempActor !== null && tempActor.isActorAlive() === true)
+	// Check the actor exists, is alive and is in a viewable part of the map
+	if(tempActor !== null && tempActor.isActorAlive() === true && viewedCellValue !== null)
 	{
 		var gameEvent = tempActor.getGameEvent();
 	
@@ -140,8 +144,10 @@ p._renderAll = function(_map, _actorsCellObject)
 	for(var i=0; i < Globals.MAP_WINDOW_WIDTH; i++)	
 		for(var j=0; j < Globals.MAP_WINDOW_HEIGHT; j++)
 		{						
-			this._renderMapCell(_map, this._map_camera_col + i, this._map_camera_row + j)		
-			this._renderActorCell(_actorsCellObject, this._map_camera_col + i, this._map_camera_row + j)				
+			// this._renderMapCell(_map, this._map_camera_col + i, this._map_camera_row + j);
+			this._renderMapCell(_map, i, j);
+			// this._renderActorCell(_actorsCellObject, this._map_camera_col + i, this._map_camera_row + j);				
+			this._renderActorCell(_map, _actorsCellObject, i, j);				
 		}	
 }
 
