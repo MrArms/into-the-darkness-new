@@ -41,7 +41,7 @@ p.addPlayer = function(_player)
 				
 	var startPos = this._map.getStartPos();
 	
-	this._setActorPosition(_player, startPos[0], startPos[1]);	
+	this._addActorAtPosition(_player, startPos[0], startPos[1]);	
 }
 
 p.initialiseActorTimers = function()
@@ -80,7 +80,7 @@ p.moveActor = function(_actor, _newPosition)
 // Private Methods
 //===================================================
 
-p._setActorPosition = function(_actor, _col, _row)
+p._addActorAtPosition = function(_actor, _col, _row)
 {
 	if(this._actors.getElementFromValues(_col, _row) !== null)
 		Utils.console("Error! Adding actor to position but there is already something there");
@@ -91,6 +91,14 @@ p._setActorPosition = function(_actor, _col, _row)
 
 p._createMonsters = function()
 {
+	var testNumberMonsters = 1;
+
+	for(var i=0; i<testNumberMonsters; i++)
+	{
+		var cellPosition = this._map.getFreeCell();
+		this._addActorAtPosition(new Actor("A"), cellPosition[0], cellPosition[1]);	
+	}
+
 	// Initialise test monsters
 	/*this._actors.push(new Actor(2,4, 20, Actor.NORMAL_SPEED, true, false)); // counter	
 	this._actors.push(new Actor(3,4, 15, Actor.FAST_SPEED, false, false)); 
@@ -111,7 +119,7 @@ p._init = function()
 	//this._actors = [];		
 	this._actors = new CellDataObject();		
 	
-	// this._createMonsters();
+	this._createMonsters();
 	
 }
 

@@ -5,12 +5,15 @@ goog.provide( "tt.Actor" );
 // Constructor
 //===================================================
 
-Actor = function(_health, _speed, _hasCounterAttack, _isPlayer)
+// Actor = function(_health, _speed, _hasCounterAttack, _isPlayer)
+Actor = function(_char)
 {
 	/*this._col = _col;
 	this._row = _row;*/
 	
-	this._maxHP = _health;
+	this._char = _char;
+	
+	/*this._maxHP = _health;
 	this._currentHP = _health;
 	
 	this._baseSpeed = _speed;
@@ -18,7 +21,7 @@ Actor = function(_health, _speed, _hasCounterAttack, _isPlayer)
 	
 	this._hasCounterAttack = _hasCounterAttack;
 	
-	this._isPlayer = _isPlayer;
+	this._isPlayer = _isPlayer;*/
 
 	this._init();
 }
@@ -39,6 +42,9 @@ Actor.TIMER_TICK = 1;
 
 Actor.TIMER_MONSTER_START = 1;
 Actor.TIMER_PLAYER_START = 100;
+
+p._char = null;
+p._baseColour = null;
 
 p._col = null;
 p._row = null;
@@ -61,6 +67,11 @@ p._currentGameEvent = null;
 //===================================================
 // Public Methods
 //===================================================
+
+p.getChar = function()
+{
+	return this._char;
+}
 
 p.isPlayer = function()
 {
@@ -239,6 +250,11 @@ p.heal = function(_amount)
 	this._currentHP = Math.min(this._maxHP, this._currentHP + _amount);
 }
 
+p.getAlignment = function()
+{
+	return this._alignment;
+}
+
 //===================================================
 // Private Methods
 //===================================================
@@ -251,6 +267,21 @@ p._kill = function()
 p._init = function()
 {		
 	this._isAlive = true;
+	
+	this._maxHP = GameGlobals.actorsData[this._char].max_hp;
+	this._currentHP = this._maxHP;
+	
+	this._baseSpeed = GameGlobals.actorsData[this._char].speed;
+	this._currentSpeed = this._baseSpeed;
+	
+	this._alignment = GameGlobals.actorsData[this._char].alignment;
+		
+	// Not adding attack/defence etc. just yet	
+	
+	// Just set to false for the moment ****
+	this._hasCounterAttack = false;
+	
+	this._isPlayer = this._char === "@";
 	
 	this._moveTimer = 0;
 	

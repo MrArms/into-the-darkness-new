@@ -83,8 +83,8 @@ p.getRandomElementPosition = function()
 
 p.setElement = function(_element, _x, _y)
 {
-	if(this.getElementFromValues(_x, _y) !== null)
-		Utils.console("WARNING! Setting element on top of an old one");
+	//if(this.getElementFromValues(_x, _y) !== null)
+	//	Utils.console("WARNING! Setting element on top of an old one");
 
 	this._data[this._getKeyFromValues(_x, _y)] = _element;
 	

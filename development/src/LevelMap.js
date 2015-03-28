@@ -116,7 +116,13 @@ p.canDraw = function()
 // Eventually may specify general position and whether to delete the cell afterwards
 p.getFreeCell = function()
 {
-	return this._freeCells.getRandomElementPosition();
+	var freeCellPosition = this._freeCells.getRandomElementPosition();
+	
+	// Remove the freeCell so we can't put another actor in the same place
+	this._freeCells.removeElementFromValues(freeCellPosition[0], freeCellPosition[1]);
+
+	// return this._freeCells.getRandomElementPosition();
+	return freeCellPosition;
 }
 
 //===================================================

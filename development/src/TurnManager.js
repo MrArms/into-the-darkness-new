@@ -80,7 +80,7 @@ TurnManager._getActorsReadyToMove = function(_actorsCellObject)
 				returnObject.player = tempActor;
 			// Don't bother to add the player to the ready actors 
 			else
-				returnObject.actorsReadyArray.push(tempActor[key]);														
+				returnObject.actorsReadyArray.push(tempActor);														
 		}
 	}
 

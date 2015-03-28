@@ -87,7 +87,7 @@ p._init = function()
 	window.addEventListener('keydown', function(e) { this._handle._keydownHandler(e); }.bind(this), false);
 			
 	// Initialise the player
-	this._player = new Actor(500, Actor.NORMAL_SPEED, false, true)
+	this._player = new Actor("@"); //500, Actor.NORMAL_SPEED, false, true)
 	
 	// Create first level
 	this._currentLevelIndex = 1;
@@ -112,18 +112,36 @@ p._startLevel = function()
 	this._getCurrentLevel().addPlayer(this._player);
 	
 	// Need to update the map viewable tiles from the player position
+	//this._getCurrentLevel().getMap().updateViewableTiles(this._player.getPosition()[0], this._player.getPosition()[1]);
+	
+	// Need to set the renderer camera position to the player position
+	//this._renderer.setMapCameraPosition(this._player.getPosition()[0], this._player.getPosition()[1]);
+	
+	// Set the initial actor times (player gets first move)
+	this._getCurrentLevel().initialiseActorTimers();
+			
+	// Update the visible part of the map
+	this._updateVisibleMapFromPlayerPosition();
+			
+	// Let the renderer draw the map
+	//this._doRenderMap = true;
+		
+	this._nextTurn();	
+}
+
+p._updateVisibleMapFromPlayerPosition = function()
+{
+	// Stop the renderer drawing the map whilst we recalculate the viewable tiles
+	this._doRenderMap = true;
+
+	// Need to update the map viewable tiles from the player position
 	this._getCurrentLevel().getMap().updateViewableTiles(this._player.getPosition()[0], this._player.getPosition()[1]);
 	
 	// Need to set the renderer camera position to the player position
 	this._renderer.setMapCameraPosition(this._player.getPosition()[0], this._player.getPosition()[1]);
 	
-	// Set the initial actor times (player gets first move)
-	this._getCurrentLevel().initialiseActorTimers();
-						
 	// Let the renderer draw the map
 	this._doRenderMap = true;
-		
-	this._nextTurn();	
 }
 
 p._nextTurn = function()
@@ -140,8 +158,17 @@ p._nextTurn = function()
 	// Otherwise get the AI move and start to perform it
 	else
 	{
-		this._actionGod.addAction(AI.getMove(this._currentActor, this._player));
-		this._actionGod.startAction(this._turnActionFinished.bind(this) );		
+		var monsterMove = AI.getMove(this._currentActor, this._getCurrentLevel().getActors(), this._player, this._getCurrentLevel(), this._getCurrentLevel().getMap());
+	
+		// If the monster is going to move then start the move here
+		if(monsterMove !== null)
+		{				
+			this._actionGod.addAction(monsterMove);
+			this._actionGod.startAction(this._turnActionFinished.bind(this) );
+		}
+		// Here the monster is not going to move so just call end turn 
+		else
+			this._turnFinished();
 	}					
 }	
 
@@ -157,9 +184,7 @@ p._interpretPlayerMove = function(_keyCode)
 			this._turnFinished();
 		}
 		else
-		{
-			// Eventually we're going to test for attacking monsters in here too *******
-		
+		{					
 			var diff = ROT.DIRS[8][_keyCode.direction];			
 
 			var oldPos = this._player.getPosition();
@@ -169,19 +194,28 @@ p._interpretPlayerMove = function(_keyCode)
 			
 			var tempActors = this._getCurrentLevel().getActors();
 			
-			// Check the new position is walkable and if so check whether there is an enemy there instead
-			// Check the new position is walkable and if so check whether there is an enemy there instead
+			// Check the new position is walkable and if so check whether there is an enemy there instead			
 			if(this._getCurrentLevel().getMap().canWalk(newCol, newRow))
 			{
 				var actor = tempActors.getElementFromValues(newCol, newRow);
 			
 				if(actor !== null)
 				{
-					// Do enemy stuff in here, will need to add alignment stuff first *****
+					// Check whether the alignment of the actor is the same or different to the player
+					// If it is different then attack the actor
+					if( this._player.getAlignment() !== actor.getAlignment() )
+					{
+						// Eventually we will get the attack targets using skills and status data
+						var targets = Attack.getAttackTargets(this._player, tempActors, [newCol, newRow], Attack.SINGLE_TARGET_PATTERN);
 					
-					// Just unlock controls for the moment *****
-					this._controlsLocked = false;
-					
+						this._actionGod.addAction(new Action(this._currentActor, Action.ATTACK, [targets] ) );	
+						this._actionGod.startAction(this._turnActionFinished.bind(this) );
+					}
+					else
+					{												
+						// Just unlock controls for the moment (as you haven't made a move since we do nothing to friendly actors)
+						this._controlsLocked = false;					
+					}
 				}
 				// Here the cell is empty and walkable and so we can move into it
 				else
@@ -191,9 +225,10 @@ p._interpretPlayerMove = function(_keyCode)
 					this._actionGod.startAction(this._turnActionFinished.bind(this) );	
 				}
 			}			
+			// We are trying to walk into an unwalkable cell here 
 			else
 			{
-				// Can create an animation that does not end the actors turn here
+				// Perhaps create an animation that does not end the actors turn here ***
 				
 				// Just unlock controls for the moment *****
 				this._controlsLocked = false;
@@ -236,7 +271,12 @@ p._turnFinished = function()
 	// Need to remove any actors killed this turn here
 	this._removeDeadActors();
 	
+	// Need to update the map viewable tiles here
+	this._updateVisibleMapFromPlayerPosition();
+	
 	// Slight delay before letting the next character move
+	// At the moment this is set to 0 as it is annoying, perhaps we will have a delay only after certain actions that we want a pause afterwards
+	//						so that the player can see what is going on more clearly
 	TweenMax.delayedCall(Globals.END_TURN_DELAY, this._nextTurn, [], this);
 }
 
