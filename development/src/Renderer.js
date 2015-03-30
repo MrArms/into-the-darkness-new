@@ -6,8 +6,10 @@ goog.provide( "tt.Renderer" );
 //===================================================
 
 // _args is an array of arguments
-Renderer = function()
+Renderer = function(_display)
 {
+	this._display = _display;
+
 	this._init();
 }
 
@@ -29,8 +31,6 @@ p._map_camera_row = null;
 // Will eventually send map, the camera position and the actors here
 p.update = function(_map, _actors)
 {
-	this._display.clear();
-
 	this._renderAll(_map, _actors);
 
 	//this._renderActors(_actors);
@@ -66,7 +66,6 @@ p._inWindowBounds = function(_col, _row)
 			|| _row < top || _row > top + Globals.MAP_WINDOW_HEIGHT);
 			
 	return (!outOfBounds);
-
 }
 
 p._renderMapCell = function(_map, _col, _row)
@@ -154,10 +153,7 @@ p._renderAll = function(_map, _actorsCellObject)
 p._init = function()
 {	
 	this._map_camera_col = 0;
-	this._map_camera_row = 0;
-	
-	this._display = new ROT.Display({width: Globals.SCREEN_WIDTH, height: Globals.SCREEN_HEIGHT, fontSize:Globals.FONT_SIZE});
-	document.body.appendChild(this._display.getContainer());
+	this._map_camera_row = 0;		
 }
 
 //===================================================

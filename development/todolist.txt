@@ -1,28 +1,121 @@
 
 
+WHY IS NEXT TURN CALLED TWICE???!?!??!
 
-Why is there still a delay of a frame or so after the player moves and the enemies move? FIXED (took two frames previously)
+Statuses can have multiple effects?
+	So need a list of StatusEffects and a globalList of statuses and which effects they have
+		In the Status we test to see what statusEffects are in affect from
+	NO DON'T MIX THEM UP
+		MAKE THEM ALL SEPARATE STATUS' but allow charms to have multiple status effects
+			As they get applied then they add the status effects to the status list!!!!
 
+Charms have a list of status effects
+	When applied they add to the status effects of the actor
+	When selected they update the display in much the same way as if they were applied, but stuff gets reapplied as the actor takes their turn
+			
 
-Need to create an animation system that waits for gameEvents a different amount of time depending on what they are DONE
-	(it also wait for the longest one to finish) DONE
-		Perhaps it should use frames rather than a TweenMax delay DONE
+Charms .... statusList:{attack:-1}		
 
-
-Need a function for determining the actors that get hit by an attack DONE (although only for the normal single cell attack) DONE
-
-
+Problem - status effects can either be on or off with a counter eg. Poison counter
+	The trouble is that we might want multiple effects that change say attack and we want them to stack
+		eg. attack +2, attack - 1 etc.
+			Need to cater for this as well
 	
-Want to improve the animation system and give them timings that can last different lengths of time (eg. movement is faster than say an attack)
-	Then need to test the actors to see if all the animations have finished
-Also perhaps need an array of GameEvents possible on an actor rather than just one	
+	Could split them into effects and status (again)
+		effects can have multiple values and stack by addition, whereas Status are just a counter
+			effects could work only on attack and defence values (and eventually evasion etc.)
+			
+	Need separate effects list from Status
+		They stack differently, some add together and some don't - need to manage them
+			
+	Charms have EFFECTS ONLY - although some can CAUSE A STATUS on an enemy when resolved
+		eg. poison_brand ---> causes poison on enemy
+			
+	Effects can be innate (not charms)
+	
+An innate effect is like a member of the effects in a charm
+	A charm has a list of effects basically and an actor can also have this effect innately
+			
+NEED TO ADD THE TIMER FOR THE CHARMS LIST!!!
+	As you want them valid until the start of your next turn   <====== THINK ABOUT THIS NEXT ***********
+	
+STATUS' can affect attack/defence values too :/
+Need to apply them too during the turn for certain status? YES I GUESS So
+		What's the difference between one of these status' and an effect? UGH
+		
+		
+Need to updateActors when you change the charms selected****
+	Need an inventory and UI for the charms - tidy up everything else before this ******
+	
+	
+Effects work DURING THE TURN - affect battles etc.
+Status effects work before/after the turn
+
+Effects don't combine in the way status' do. They just go one after each other in a list.
+
+BLESSINGS INSTEAD OF CHARMS?
+
+Need a separate effects class and to deal with them separately
+			
+Tomorrow
+
+Get bravery working add testCard array
+Get the UI updating when necessary for the player attack/defence
+
+AFTER - want a nice big tidy up 
+	Do we want to move the Game stuff into Level where appropriate? Yes I think so
+	
+After that PUSH
+
+After that think about recording/replaying/loading/saving - read up about it
+
+
+
+
+Need the ability to add innate effects to the actors
+	Need to tie this in with the status effects somehow
+	Need a way of getting values for Attack and updating UI when you add cards etc.
+
+1) Need a way of getting all the effects/status' on the actor that can affect stuff (also values need to be added to the actor class)
+		eg. Attack Bonus, Defence Bonus, Accuracy, Evasion JUST DOING ATTACK AND DEFENCE (Bonuses) for the moment
+		
+	Need to update stuff from the map - just doing actors surrounding for the moment
+		Actors, Enemies surrounding
+		Walls surrounding
+		
+Need a function that updates all actors with their surroundings (eg. actors adjacent etc.) - THIS HAPPENS AT THE START OF THE TURN
+	And another one that refreshes their values based on their effects
+		ALL ONE FUNCTION?
+	
+		IT ALSO HAPPENS AFTER EACH ACTION TOO (so number killed etc. increases attack if you have the right effect)
+
+		
+2) Need to display the player values for the above
+
+
+Need a way of calculating effects on the actor to give you 	
+	
+
+The actors take the values from the status effects on them (innate and other)
+		Innate can just create a never ending status effect!!!!!
+	
+	Also the player gets the values from currently selected cards to add to the calculation - JUST CREATE A DUMMY SELECTION AND USE THAT FOR THE MOMENT ******
+
+NEED TO CREATE A SIMPLE UI WITH PLAYER ATT AND DEFENCE BONUS VALUES
+	THEN CREATE A TEST CARD SELECTION DATA (they will have the same key names as status' if that's what they do)
+		THEN TEST BRAVERY IN GAME (make a couple of monsters)
+	
+Should we put all the level logic into Level rather than Game? ******** THINK ABOUT THIS - YES DO THIS AFTER UPDATING ACTOR VALUES FROM EFFECTS
+	
+Ignore UI for the moment (can you partially clear the screen? Would be nice to clear the UI cards, the UI mouse over and game windows separately)
+
 Then need to implement knockback with damage and see if it all holds up
 	
-Need to create an action and gameEvent here somehow	for movement (remember all that shit?)
 
 Add attacking monsters (also need to add to them an alignment in case we want to add friendly units or tribes)
 	
-
+Also perhaps need an array of GameEvents possible on an actor rather than just one	
+	
 PUSH IT FIRST THING WHEN FINISHED THE ABOVE!!!!!!!
 Review level logic in Game.js - should it be moved to the level? Think of the role of each class
 Should CellDataObject.getData() stuff be simplified to be easier to use?

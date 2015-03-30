@@ -22,7 +22,8 @@ p._oneTurn = null;
 
 Status.POISON = "poison";
 Status.REGEN = "regen";
-Status.ATTACK_PLUS = "attack_plus";
+// Status.ATTACK_PLUS = "attack_plus";
+// Status.BRAVERY = "bravery";
 
 //===================================================
 // Public Methods

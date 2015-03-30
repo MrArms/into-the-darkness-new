@@ -58,7 +58,7 @@ p.getRandomElementKey = function()
 	{
 		if(count === randomIndex)	
 			return key;
-			// return this.getIndicesFromKey(key);
+			// return Utils.getIndicesFromKey(key);
 		
 		count = count + 1;
 	}
@@ -78,7 +78,7 @@ p.getRandomElementPosition = function()
 {
 	var tempKey = this.getRandomElementKey();
 	
-	return this.getIndicesFromKey(tempKey);
+	return Utils.getIndicesFromKey(tempKey);
 }
 
 p.setElement = function(_element, _x, _y)
@@ -86,7 +86,7 @@ p.setElement = function(_element, _x, _y)
 	//if(this.getElementFromValues(_x, _y) !== null)
 	//	Utils.console("WARNING! Setting element on top of an old one");
 
-	this._data[this._getKeyFromValues(_x, _y)] = _element;
+	this._data[Utils.getKeyFromValues(_x, _y)] = _element;
 	
 	this._setNumberElements();
 	
@@ -100,9 +100,9 @@ p.removeElementByKey = function(_key)
 
 p.removeElementFromValues = function(_x, _y)
 {
-	if(this._data[this._getKeyFromValues(_x, _y)] !== null)
+	if(this._data[Utils.getKeyFromValues(_x, _y)] !== null)
 	{			
-		delete this._data[this._getKeyFromValues(_x, _y)];	
+		delete this._data[Utils.getKeyFromValues(_x, _y)];	
 	}
 	else
 		Utils.console("Error, trying to delete an element that doesn't exist");
@@ -112,15 +112,18 @@ p.removeElementFromValues = function(_x, _y)
 
 p.getElementFromValues = function(_x, _y)
 {
-	if(this._data[this._getKeyFromValues(_x, _y)])
-		return this._data[this._getKeyFromValues(_x, _y)];
+	if(this._data[Utils.getKeyFromValues(_x, _y)])
+		return this._data[Utils.getKeyFromValues(_x, _y)];
 	else
 		return null;
 }
 
 p.getElementFromKey = function(key)
 {
-	return this._data[key]
+	if(this._data[key] && this._data[key] !== null)
+		return this._data[key];
+	else
+		return null;	
 }
 
 p.moveElement = function(_oldX, _oldY, _newX, _newY)
@@ -140,7 +143,7 @@ p.moveElement = function(_oldX, _oldY, _newX, _newY)
 
 p.hasElement = function(_x, _y)
 {
-	return (this._data[this._getKeyFromValues(_x, _y)] !== undefined && this._data[this._getKeyFromValues(_x, _y)] !== null);
+	return (this._data[Utils.getKeyFromValues(_x, _y)] !== undefined && this._data[Utils.getKeyFromValues(_x, _y)] !== null);
 }
 
 p.getData = function()
@@ -159,14 +162,7 @@ p.getKey = function(_element)
 	return null;	
 }
 
-p.getIndicesFromKey = function(_key)
-{
-	var parts = _key.split(",");
-    var x = parseInt(parts[0]);
-    var y = parseInt(parts[1]);
-	
-	return [x,y];
-}
+
 
 //===================================================
 // Private Methods
@@ -182,11 +178,7 @@ p._setNumberElements = function()
 	this._numberElements = count;
 }
 
-p._getKeyFromValues = function(_x, _y)
-{
-	var key = _x + "," + _y;	
-	return key;
-}
+
 
 p._init = function()
 {	

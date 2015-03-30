@@ -1,27 +1,15 @@
 
 goog.provide( "tt.Actor" );
 
+goog.require( "tt.Effect" );
+
 //===================================================
 // Constructor
 //===================================================
 
-// Actor = function(_health, _speed, _hasCounterAttack, _isPlayer)
 Actor = function(_char)
 {
-	/*this._col = _col;
-	this._row = _row;*/
-	
-	this._char = _char;
-	
-	/*this._maxHP = _health;
-	this._currentHP = _health;
-	
-	this._baseSpeed = _speed;
-	this._currentSpeed = _speed;
-	
-	this._hasCounterAttack = _hasCounterAttack;
-	
-	this._isPlayer = _isPlayer;*/
+	this._char = _char;	
 
 	this._init();
 }
@@ -49,17 +37,38 @@ p._baseColour = null;
 p._col = null;
 p._row = null;
 
+
+// Stats
 p._maxHP = null;
 p._currentHP = null;
-p._isAlive = null;
-p._hasCounterAttack = null;
 
-p._isPlayer = null;
-
-p._moveTimer = null;
 p._baseSpeed = null;
 p._currentSpeed = null;
 
+p._baseAttackBonus = null;
+p._currentAttackBonus = null;
+
+p._baseDefenceBonus = null;
+p._currentDefenceBonus = null;
+
+// Level based attributes
+p._numberActorsAdjacent = null;
+
+// Innate effects
+p._innateEffects = null;
+
+// This stores effects from your charms
+p._charmEffects = null;
+// This stores temporary charms effects that get copid to the charmEffects at the end of the turn
+// We need these because we might keep swapping the charms selected and want to update the values in the UI
+// 		but we only want to add them to the list when the turn ends and the selection is made definite
+p._tempCharmEffects = null;
+
+// Other
+p._isAlive = null;
+p._hasCounterAttack = null; // NEED TO REIMPLEMENT THIS ****
+p._isPlayer = null;
+p._moveTimer = null;
 p._statusArray = null;
 
 p._currentGameEvent = null;
@@ -93,20 +102,10 @@ p.increaseMoveTimerTick = function()
 	this._moveTimer += (this._currentSpeed * Actor.TIMER_TICK);
 }
 
-/*p.getCurrentSpeed = function()  // NOT USED YET
-{
-	return this._currentSpeed;
-}*/
-
 p.isReadyToMove = function()
 {
 	return (this._isAlive === true && this._moveTimer >= Actor.TIMER_MAX);
 }
-
-/*p.resetMoveCounter = function()  // NOT USED YET DO IN END TURN STUFF ****
-{
-	this._moveTimer = 0;
-}*/
 
 p.addStatus = function(_statusType, _timer)
 {
@@ -123,14 +122,33 @@ p.addStatus = function(_statusType, _timer)
 		}
 	}
 	
-	// We eon't already have the status active so add it to the status array here
+	// We don't already have the status active so add it to the status array here
 	if(alreadyActive === false)
 	{
 		this._statusArray.push(new Status(_statusType, _timer));
 	}	
 }
 
-// Get the current actions associated with active status' and return them all in order to be processed
+p.addEffect = function(_effectType)
+{
+	
+
+}
+
+// These are stored and re-applied each turn (designed to be used by monsters rather than the player)
+p.addInnateEffects = function()
+{
+	// This is an array of effects that get re-applied every time the actor values are updated
+	this._innateEffects = [];
+
+	for(var i=0; i< GameGlobals.actorsData[this._char].effects.length; i++)	
+	{
+		var newEffect = new Effect(GameGlobals.actorsData[this._char].effects[i], -1);	
+		this._innateEffects.push(newEffect);
+	}
+}
+
+// Get the current actions associated with active status' and return them all in order to be processed by the actionGod
 p.getEndTurnStatusActions = function()
 {
 	var returnActionArray = [];
@@ -143,7 +161,7 @@ p.getEndTurnStatusActions = function()
 		if(this._statusArray[i].getStatusType() === Status.REGEN)		
 			returnActionArray.unshift(newAction);
 		// Other status' go on at the end
-		else
+		else if(this._statusArray[i].getStatusType() === Status.POISON)	
 		{
 			returnActionArray.push(newAction);	
 		}		
@@ -153,21 +171,34 @@ p.getEndTurnStatusActions = function()
 }
 
 p.turnStarted = function()
-{
+{	
 	// Update one turn status and anything else that needs to be done before the turn
-	for(var i=this._statusArray.length - 1; i>=0; i--)
+	/*for(var i=this._statusArray.length - 1; i>=0; i--)
 	{
 		this._statusArray[i].reduceTimer(true);
 		
 		if(this._statusArray[i].isActive() === false)
 			this._statusArray[i].splice(i, 1);
-	}
+	}*/
+	
+	// Update charm effects here - it should remove all the charms currently as they only last 1 turn, but we could introduce longer charm effects eventually
+	for(var i=this._charmEffects.length - 1; i>=0; i--)
+	{
+		this._charmEffects[i].reduceTimer(true);
+		
+		if(this._charmEffects[i].isActive() === false)
+			this._charmEffects[i].splice(i, 1);
+	}	
 }
 
 p.turnFinished = function()
 {
 	this._currentGameEvent = null;
 
+	// Copy the temp charm effects to the stored ones in this._charmEffects
+	for(var i=0; i<this._tempCharmEffects.length; i++)	
+		this._charmEffects.push(this._tempCharmEffects[i]);
+				
 	// Update status and anything else that needs to be done after the turn
 	for(var i=this._statusArray.length - 1; i>=0; i--)
 	{
@@ -255,9 +286,140 @@ p.getAlignment = function()
 	return this._alignment;
 }
 
+// This updates all values (at the moment just attack and defence bonus) from the status effects, 
+//					current cards helds, extra bonuses (monsters killed last turn etc.) and bonuses from the map (eg. number actors adjacent)
+// The _apply parameter tells us that the charms are to be applied by being added to the charmsEffects rather than just calculated here
+p.updateValuesFromLevel = function(_map, _actors, _charmsList)
+{
+	// Reset values first
+	this._numberActorsAdjacent = 0;
+	
+	this._currentAttackBonus = this._baseAttackBonus;
+	this._currentDefenceBonus = this._baseDefenceBonus;
+	
+	var adjacentCellKeys = Utils.getCellsSurroundingCell(this._col, this._row);
+	
+	for(var i=0; i<adjacentCellKeys.length; i++)
+	{
+		var actorTest = _actors.getElementFromKey(adjacentCellKeys[i]);
+	
+		if(_actors.getElementFromKey(adjacentCellKeys[i]) !== null)		
+			this._numberActorsAdjacent += 1;		
+	}
+	
+	// Need to go through the status effects IN ORDER STATUS' ARE APPLIED AT START/END OF TURN NOT DURING!!!
+	// CAN STATUS' AFFECT ATT/DEF VALUES? Possible yes.....ugh ****************************************************
+	// Effects are from charms - status' are from things happening to the characterSet
+	// You can only have 1 status effect of each type and their timers stack
+	// Effects are things such changes in attack value and you can have multiple effects of the same type occurring at once - adding another just adds to the list
+	// So if you are made vulnerable for example then that is an effect as you can have multiple affecting you at the same time.
+	// EFFECTS ARE PURELY FOR CHARMS AND LAST 1 TURN ******** DUNNO ABOUT THIS ****
+	// Charms effects timers are reduced and charm effects removed before the start of the next turn - status are done at the end
+	//			WHY? Could do both at the beginning of the turn **** DUNNO REALLY
+	
+	/*for(var i=0; i<this._statusArray.length; i++)	
+		this.updateValuesFromStatus(this._statusArray[i]);	*/
+	
+	
+		
+	// This is like the "effect" list in the charms (so not the same as a charm)	
+	var allEffects = [];
+	
+	for(var i=0; i< this._innateEffects.length; i++)	
+		allEffects.push(this._innateEffects[i]);	
+		
+	// At the moment charm effects only last 1 turn so this array should be empty now (as they would have been cleared at the start of the turn)
+	//	However we might add longer charm effects later on
+	for(var i=0; i< this._charmEffects.length; i++)	
+		allEffects.push(this._charmEffects[i]);	
+	
+	// Clear old temporary charm effects
+	this._tempCharmEffects = [];
+	
+	// If we're being passed the charms list for the player then add them to the effects list here
+	if(_charmsList && _charmsList !== null)
+	{
+		for(var i=0; i<_charmsList.length; i++)
+		{
+			var charmData = CharmGlobals.data(_charmsList[i]);
+		
+			if(charmData && charmData !== null)
+			{	
+				for(var key in charmData.effects)	
+				{				
+					allEffects.push( new Effect(charmData.effects[key]) );		// Add to the list to calculate (can just be to update UI as you select charms)
+					
+					// Add the the temp charm effect list to be copied to the actual charm effects when the turn ends
+					this._tempCharmEffects.push(new Effect(charmData.effects[key]) );	
+					
+					// if(_apply && _apply === true)
+					//	this._charmEffects.push( new Effect(charmData.effects[key]) );	// Add to the charms effect to still be in effect during opponents turns
+				}
+			}
+			else
+				Utils.console("Error, cannot find effect data for: " + _charmsList[i]);							
+		}
+	}
+	
+	// Now apply the effects in order	
+	for(var i=0; i<allEffects.length; i++)	
+		this.updateValuesFromEffect(allEffects[i]);	
+}
+
+
+// This will eventually list all the effects in the game and apply them
+p.updateValuesFromEffect = function(_effect)
+{	
+	if(_effect.getEffectType() === Effect.ATTACK)
+		this._currentAttackBonus += _effect.getValue();
+		
+	else if(_effect.getEffectType() === Effect.DEFENCE)
+		this._currentAttackBonus += _effect.getValue();
+
+	else if(_effect.getEffectType() === Effect.BRAVERY)
+		this._currentAttackBonus += this._numberActorsAdjacent;		
+}
+
+p.updateValuesFromStatus = function(_statusName)
+{
+	// Statuses caused by effects go in here ***
+}
+
+p.getCurrentAttackBonus = function()
+{
+	//p._baseAttackBonus = null;
+	
+	return this._currentAttackBonus;
+
+	// p._baseDefenceBonus = null;
+	// p._currentDefenceBonus
+
+}
+
 //===================================================
 // Private Methods
 //===================================================
+
+// NOT SURE THIS IS EVEN USED ANYMORE ****** DO WE WANT BOTH CHARMS AND STATUS STUFF IN HERE ANYWAY?
+p._hasStatus = function(_statusType, _selectedCharms)
+{
+	for(var i=0; i<this._statusArray.length; i++)
+	{
+		if(this._statusArray[i].getStatusType() === _statusType)
+			return true;
+	}
+	
+	if(_selectedCharms && _selectedCharms !== null)
+	{
+		for(var i=0; i<this._selectedCharms.length; i++)
+		{
+			if(this._selectedCharms[i] === _statusType)
+				return true;
+		}	
+	}
+		
+	return false;
+}
 
 p._kill = function()
 {
@@ -275,6 +437,17 @@ p._init = function()
 	this._currentSpeed = this._baseSpeed;
 	
 	this._alignment = GameGlobals.actorsData[this._char].alignment;
+	
+	this._baseAttackBonus = GameGlobals.actorsData[this._char].base_attack;
+	this._currentAttackBonus = this._baseAttackBonus;
+
+	this._baseDefenceBonus = GameGlobals.actorsData[this._char].base_defence;
+	this._currentDefenceBonus = this._baseDefenceBonus;
+		
+	// There are no charms active at the moment
+	this._charmEffects = [];	
+		
+	this.addInnateEffects();
 		
 	// Not adding attack/defence etc. just yet	
 	

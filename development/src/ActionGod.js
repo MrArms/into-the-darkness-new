@@ -194,12 +194,6 @@ p._processAction = function()
 	// Otherwise go straight to the next part
 	else	
 		this._resolveAction();
-	
-	
-	// Need a callback here for when the animations have been completed, for now we are going to use a tween with a standard animation delay
-	//				but eventually we might want a more custom method for each animation type 
-	// TweenMax.delayedCall(Globals.GAME_EVENT_ANIM_LENGTH, this._resolveAction, [], this);
-
 }
 
 // This applies the action to the actors after the animation has been completed
@@ -219,11 +213,15 @@ p._resolveAction = function()
 		if(this._actionQueue[j].getActor().isActorAlive() === false)		
 			this._actionQueue.splice(j, 1);					
 	}
-					
+	
+	// We need to update the actors here again as the situation may have changed (if knockback moves an actor or more enemies killed this turn etc.)	
+	if(this._actionQueue.length > 0)
+		this._actionQueue[0].getLevel().updateActors();
+						
 	// if we have any actions left then we need to start the next one in the queue
 	// Check the actor to perform the action is still alive too
 	if(this._actionQueue.length > 0)
-	{
+	{			
 		// We put a slight delay between actions
 		TweenMax.delayedCall(Globals.DELAY_BETWEEN_ACTIONS, this._processAction, [], this);		
 	}

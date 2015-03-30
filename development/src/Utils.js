@@ -146,6 +146,34 @@ Utils.itemIncludedInArray = function(arr,obj)
     return (arr.indexOf(obj) != -1);
 }
 
+Utils.getKeyFromValues = function(_x, _y)
+{
+	var key = _x + "," + _y;	
+	return key;
+}
+
+Utils.getIndicesFromKey = function(_key)
+{
+	var parts = _key.split(",");
+    var x = parseInt(parts[0]);
+    var y = parseInt(parts[1]);
+	
+	return [x,y];
+}
+
+Utils.getCellsSurroundingCell = function(_col, _row)
+{
+	var returnArray = [];
+	
+	for(var i=-1; i<=1; i++)
+		for(var j=-1; j<=1; j++)
+		{
+			if(i != 0 || j != 0)
+				returnArray.push(Utils.getKeyFromValues(_col + i, _row + j));			
+		}
+		
+	return returnArray;
+}
 
 
 /*Utils.hasKeyBeenPressed = function(_event, _symbol)

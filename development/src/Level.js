@@ -76,6 +76,14 @@ p.moveActor = function(_actor, _newPosition)
 
 }
 
+p.updateActors = function()
+{
+	for(var key in this._actors.getData())
+	{
+		this._actors.getElementFromKey(key).updateValuesFromLevel(this._map, this._actors)
+	}
+}
+
 //===================================================
 // Private Methods
 //===================================================

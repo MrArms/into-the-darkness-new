@@ -13,6 +13,7 @@ goog.require( "tt.Globals" );
 goog.require( "tt.GameGlobals" );
 goog.require( "tt.Level" );
 goog.require( "tt.LevelMap" );
+goog.require( "tt.UI" );
 
 
 
@@ -79,7 +80,11 @@ p._init = function()
 	
 	this._doRenderMap = false;
 
-	this._renderer = new Renderer();
+	this._display = new ROT.Display({width: Globals.SCREEN_WIDTH, height: Globals.SCREEN_HEIGHT, fontSize:Globals.FONT_SIZE});
+	document.body.appendChild(this._display.getContainer());
+	
+	this._UI = new UI(this._display);
+	this._renderer = new Renderer(this._display);
 	
 	this._actionGod = new ActionGod();
 	
@@ -111,21 +116,12 @@ p._startLevel = function()
 	// Add the player to the level
 	this._getCurrentLevel().addPlayer(this._player);
 	
-	// Need to update the map viewable tiles from the player position
-	//this._getCurrentLevel().getMap().updateViewableTiles(this._player.getPosition()[0], this._player.getPosition()[1]);
-	
-	// Need to set the renderer camera position to the player position
-	//this._renderer.setMapCameraPosition(this._player.getPosition()[0], this._player.getPosition()[1]);
-	
 	// Set the initial actor times (player gets first move)
 	this._getCurrentLevel().initialiseActorTimers();
 			
 	// Update the visible part of the map
 	this._updateVisibleMapFromPlayerPosition();
 			
-	// Let the renderer draw the map
-	//this._doRenderMap = true;
-		
 	this._nextTurn();	
 }
 
@@ -144,9 +140,11 @@ p._updateVisibleMapFromPlayerPosition = function()
 	this._doRenderMap = true;
 }
 
+// Considering putting this logic into the level *******
 p._nextTurn = function()
 {		
-	// Considering putting this logic into the level *******
+	this._getCurrentLevel().updateActors();
+		
 	this._currentActor = TurnManager.getNextActor(this._player, this._getCurrentLevel().getActors());	
 	this._currentActor.turnStarted();
 	
@@ -305,6 +303,8 @@ p._onTimerTick = function(e)
 		// Make sure we aren't in the middle of recalculating fov 
 		if(this._getCurrentLevel().getMap().canDraw() === true)		
 		{
+			this._display.clear();
+			this._UI.update(this._player);
 			this._renderer.update(this._getCurrentLevel().getMap(), this._getCurrentLevel().getActors());
 		}
 		

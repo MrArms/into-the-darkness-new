@@ -1,0 +1,6 @@
+
+
+Inventory
+
+Normal inventory stuff - items and equipment (can use consumbales)
+Charms - separate and have a maximum amount you can use

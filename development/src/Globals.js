@@ -25,7 +25,7 @@ Globals.DELAY_BETWEEN_ACTIONS = 0.2; //0.25;
 Globals.MAP_START_COL = 5;
 Globals.MAP_START_ROW = 5;
 
-Globals.MAP_WINDOW_WIDTH = 80;
+Globals.MAP_WINDOW_WIDTH = 50;
 Globals.MAP_WINDOW_HEIGHT = 36;
 
 Globals.SCREEN_WIDTH = 120;
@@ -35,6 +35,8 @@ Globals.FONT_SIZE = 18;
 
 Globals.COLOUR_WHITE = "#FFF"
 Globals.COLOUR_CYAN = "#1FF"
+
+Globals.TEXT_COLOUR_WHITE =   "%c{" + Globals.COLOUR_WHITE + "}";
 
 //===================================================
 // Variables
