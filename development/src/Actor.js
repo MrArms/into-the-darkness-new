@@ -213,9 +213,9 @@ p.heal = function(_amount)
 }
 
 // This updates all values (at the moment just attack and defence bonus) from the status effects, 
-//					current cards helds, extra bonuses (monsters killed last turn etc.) and bonuses from the map (eg. number actors adjacent)
-// They are only applied temporarily until the end of the turn when they are added to this._charmEffects to continue to work until the start of the next turn
-p.updateValuesFromLevel = function(_map, _actors) //, _charmsList)
+//					current charms selected, extra bonuses (monsters killed last turn etc.) and bonuses from the map (eg. number actors adjacent)
+// Charms are only applied temporarily until the end of the turn when they are added to this._charmEffects to continue to work until the start of the next turn
+p.updateValuesFromLevel = function(_map, _actors) 
 {
 	// Reset values first
 	this._currentAttackBonus = this._baseAttackBonus;
@@ -272,20 +272,6 @@ p.updateSelectedCharms = function(_map, _actors, _charmsList)
 //===================================================
 // Private Methods
 //===================================================
-
-// This will eventually list all the effects in the game and apply them
-// Could put in effect class, but then would have to expose all the actor variables and functions to modify them
-/*p._updateValuesFromEffect = function(_effect)
-{	
-	if(_effect.getEffectType() === Effect.ATTACK)
-		this._currentAttackBonus += _effect.getValue();
-		
-	else if(_effect.getEffectType() === Effect.DEFENCE)
-		this._currentAttackBonus += _effect.getValue();
-
-	else if(_effect.getEffectType() === Effect.BRAVERY)
-		this._currentAttackBonus += this._numberActorsAdjacent;		
-}*/
 
 p._getAllEffects = function() 
 {

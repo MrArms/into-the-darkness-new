@@ -1,15 +1,62 @@
 
+Code Refactor
+=============
+
+Keep renderer in Game - it just grabs the necessary stuff from the current level (it just needs the map and actors)
+Keep mouse/keyboard handling in game - it just gets passed to the level when needed (and checks for locked controls)
+
+Move from Game --> Level
+	
+	this._controlsLocked (have a function for Game to test this for doing the UI)
+		Call it something better maybe?
+	ActionGod
+	_startLevel
+	_updateVisibleMapFromPlayerPosition
+	Turn stuff - think about what happens here when you leave the level, don't want turns to keep getting called
+		Perhaps a levelActive parameter? Yuck
+	
+Add add/remove player methods to the Level
+Create a nicer game loop for going to and from levels
+Add a callback for player death in Level to Game
+Player needs to "exist" in both Game and Level - having two pointers might be a bit dodgy? Dunno should be alright really.
+Need a method in level for updating charms selected
+Need a "can update map" function in Level to see if it is ok to update the map yet?
+
+Want a separate actionGod for each level? Sure why not
+
+Where is the inventory going? Off Game would be the best bet as it carries over between levels
+
+Need to sort out the "can draw" flags and the "controls locked" flags too - horrible checks in Game.render method
+
+Where should the turn loop be? Presumably in the level itself?
+
+NOT SURE ABOUT THE ABOVE REALLY
+	Seems to work ok now?
+	
+	
+==== Adding multiple levels ======	
+	
+
+==== Adding screen manager and other screens ====
+
+Copy from previous project
+Pass the keyboard and mouse handling to the current screen to be processed
+
+
+
+
 ===== Tomorrow  =========
 
 WHY IS NEXT TURN CALLED TWICE???!?!??! Investigate this first SEEMS TO WORK FINE
 
 Decide whether to make getters/setters for actor values and then apply effects in the effects class rather than updateValuesFromEffect in actor DONE
 
-Then check in and PUSH (make a copy first)
+Then check in and PUSH (make a copy first) DONE
 
-Then go through and update the Status/Effect/Charms document properly
+Then go through and update the Status/Effect/Charms document properly THAT'LL DO FOR THE MOMENT
 
-
+1) Think about load/save and record/playthrough
+2) Add some more effects like counter attack (needs a hasEffect method in actor and then needs to be grabbed by Game/attack jobby)
 
 
 Charm names and their effect names need to be different UNLESS we just want one effect per charm - need to think about this

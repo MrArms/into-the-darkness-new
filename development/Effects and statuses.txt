@@ -1,0 +1,15 @@
+
+
+Statuses happen on actors (currently) at the end of the turn. They create actions and gameEvents and word with the ActionGod.
+Currently they cannot affect attack/defence/evasion etc..
+
+Effects are applied during the turns and affect attack/defence/evasion etc. but they don't directly create Actions or gameEvents.
+Whenever the state of the game changes the effects are reapplied to each actor.
+They CURRENTLY only last one turn - but this may change for monster innate effects like vulnerability and weaken.
+The timer is reduced at the start of each turn rather than the end.
+
+Charms have one or more effect associated with them
+Charms that are selected add to the players this._tempCharmEffects array and all the actors
+This is copied to the this._charmEffects at the end of their turn
+
+We could make both sets deplete the timer at the start rather than the end of the turn, but will leave it how it is for now. 

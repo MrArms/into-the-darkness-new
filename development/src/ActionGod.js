@@ -90,7 +90,6 @@ p.update = function()
 p.getAfterAnimWaitTime = function()
 {
 	return this._afterAnimWaitTime;
-
 }
 
 //===================================================

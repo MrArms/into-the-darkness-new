@@ -20,7 +20,7 @@ CharmGlobals.data["attack_plus_2"] = {name:"Attack +2", description:"Increases y
 // ADDED ANOTHER ATTACK POINT TO TEST MULTIPLE STATUS EFFECTS *****
 CharmGlobals.data[Charm.BRAVERY] = {name:"Bravery", description:"+1 attack for each enemy surrounding you", effects:[
 																							{name:"bravery_effect", value:1},
-																							{name:"attack_effect", value:3},
+																							{name:"attack_effect", value:1},
 																							] };
 
 // Want to be able to have multiple effects on the same card - can have rare cards with more than one effect on them
