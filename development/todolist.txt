@@ -1,6 +1,19 @@
 
+===== Tomorrow  =========
 
-WHY IS NEXT TURN CALLED TWICE???!?!??!
+WHY IS NEXT TURN CALLED TWICE???!?!??! Investigate this first SEEMS TO WORK FINE
+
+Decide whether to make getters/setters for actor values and then apply effects in the effects class rather than updateValuesFromEffect in actor DONE
+
+Then check in and PUSH (make a copy first)
+
+Then go through and update the Status/Effect/Charms document properly
+
+
+
+
+Charm names and their effect names need to be different UNLESS we just want one effect per charm - need to think about this
+
 
 Statuses can have multiple effects?
 	So need a list of StatusEffects and a globalList of statuses and which effects they have

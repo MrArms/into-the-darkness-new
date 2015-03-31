@@ -22,8 +22,6 @@ p._oneTurn = null;
 
 Status.POISON = "poison";
 Status.REGEN = "regen";
-// Status.ATTACK_PLUS = "attack_plus";
-// Status.BRAVERY = "bravery";
 
 //===================================================
 // Public Methods
@@ -39,30 +37,21 @@ p.isActive = function()
 	return this._timer > 0;
 }
 
-p.reduceTimer = function(_beforeTurn)
+p.reduceTimer = function()
 {
-	if(_beforeTurn === false || this._oneTurn === true)
-	{
-		this._timer -= 1; 	
-	}
+	this._timer = Math.max(0, this._timer - 1); 		
 }
 
 p.increaseTimer = function(_timer)
-{
-	if(this._oneTurn)
-		_timer = 2;
-	else
-	{
-		// Make sure the timer isn't negative first as a failsafe
-		this._timer = Math.max(0, this._timer);	
-		this._timer += _timer;	
-	}
+{	
+	// Make sure the timer isn't negative first as a failsafe
+	this._timer = Math.max(0, this._timer);	
+	this._timer += _timer;		
 }
 
-// This an action for the status - actions are things that happen with a set time that gameEvents can be applied to
+// This returns an action for the status - actions are things that happen with a set time that gameEvents can be applied to
 p.getAction = function(_actor)
 {		
-	// return (new Action(_actor, Action.STATUS, [[_actor], this._statusType]));	
 	return (new Action(_actor, Action.STATUS, [[_actor], this]));	
 }
 
@@ -109,11 +98,6 @@ p._init = function(_statusType, _timer)
 	else if(_statusType === Status.REGEN)
 	{
 		this._timer = _timer;
-	}
-	else if(_statusType === Status.ATTACK_PLUS)
-	{		
-		this._oneTurn = true;
-		this._timer = 2; // Timer set to 2 which will be reduced at the end of the turn and at the beginning of the next one
 	}
 
 }

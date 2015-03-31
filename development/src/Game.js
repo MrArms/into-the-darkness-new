@@ -141,6 +141,7 @@ p._updateVisibleMapFromPlayerPosition = function()
 }
 
 // Considering putting this logic into the level *******
+// NAH KEEP IT HERE - the level is as dumb as possible as are the actors
 p._nextTurn = function()
 {		
 	this._getCurrentLevel().updateActors();
@@ -151,6 +152,9 @@ p._nextTurn = function()
 	// Unlock the controls for the player turn
 	if(this._currentActor.isPlayer())
 	{
+		// TEST STUFF
+		this._player.updateSelectedCharms(this._getCurrentLevel().getMap(), this._getCurrentLevel().getActors(), [Charm.BRAVERY]);
+	
 		this._controlsLocked = false;
 	}
 	// Otherwise get the AI move and start to perform it
@@ -279,14 +283,10 @@ p._turnFinished = function()
 
 p._removeDeadActors = function()
 {
-	// for(var i=this._getCurrentLevel().getActors().length - 1; i>= 0; i--)
-			
 	for( var key in this._getCurrentLevel().getActors().getData() )
 	{
 		var actors = this._getCurrentLevel().getActors();
 	
-		//var test = actors.getElementFromKey(key);
-		
 		if(actors.getElementFromKey(key).isActorAlive() === false)		
 			actors.removeElementByKey(key);	
 	}
@@ -308,8 +308,7 @@ p._onTimerTick = function(e)
 			this._renderer.update(this._getCurrentLevel().getMap(), this._getCurrentLevel().getActors());
 		}
 		
-		this._actionGod.update();
-		
+		this._actionGod.update();		
 	}
 }
 

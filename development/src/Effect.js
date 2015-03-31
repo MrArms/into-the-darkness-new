@@ -20,39 +20,29 @@ p._effectType = null;
 p._timer = null;
 p._value = null;
 
-Effect.BRAVERY = "bravery";
-Effect.ATTACK = "attack";
-Effect.DEFENCE = "defence";
+Effect.BRAVERY = "bravery_effect";
+Effect.ATTACK = "attack_effect";
+Effect.DEFENCE = "defence_effect";
 
 //===================================================
 // Public Methods
 //===================================================
 
-p.getEffectType = function()
-{
-	return this._effectType;
-}
-
-p.isActive = function()
-{
-	return this._timer > 0;
-}
-
-p.reduceTimer = function(_beforeTurn)
+p.reduceTimer = function()
 {
 	this._timer -= 1; 		
 }
 
-/*p.increaseTimer = function(_timer)
-{	
-	// Make sure the timer isn't negative first as a failsafe
-	this._timer = Math.max(0, this._timer);	
-	this._timer += _timer;	
-}*/
+p.applyEffectToActor = function(_actor)
+{
+	if(this._effectType === Effect.ATTACK)
+		_actor.setCurrentAttackBonus(_actor.getCurrentAttackBonus() + this._value);
+		
+	else if(this._effectType === Effect.DEFENCE)
+		_actor.setCurrentDefenceBonus(_actor.getCurrentDefenceBonus() + this._value);
 
-p.getValue = function()
-{	
-	return this._value;
+	else if(this._effectType === Effect.BRAVERY)
+		_actor.setCurrentAttackBonus(_actor.getCurrentAttackBonus() + _actor.getNumberActorsAdjacent() );		
 }
 
 //===================================================
@@ -70,12 +60,27 @@ p._init = function(_effectData, _timer)
 		_timer = _timer
 	else
 		_timer = 1;
-		
-	//if(this._effectType === Effect.ATTACK)
-	//	this._value = 
 }
 
 //===================================================
 // Events
 //===================================================
 
+//===================================================
+// GETTERS & SETTERS
+//===================================================
+
+p.getEffectType = function()
+{
+	return this._effectType;
+}
+
+p.isActive = function()
+{
+	return this._timer > 0;
+}
+
+p.getValue = function()
+{	
+	return this._value;
+}

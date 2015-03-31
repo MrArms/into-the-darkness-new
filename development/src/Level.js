@@ -21,7 +21,6 @@ var p = Level.prototype;
 //===================================================
 
 p._actors = null;
-// p._currentActor = null;
 p._levelIndex = null;
 
 p._map = null;
@@ -36,9 +35,7 @@ p.getActors = function()
 }
 
 p.addPlayer = function(_player)
-{
-	// this._actors.unshift(_player);
-				
+{	
 	var startPos = this._map.getStartPos();
 	
 	this._addActorAtPosition(_player, startPos[0], startPos[1]);	
@@ -106,29 +103,15 @@ p._createMonsters = function()
 		var cellPosition = this._map.getFreeCell();
 		this._addActorAtPosition(new Actor("A"), cellPosition[0], cellPosition[1]);	
 	}
-
-	// Initialise test monsters
-	/*this._actors.push(new Actor(2,4, 20, Actor.NORMAL_SPEED, true, false)); // counter	
-	this._actors.push(new Actor(3,4, 15, Actor.FAST_SPEED, false, false)); 
-	this._actors.push(new Actor(4,4, 10, Actor.SLOW_SPEED, false, false)); 
-	
-	// Here add the status effects to the player and monsters to test 
-	this._actors[0].addStatus(Status.POISON, 3);
-	this._actors[0].addStatus(Status.REGEN, 7);
-	
-	this._actors[1].addStatus(Status.POISON, 2);
-	this._actors[1].addStatus(Status.REGEN, 1);*/
 }
 
 p._init = function()
 {	
 	this._map = new LevelMap(this._levelIndex);
-
-	//this._actors = [];		
+	
 	this._actors = new CellDataObject();		
 	
-	this._createMonsters();
-	
+	this._createMonsters();	
 }
 
 //===================================================
