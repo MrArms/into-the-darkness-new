@@ -1,48 +1,29 @@
-
-Code Refactor
-=============
-
-Keep renderer in Game - it just grabs the necessary stuff from the current level (it just needs the map and actors)
-Keep mouse/keyboard handling in game - it just gets passed to the level when needed (and checks for locked controls)
-
-Move from Game --> Level
-	
-	this._controlsLocked (have a function for Game to test this for doing the UI)
-		Call it something better maybe?
-	ActionGod
-	_startLevel
-	_updateVisibleMapFromPlayerPosition
-	Turn stuff - think about what happens here when you leave the level, don't want turns to keep getting called
-		Perhaps a levelActive parameter? Yuck
-	
-Add add/remove player methods to the Level
-Create a nicer game loop for going to and from levels
-Add a callback for player death in Level to Game
-Player needs to "exist" in both Game and Level - having two pointers might be a bit dodgy? Dunno should be alright really.
-Need a method in level for updating charms selected
-Need a "can update map" function in Level to see if it is ok to update the map yet?
-
-Want a separate actionGod for each level? Sure why not
-
-Where is the inventory going? Off Game would be the best bet as it carries over between levels
-
-Need to sort out the "can draw" flags and the "controls locked" flags too - horrible checks in Game.render method
-
-Where should the turn loop be? Presumably in the level itself?
-
-NOT SURE ABOUT THE ABOVE REALLY
-	Seems to work ok now?
-	
-	
+		
 ==== Adding multiple levels ======	
+
+Going up and downstairs sometimes locks the game - seems ok now - test a few more times then go onto load/save FIXED I THINK
+
+Then want to load and save the levels be pressing "S" and "L"
+
+Some info and code on storing and retrieving objects in javascript:
+http://stackoverflow.com/questions/2010892/storing-objects-in-html5-localstorage
+
+
+
+===== Add folders for different parts of the game ====
+
+Design which ones here first before you do anything
 	
 
 ==== Adding screen manager and other screens ====
 
-Copy from previous project
+Copy from previous project - but I don't want signals anymore as they are shite
 Pass the keyboard and mouse handling to the current screen to be processed
 
+==== Player dying =====
 
+Need to wait until the full turn is over and then test for player death (when removing dead actors probably)
+Then set the level to inactive (leave level maybe?) then tell the game screen you've died
 
 
 ===== Tomorrow  =========

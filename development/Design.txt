@@ -4,3 +4,15 @@ Inventory
 
 Normal inventory stuff - items and equipment (can use consumbales)
 Charms - separate and have a maximum amount you can use
+
+
+Skill points can be re-assigned? Not sure might be interesting.
+Or perhaps skills are reliant on equipment.
+Mind you I like the idea of a skill system with points that you assign. Let's you build up a character gradually. Spells/prayers etc.
+Could avoid the class/race stuff at the start perhaps....
+
+Interesting brogue design post
+http://brogue.createforumhosting.com/on-the-outlandish-balance-of-brogue-t497.html
+
+And in the Angband forums
+http://angband.oook.cz/forum/showthread.php?t=5798&page=2

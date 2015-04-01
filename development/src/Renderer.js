@@ -101,7 +101,6 @@ p._renderActorCell = function(_map, _actorsCellObject, _col, _row)
 	var viewedCellValue = currentViewableCells.getElementFromValues(this._map_camera_col + _col, this._map_camera_row + _row);
 
 	var tempActor = _actorsCellObject.getElementFromValues(this._map_camera_col + _col, this._map_camera_row + _row);
-	//var tempActor = _actorsCellObject.getElementFromValues(_col, _row);
 	
 	// Check the actor exists, is alive and is in a viewable part of the map
 	if(tempActor !== null && tempActor.isActorAlive() === true && viewedCellValue !== null)

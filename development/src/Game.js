@@ -47,6 +47,8 @@ p.FPS = 60;
 
 Game.CONTROL_MOVEMENT = "movement";
 Game.CONTROL_NO_MOVE = "no_move";
+Game.CONTROL_DOWN_STAIRS = "down_stairs";
+Game.CONTROL_UP_STAIRS = "up_stairs";
 
 p._keyMap = {};
 
@@ -59,7 +61,8 @@ p._keyMap[ROT.VK_NUMPAD1] = {controlType:Game.CONTROL_MOVEMENT, direction:5};
 p._keyMap[ROT.VK_NUMPAD4] = {controlType:Game.CONTROL_MOVEMENT, direction:6}; 
 p._keyMap[ROT.VK_NUMPAD7] = {controlType:Game.CONTROL_MOVEMENT, direction:7}; 
 
-p._keyMap[ROT.VK_NUMPAD5] = {controlType:Game.CONTROL_MOVEMENT, direction:Game.CONTROL_NO_MOVE}; 
+p._keyMap[ROT.VK_D] = {controlType:Game.CONTROL_MOVEMENT, direction:Game.CONTROL_DOWN_STAIRS}; 
+p._keyMap[ROT.VK_U] = {controlType:Game.CONTROL_MOVEMENT, direction:Game.CONTROL_UP_STAIRS}; 
 
 //===================================================
 // Public Methods
@@ -90,7 +93,7 @@ p._init = function()
 	// Create first level
 	this._currentLevelIndex = 1;
 	this._levels = [];
-	this._levels.push(new Level(1, this._playerLeavesLevel, this._playerDies));
+	this._levels.push(new Level(1, this, this._playerLeavesLevel, this._playerDies));
 	
 	setInterval(this._onTimerTick.bind(this), 1000 / this.FPS); // 33 milliseconds = ~ 30 frames per sec
 									
@@ -100,7 +103,7 @@ p._init = function()
 
 p._start = function()
 {
-	this._getCurrentLevel().joinLevel(this._player);
+	this._getCurrentLevel().joinLevel(this._player, true);
 }
 
 p._getCurrentLevel = function()
@@ -108,8 +111,7 @@ p._getCurrentLevel = function()
 	if(this._levels[this._currentLevelIndex - 1] && this._levels[this._currentLevelIndex - 1] !== null)
 		return this._levels[this._currentLevelIndex - 1]
 	else
-		return null;
-	//return this._levels[this._currentLevelIndex - 1];
+		return null;	
 }
 
 p._playerLeavesLevel = function(_up)
@@ -124,9 +126,9 @@ p._playerLeavesLevel = function(_up)
 		
 	// If the level doesn't exist then create it here
 	if(this._getCurrentLevel() === null)			
-		this._levels.push(new Level(this._currentLevelIndex, this._playerLeavesLevel, this._playerDies));	
+		this._levels.push(new Level(this._currentLevelIndex, this, this._playerLeavesLevel, this._playerDies));	
 		
-	this._getCurrentLevel().joinLevel(this._player);
+	this._getCurrentLevel().joinLevel(this._player, _up);
 }
 
 p._playerDies = function()

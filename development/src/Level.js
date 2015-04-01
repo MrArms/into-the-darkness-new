@@ -7,12 +7,12 @@ goog.provide( "tt.Level" );
 // Constructor
 //===================================================
 
-Level = function(_levelIndex, _leaveLevelCallback, _playerDiesCallback)
+Level = function(_levelIndex, _game, _leaveLevelCallback, _playerDiesCallback)
 {
 	this._levelIndex = _levelIndex;
 	
-	this._leaveLevelCallback = _leaveLevelCallback;
-	this._playerDiesCallback = _playerDiesCallback;
+	this._leaveLevelCallback = _leaveLevelCallback.bind(_game);
+	this._playerDiesCallback = _playerDiesCallback.bind(_game);
 
 	this._init()
 }
@@ -43,12 +43,12 @@ p._map = null;
 // Public Methods
 //===================================================
 
-p.joinLevel = function(_player)
+p.joinLevel = function(_player, _atStart)
 {
 	// Add the player to the level
 	// this._getCurrentLevel().addPlayer(this._player);
 	
-	this._addPlayer(_player);
+	this._addPlayer(_player, _atStart);
 	
 	// Set the initial actor times (player gets first move)
 	this._initialiseActorTimers();
@@ -80,14 +80,27 @@ p.interpretPlayerInput = function(_keyCode)
 		return;
 		
 	this._setControlLock(true);
-
-	if(_keyCode.direction === Game.CONTROL_NO_MOVE)
-	{
-		this._turnFinished();
-	}
-	else if(_keyCode.controlType === Game.CONTROL_MOVEMENT)
-	{					
-		this._processPlayerMove(_keyCode);
+	
+	if(_keyCode.controlType === Game.CONTROL_MOVEMENT)
+	{		
+		if(_keyCode.direction === Game.CONTROL_NO_MOVE)		
+			this._turnFinished();
+		else if(_keyCode.direction === Game.CONTROL_DOWN_STAIRS)
+		{
+			if(this._map.isDownStairs(this._player.getPosition()[0], this._player.getPosition()[1]) )
+				this._leaveLevel(false);
+			else
+				this._setControlLock(false);
+		}		
+		else if(_keyCode.direction === Game.CONTROL_UP_STAIRS)
+		{
+			if(this._map.isUpStairs(this._player.getPosition()[0], this._player.getPosition()[1]) )
+				this._leaveLevel(true);
+			else
+				this._setControlLock(false);
+		}
+		else	
+			this._processPlayerMove(_keyCode);
 	}	
 }
 
@@ -167,11 +180,12 @@ p._leaveLevel = function(_up)
 	this._leaveLevelCallback(_up);
 }
 
-p._addPlayer = function(_player)
+p._addPlayer = function(_player, _atStart)
 {	
 	this._player = _player;
-
-	var startPos = this._map.getStartPos();
+	
+	// If we are coming back down the stairs then set the player position to the end point of the level and not the start
+	var startPos = _atStart ? this._map.getStartPos() : this._map.getEndPos();
 	
 	this._addActorAtPosition(_player, startPos[0], startPos[1]);	
 }
