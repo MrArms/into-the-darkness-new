@@ -8,10 +8,8 @@ goog.require( "tt.CharmGlobals" );
 // Constructor
 //===================================================
 
-Actor = function(_char)
+Actor = function()
 {
-	this._char = _char;	
-
 	this._init();
 }
 
@@ -33,11 +31,10 @@ Actor.TIMER_MONSTER_START = 1;
 Actor.TIMER_PLAYER_START = 100;
 
 p._char = null;
-p._baseColour = null;
+// p._baseColour = null;
 
 p._col = null;
 p._row = null;
-
 
 // Stats
 p._maxHP = null;
@@ -67,7 +64,7 @@ p._tempCharmEffects = null;
 
 // Other
 p._isAlive = null;
-p._hasCounterAttack = null; // NEED TO REIMPLEMENT THIS ****
+// p._hasCounterAttack = null; // NEED TO REIMPLEMENT THIS ****
 p._isPlayer = null;
 p._moveTimer = null;
 p._statusArray = null;
@@ -77,6 +74,28 @@ p._currentGameEvent = null;
 //===================================================
 // Public Methods
 //===================================================
+
+p.create = function(_char)
+{
+	this._char = _char;	
+	this._isPlayer = this._char === "@";
+	
+	this._maxHP = GameGlobals.actorsData[this._char].max_hp;
+	this._currentHP = this._maxHP;
+	
+	this._baseSpeed = GameGlobals.actorsData[this._char].speed;
+	this._currentSpeed = this._baseSpeed;
+	
+	this._alignment = GameGlobals.actorsData[this._char].alignment;
+	
+	this._baseAttackBonus = GameGlobals.actorsData[this._char].base_attack;
+	this._currentAttackBonus = this._baseAttackBonus;
+
+	this._baseDefenceBonus = GameGlobals.actorsData[this._char].base_defence;
+	this._currentDefenceBonus = this._baseDefenceBonus;
+	
+	this.addInnateEffects();
+}
 
 p.addStatus = function(_statusType, _timer)
 {
@@ -96,7 +115,10 @@ p.addStatus = function(_statusType, _timer)
 	// We don't already have the status active so add it to the status array here
 	if(alreadyActive === false)
 	{
-		this._statusArray.push(new Status(_statusType, _timer));
+		var newStatus = new Status();
+		newStatus.create(_statusType, _timer);
+	
+		this._statusArray.push(newStatus);
 	}	
 }
 
@@ -108,7 +130,8 @@ p.addInnateEffects = function()
 
 	for(var i=0; i< GameGlobals.actorsData[this._char].effects.length; i++)	
 	{
-		var newEffect = new Effect(GameGlobals.actorsData[this._char].effects[i], -1);	
+		var newEffect = new Effect();
+		newEffect.create(GameGlobals.actorsData[this._char].effects[i], -1);	
 		this._innateEffects.push(newEffect);
 	}
 }
@@ -257,8 +280,12 @@ p.updateSelectedCharms = function(_map, _actors, _charmsList)
 			{	
 				for(var j=0; j<charmData.effects.length; j++)	
 				{					
+					var newEffect = new Effect();
+					newEffect.create(charmData.effects[j]);
+				
 					// Add the the temp charm effect list to be copied to the actual charm effects when the turn ends
-					this._tempCharmEffects.push(new Effect(charmData.effects[j]) );										
+					this._tempCharmEffects.push(newEffect);										
+					//this._tempCharmEffects.push(new Effect(charmData.effects[j]) );										
 				}
 			}
 			else
@@ -272,6 +299,24 @@ p.updateSelectedCharms = function(_map, _actors, _charmsList)
 //===================================================
 // Private Methods
 //===================================================
+
+p._init = function()
+{			
+	this._isAlive = true;
+	
+	this._moveTimer = 0;
+		
+	// There are no charms active at the moment
+	this._charmEffects = [];	
+	this._tempCharmEffects = [];	
+	this._innateEffects = [];
+	
+	this._tempCharmEffects = [];
+	
+	this._statusArray = [];
+	
+	this._currentGameEvent = null;
+}
 
 p._getAllEffects = function() 
 {
@@ -312,41 +357,7 @@ p._kill = function()
 	this._isAlive = false;
 }
 
-p._init = function()
-{		
-	this._isAlive = true;
-	
-	this._maxHP = GameGlobals.actorsData[this._char].max_hp;
-	this._currentHP = this._maxHP;
-	
-	this._baseSpeed = GameGlobals.actorsData[this._char].speed;
-	this._currentSpeed = this._baseSpeed;
-	
-	this._alignment = GameGlobals.actorsData[this._char].alignment;
-	
-	this._baseAttackBonus = GameGlobals.actorsData[this._char].base_attack;
-	this._currentAttackBonus = this._baseAttackBonus;
 
-	this._baseDefenceBonus = GameGlobals.actorsData[this._char].base_defence;
-	this._currentDefenceBonus = this._baseDefenceBonus;
-		
-	// There are no charms active at the moment
-	this._charmEffects = [];	
-	this._tempCharmEffects = [];	
-		
-	this.addInnateEffects();
-		
-	// Not adding attack/defence etc. just yet	
-	
-	// Just set to false for the moment ****
-	this._hasCounterAttack = false;
-	
-	this._isPlayer = this._char === "@";
-	
-	this._moveTimer = 0;
-	
-	this._statusArray = [];
-}
 
 //===================================================
 // Events
@@ -368,7 +379,7 @@ p.increaseMoveTimerTick = function() { this._moveTimer += (this._currentSpeed * 
 
 p.isReadyToMove = function() { return (this._isAlive === true && this._moveTimer >= Actor.TIMER_MAX); }
 
-p.isHasCounterAttack = function() { return this._hasCounterAttack; } // NEED TO REPLACE THIS WITH EFFECT JOBBY ***
+// p.isHasCounterAttack = function() { return this._hasCounterAttack; } // NEED TO REPLACE THIS WITH EFFECT JOBBY ***
 
 // The renderer looks for this to see whether there is any gameEvents to render (eg. damage etc.)
 p.getGameEvent = function() { return this._currentGameEvent; }
@@ -394,3 +405,98 @@ p.setCurrentDefenceBonus = function(_value) { this._currentDefenceBonus = _value
 p.getNumberActorsAdjacent = function() { return this._numberActorsAdjacent; }
 
 p.getAlignment = function() { return this._alignment; }
+
+//===================================================
+// LOADING & SAVING
+//===================================================
+
+p.getSaveObject = function()
+{
+	var saveObject = {};
+	
+	saveObject._char = this._char;	
+	saveObject._isPlayer = this._isPlayer;
+	
+	saveObject._col = this._col;
+	saveObject._row = this._row;
+	
+	saveObject._maxHP = this._maxHP;
+	saveObject._currentHP = this._currentHP;
+	
+	saveObject._baseSpeed = this._baseSpeed;
+	saveObject._currentSpeed = this._currentSpeed;
+	
+	saveObject._alignment = this._alignment;
+	
+	saveObject._baseAttackBonus = this._baseAttackBonus;
+	saveObject._currentAttackBonus = this._currentAttackBonus;
+
+	saveObject._baseDefenceBonus = this._baseDefenceBonus;
+	saveObject._currentDefenceBonus = this._currentDefenceBonus;
+	
+	saveObject._moveTimer = this._moveTimer;
+
+	saveObject._statusArray = [];
+	
+	for(var i=0; i<this._statusArray.length; i++)	
+		saveObject._statusArray.push(this._statusArray[i].getSaveObject());
+		
+	saveObject._innateEffects = [];
+	
+	for(var i=0; i<this._innateEffects.length; i++)	
+		saveObject._innateEffects.push(this._innateEffects[i].getSaveObject());
+		
+	saveObject._charmEffects = [];
+	
+	for(var i=0; i<this._charmEffects.length; i++)	
+		saveObject._charmEffects.push(this._charmEffects[i].getSaveObject());
+		
+	return saveObject; 
+}
+
+p.restoreFromSaveObject = function(_saveObject)
+{
+	this._char = _saveObject._char;	
+	this._isPlayer = _saveObject._isPlayer;
+	
+	this._col = _saveObject._col;
+	this._row = _saveObject._row;
+
+	this._maxHP = _saveObject._maxHP;
+	this._currentHP = _saveObject._currentHP;
+	
+	this._baseSpeed = _saveObject._baseSpeed;
+	this._currentSpeed = _saveObject._currentSpeed;
+	
+	this._alignment = _saveObject._alignment;
+	
+	this._baseAttackBonus = _saveObject._baseAttackBonus;
+	this._currentAttackBonus = _saveObject._currentAttackBonus;
+
+	this._baseDefenceBonus = _saveObject._baseDefenceBonus;
+	this._currentDefenceBonus = _saveObject._currentDefenceBonus;
+	
+	this._moveTimer = _saveObject._moveTimer;
+	
+	for(var i=0; i<_saveObject._statusArray.length; i++)	
+	{
+		var status = new Status();
+		status.restoreFromSaveObject(_saveObject._statusArray[i]);
+		this._statusArray.push(status);
+	}
+
+	for(var i=0; i<_saveObject._innateEffects.length; i++)	
+	{
+		var effect = new Effect();
+		effect.restoreFromSaveObject(_saveObject._innateEffects[i]);
+		this._innateEffects.push(status);
+	}
+
+	for(var i=0; i<_saveObject._charmEffects.length; i++)	
+	{
+		var effect = new Effect();
+		effect.restoreFromSaveObject(_saveObject._charmEffects[i]);
+		this._charmEffects.push(status);
+	}
+	
+}

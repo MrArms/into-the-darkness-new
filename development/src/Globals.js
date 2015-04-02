@@ -38,6 +38,9 @@ Globals.COLOUR_CYAN = "#1FF"
 
 Globals.TEXT_COLOUR_WHITE =   "%c{" + Globals.COLOUR_WHITE + "}";
 
+// This could be a variable eventually and called when loading in different files from the main menu (if we want that functionality)
+Globals.SAVE_GAME_NAME = "SAVE1";
+
 //===================================================
 // Variables
 //===================================================

@@ -1,8 +1,70 @@
 		
-==== Adding multiple levels ======	
+========== Add load and save ===================
 
-Going up and downstairs sometimes locks the game - seems ok now - test a few more times then go onto load/save FIXED I THINK
+Test and check the game in **** and push!!
 
+Need to think about random seed stuff for the game - look into this
+	Could save the level seeds at the start
+	Also could use that seed to generate contents for chests and drops for monsters when they are created.
+
+
+Then need to set up the game so you can save it (perhaps give the game a random name for the moment) and reload it later on	
+	
+BUGS
+
+
+Saving and loading straight away causes a blank screen FIXED
+Saving and loading elsewhere works, but you cannot move the player FIXED
+
+Players are copies of each other rather than the original - need to unify them all DONE
+
+
+Ok the "class" part of a level needs to be separate from the "data" part of a level
+You can create the class which consists of the class methods and the data 
+	Then either initialise through create() method or through a restore() method
+	
+	
+new Level() --- creates an empty level class with no data in it
+level1.create() ---- creates the stuff you want - levelData    (leave this stuff for now - actors, map etc, will do the same for this later on I think)
+level1.restore(_dataObject) - just stores this object where the above data is stored
+
+getDataObject
+		This stores the leveldata in an object and returns it
+restoreFromDataObject
+		This takes the levelData and creates a new levelData from it
+	
+
+	
+Level - class/data object
+	Actors - class/data objects
+	
+	
+Save 
+	returns levelData
+	
+
+Save object
+	Level.levelData (stores levelIndex etc. if that's all you need then just recreate it from the index when you load the level - NAH KEEP FOR THE MOMENT)
+	Level.actors = array containing each actorData object
+	Level.map = mapData object that you can recreate the map from
+	
+Need to serialise CellDataObject for load and save objects and use them in the map
+Then need to finish the Level stuff
+Then do the load/save from Game
+Then need to create and init all class types
+	Level, actors, celldataobjs, status, effects
+	
+	
+Need separate methods for each saveable object
+	_init()  this is stuff that is in both newly created and stored versions of the object
+	.create() this is when creating from scratch
+	.restore() this is when restoring the object from a saved object
+
+
+Could store simple data stuff in a data object for each class
+	eg. in actor all the _maxHP, _currentHP etc. as a dataObject._maxHP etc.
+	Then could save it as one object rather than having to manually copy over the values each time
+	
 Then want to load and save the levels be pressing "S" and "L"
 
 Some info and code on storing and retrieving objects in javascript:

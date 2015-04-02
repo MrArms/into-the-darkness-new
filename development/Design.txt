@@ -11,8 +11,14 @@ Or perhaps skills are reliant on equipment.
 Mind you I like the idea of a skill system with points that you assign. Let's you build up a character gradually. Spells/prayers etc.
 Could avoid the class/race stuff at the start perhaps....
 
+Could AVOID consumables and use cards cleverly to restore SP and HP!!!! 
+Can use cards to boost attacks or heal yourself instead perhaps or both with certain combos... could combine with actions you can perform (abilities, prayers etc.)
+
 Interesting brogue design post
 http://brogue.createforumhosting.com/on-the-outlandish-balance-of-brogue-t497.html
 
 And in the Angband forums
 http://angband.oook.cz/forum/showthread.php?t=5798&page=2
+
+Card conbinations for restoring lost values - maybe the "attack" and "defence" values can be used as a "force" that can be used in other ways - healing, restoring etc.
+	Can boost the cards for attack or something else

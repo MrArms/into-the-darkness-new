@@ -162,7 +162,19 @@ p.getKey = function(_element)
 	return null;	
 }
 
+p.destroy = function()
+{
+	// Call destroy method if applicable or otherwise just set the data value to null
+	for (var key in this._data)
+	{
+		if(this._data[key].destroy && this._data[key].destroy !== null)	
+			this._data[key].destroy();			
+		else
+			this._data[key] = null;
+	}
 
+	this._data = null;
+}
 
 //===================================================
 // Private Methods
@@ -178,8 +190,6 @@ p._setNumberElements = function()
 	this._numberElements = count;
 }
 
-
-
 p._init = function()
 {	
 	this._data = {};
@@ -190,3 +200,31 @@ p._init = function()
 //===================================================
 // Events
 //===================================================
+
+//===================================================
+// LOADING & SAVING
+//===================================================
+
+// This only works with objects that have single values as elements 
+// A cellDataObject of say actors needs a separate method for this
+p.getSaveObject = function()
+{
+	var saveObject = {}; 
+	
+	for(var key in this._data)
+	{
+		saveObject[key] = this._data[key];
+	}
+			
+	return saveObject;
+}
+
+p.restoreFromSaveObject = function(_saveObject)
+{
+	for(var key in _saveObject)
+	{
+		this._data[key] = _saveObject[key];
+	}
+
+	this._setNumberElements();
+}

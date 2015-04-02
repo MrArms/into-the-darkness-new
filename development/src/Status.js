@@ -5,9 +5,9 @@ goog.provide( "tt.Status" );
 // Constructor
 //===================================================
 
-Status = function(_statusType, _timer)
+Status = function() //_statusType, _timer)
 {
-	this._init(_statusType, _timer)
+	//this.init(_statusType, _timer)
 }
 
 var p = Status.prototype;
@@ -18,7 +18,6 @@ var p = Status.prototype;
 
 p._statusType = null;
 p._timer = null;
-p._oneTurn = null;
 
 Status.POISON = "poison";
 Status.REGEN = "regen";
@@ -26,6 +25,20 @@ Status.REGEN = "regen";
 //===================================================
 // Public Methods
 //===================================================
+
+p.create = function(_statusType, _timer)
+{		
+	this._statusType = _statusType;
+
+	if(_statusType === Status.POISON)
+	{
+		this._timer = _timer;
+	}
+	else if(_statusType === Status.REGEN)
+	{
+		this._timer = _timer;
+	}
+}
 
 p.getStatusType = function()
 {
@@ -86,23 +99,26 @@ p._getPoisonDamage = function()
 	return 1;
 }
 
-p._init = function(_statusType, _timer)
-{		
-	this._statusType = _statusType;
-	this._oneTurn = false;
-
-	if(_statusType === Status.POISON)
-	{
-		this._timer = _timer;
-	}
-	else if(_statusType === Status.REGEN)
-	{
-		this._timer = _timer;
-	}
-
-}
-
 //===================================================
 // Events
 //===================================================
 
+//===================================================
+// LOADING & SAVING
+//===================================================
+
+p.getSaveObject = function()
+{
+	var saveObject = {};
+	
+	saveObject._statusType = this._statusType;
+	saveObject._timer = this._timer;	
+	
+	return saveObject;
+}
+
+p.restoreFromSaveObject = function(_saveObject)
+{
+	this._statusType = _saveObject._statusType;
+	this._timer = _saveObject._timer;	
+}

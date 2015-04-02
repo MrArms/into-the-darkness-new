@@ -5,9 +5,9 @@ goog.provide( "tt.Effect" );
 // Constructor
 //===================================================
 
-Effect = function(_effectType, _timer)
+Effect = function() //_effectType, _timer)
 {
-	this._init(_effectType, _timer)
+	//this._init(_effectType, _timer)
 }
 
 var p = Effect.prototype;
@@ -27,6 +27,19 @@ Effect.DEFENCE = "defence_effect";
 //===================================================
 // Public Methods
 //===================================================
+
+p.init = function(_effectData, _timer)
+{		
+	this._effectType = _effectData.name;
+	
+	if(_effectData.value && _effectData.value !== null)
+		this._value = _effectData.value;
+	
+	if(_timer && _timer !== null)
+		_timer = _timer
+	else
+		_timer = 1;
+}
 
 p.reduceTimer = function()
 {
@@ -49,18 +62,6 @@ p.applyEffectToActor = function(_actor)
 // Private Methods
 //===================================================
 
-p._init = function(_effectData, _timer)
-{		
-	this._effectType = _effectData.name;
-	
-	if(_effectData.value && _effectData.value !== null)
-		this._value = _effectData.value;
-	
-	if(_timer && _timer !== null)
-		_timer = _timer
-	else
-		_timer = 1;
-}
 
 //===================================================
 // Events
@@ -70,17 +71,30 @@ p._init = function(_effectData, _timer)
 // GETTERS & SETTERS
 //===================================================
 
-p.getEffectType = function()
+p.getEffectType = function() { return this._effectType;}
+
+p.isActive = function() { return this._timer > 0; }
+
+p.getValue = function() { return this._value; }
+
+//===================================================
+// LOADING & SAVING
+//===================================================
+
+p.getSaveObject = function()
 {
-	return this._effectType;
+	var saveObject = {};
+	
+	saveObject._effectType = this._effectType;
+	saveObject._timer = this._timer;	
+	saveObject._value = this._value;	
+	
+	return saveObject;
 }
 
-p.isActive = function()
+p.restoreFromSaveObject = function(_saveObject)
 {
-	return this._timer > 0;
-}
-
-p.getValue = function()
-{	
-	return this._value;
+	this._effectType = _saveObject._effectType;
+	this._timer = _saveObject._timer;	
+	this._value = _saveObject._value;	
 }

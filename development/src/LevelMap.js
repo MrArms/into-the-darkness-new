@@ -7,11 +7,9 @@ goog.require( "tt.CellDataObject" );
 // Constructor
 //===================================================
 
-LevelMap = function(_levelIndex)
+LevelMap = function() 
 {
-	this._levelIndex = _levelIndex;
-
-	this._init()
+	this._init();
 }
 
 var p = LevelMap.prototype;
@@ -23,9 +21,6 @@ var p = LevelMap.prototype;
 p.MAP_WIDTH = 18; //22; //35; //92;  // <60 and we run out of free cells 
 p.MAP_HEIGHT = 15; //18; //25;
 
-// p._leftMostCell = null;
-// p._rightMostCell = null;
-
 p._startPos = null;
 p._endPos = null;
 
@@ -33,8 +28,6 @@ p._mapDigger = null;
 
 // This tells us whether we can redraw the map or not, when recalculating fov then we set this to false
 p._canDraw = null;
-
-// p.DISTANCE_FROM_EDGE_FOR_STAIRS = 0 ;//2;
 
 // Stores the map cells
 p._mapCells = null;
@@ -51,6 +44,22 @@ p._freeCells = null;
 //===================================================
 // Public Methods
 //===================================================
+
+p.create = function(_levelIndex)
+{
+	this._levelIndex = _levelIndex
+
+	this._generateMap(this._levelIndex);
+		
+	this._startPos = this.getFreeCell();  
+	
+	// We don't want stairs on the bottom level
+	if(this._levelIndex > 1)
+		this._mapCells.setElement("<", this._startPos[0], this._startPos[1]);
+	
+	this._endPos = this.getFreeCell();  
+	this._mapCells.setElement(">", this._endPos[0], this._endPos[1]);	
+}
 
 p.updateViewableTiles = function(_col, _row)
 {
@@ -83,6 +92,18 @@ p.getFreeCell = function()
 // Private Methods
 //===================================================
 
+p._init = function()
+{	
+	this._canDraw = true;
+
+	this._mapCells = new CellDataObject();
+	this._currentViewableCells = new CellDataObject();
+	this._viewedMapCells = new CellDataObject();		
+
+	// This stores empty squares where we can place things
+	this._freeCells = new CellDataObject(); 	
+}
+
 // This function outputs the visible cells
 p._fovOutput = function(_col, _row, r, visibility)
 {
@@ -111,10 +132,7 @@ p._canLightPass = function(_col, _row)
 p._generateMap = function(_levelIndex)
 {
 	this._mapDigger = new ROT.Map.Digger(this.MAP_WIDTH, this.MAP_HEIGHT, {corridorLength:[2,3], dugPercentage:0.3});
-	
-	// This stores empty squares where we can place things
-	this._freeCells = new CellDataObject(); 
-	
+			
 	var digCallback = function(x, y, isWall) 
 	{
 		if (isWall) { return; } /* do not store walls */
@@ -127,31 +145,7 @@ p._generateMap = function(_levelIndex)
 	
 	this._mapDigger.create(digCallback.bind(this));	
 
-	// var rooms = this._mapDigger.getRooms();
-}
-
-p._init = function()
-{	
-	this._canDraw = true;
-
-	this._mapCells = new CellDataObject();
-	this._currentViewableCells = new CellDataObject();
-	this._viewedMapCells = new CellDataObject();
-	
-	this._generateMap(this._levelIndex);
-		
-	this._startPos = this.getFreeCell();  
-	
-	// We don't want stairs on the bottom level
-	if(this._levelIndex > 1)
-		this._mapCells.setElement("<", this._startPos[0], this._startPos[1]);
-	
-	this._endPos = this.getFreeCell();  
-	this._mapCells.setElement(">", this._endPos[0], this._endPos[1]);
-		
-	// // Just set the start position to any free cell for the momentz	
-	// this._setStartAndEndPosition();
-	
+	// var rooms = this._mapDigger.getRooms(); // IF WE WANT ROOMS WE'LL NEED TO SAVE AND RELOAD THEM ****
 }
 
 //===================================================
@@ -197,4 +191,62 @@ p.isUpStairs = function(_x, _y)
 	var tempChar = this._mapCells.getElementFromValues(_x, _y);
 	
 	return (tempChar === '>');
+}
+
+p.destroy = function()
+{	
+	this._startPos = null;
+	this._endPos = null;
+
+	this._mapDigger = null;
+	
+	this._mapCells.destroy();
+	this._mapCells = null;
+	
+	this._currentViewableCells.destroy();
+	this._currentViewableCellss = null;
+	
+	this._viewedMapCells.destroy();
+	this._viewedMapCellss = null;
+	
+	this._freeCells.destroy();
+	this._freeCells = null;
+}
+
+//===================================================
+// LOADING & SAVING
+//===================================================
+
+p.getSaveObject = function()
+{
+	var saveObject = {};
+	
+	saveObject._startPos = this._startPos;
+	saveObject._endPos = this._endPos;
+	saveObject._mapCells = this._mapCells.getSaveObject();
+	saveObject._currentViewableCells = this._currentViewableCells.getSaveObject();
+	saveObject._viewedMapCells = this._viewedMapCells.getSaveObject();
+	saveObject._freeCells = this._freeCells.getSaveObject();	
+	
+	return saveObject;
+}
+
+p.restoreFromSaveObject = function(_saveObject)
+{
+	this._canDraw = true;
+
+	this._startPos = _saveObject._startPos;
+	this._endPos = _saveObject._endPos;
+	
+	this._mapCells = new CellDataObject();	
+	this._mapCells.restoreFromSaveObject(_saveObject._mapCells);
+	
+	this._currentViewableCells = new CellDataObject();	
+	this._currentViewableCells.restoreFromSaveObject(_saveObject._currentViewableCells);
+
+	this._viewedMapCells = new CellDataObject();	
+	this._viewedMapCells.restoreFromSaveObject(_saveObject._viewedMapCells);
+	
+	this._freeCells = new CellDataObject();	
+	this._freeCells.restoreFromSaveObject(_saveObject._freeCells);	
 }

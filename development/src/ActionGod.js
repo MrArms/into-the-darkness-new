@@ -9,8 +9,10 @@ goog.require( "tt.GameEvent" );
 //===================================================
 
 
-ActionGod = function()
+ActionGod = function(_level)
 {
+	this._level = _level;
+
 	this._init();
 }
 
@@ -20,6 +22,7 @@ var p = ActionGod.prototype;
 // Variables
 //===================================================
 
+p._level = null;
 p._currentState = null;
 
 // This stores whether to wait for an animation or not (if it is more than 0)
@@ -153,8 +156,8 @@ p._processAction = function()
 			this._addGameEvent( newDamageGameEvent );
 			// this._gameEventList.push( newDamageGameEvent );											
 			
-			// If the target has a counter attack then add it here 
-			if( currentTarget.isActorAlive() === true && currentTarget.isHasCounterAttack() )
+			// If the target has a counter attack then add it here CURRENTLY REMOVED, BUT WILL PUT BACK IN *********
+			if( currentTarget.isActorAlive() === true && false) // && currentTarget.isHasCounterAttack() )
 				this.addAction(new Action(currentTarget, Action.ATTACK, [[ currentAction.getActor() ]]) ); 					
 		}	
 		
@@ -215,7 +218,8 @@ p._resolveAction = function()
 	
 	// We need to update the actors here again as the situation may have changed (if knockback moves an actor or more enemies killed this turn etc.)	
 	if(this._actionQueue.length > 0)
-		this._actionQueue[0].getLevel().updateActors();
+		this._level.updateActors();
+		//this._actionQueue[0].getLevel().updateActors();
 						
 	// if we have any actions left then we need to start the next one in the queue
 	// Check the actor to perform the action is still alive too

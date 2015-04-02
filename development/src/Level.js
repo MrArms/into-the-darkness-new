@@ -7,10 +7,8 @@ goog.provide( "tt.Level" );
 // Constructor
 //===================================================
 
-Level = function(_levelIndex, _game, _leaveLevelCallback, _playerDiesCallback)
-{
-	this._levelIndex = _levelIndex;
-	
+Level = function(_game, _leaveLevelCallback, _playerDiesCallback)
+{		
 	this._leaveLevelCallback = _leaveLevelCallback.bind(_game);
 	this._playerDiesCallback = _playerDiesCallback.bind(_game);
 
@@ -43,11 +41,18 @@ p._map = null;
 // Public Methods
 //===================================================
 
+p.create = function(_levelIndex)
+{
+	this._levelIndex = _levelIndex;
+
+	this._map = new LevelMap(); //this._levelIndex);
+	this._map.create(this._levelIndex);
+			
+	this._createMonsters();
+}
+
 p.joinLevel = function(_player, _atStart)
 {
-	// Add the player to the level
-	// this._getCurrentLevel().addPlayer(this._player);
-	
 	this._addPlayer(_player, _atStart);
 	
 	// Set the initial actor times (player gets first move)
@@ -56,6 +61,11 @@ p.joinLevel = function(_player, _atStart)
 	// Update the visible part of the map
 	this._updateVisibleMapFromPlayerPosition();
 			
+	this.startLevel();
+}
+
+p.startLevel = function()
+{
 	this._isActive = true;		
 			
 	this._nextTurn();	
@@ -104,10 +114,35 @@ p.interpretPlayerInput = function(_keyCode)
 	}	
 }
 
+// This is called from the action God
+p.updateActors = function()
+{
+	for(var key in this._actors.getData())
+	{
+		this._actors.getElementFromKey(key).updateValuesFromLevel(this._map, this._actors)
+	}
+}
+
 p.update = function()
 {
 	if(this._isActive)
 		this._actionGod.update();
+}
+
+p.destroy = function()
+{
+	this._isActive = false;
+
+	this._player = null;
+	this._currentActor = null;
+	
+	this._actionGod = null;
+	
+	this._actors.destroy();
+	this._actors = null;
+	
+	this._map.destroy();
+	this._map = null;
 }
 
 //===================================================
@@ -223,13 +258,7 @@ p._initialiseActorTimers = function()
 	}
 }
 
-p._updateActors = function()
-{
-	for(var key in this._actors.getData())
-	{
-		this._actors.getElementFromKey(key).updateValuesFromLevel(this._map, this._actors)
-	}
-}
+
 
 p._nextTurn = function()
 {		
@@ -237,7 +266,7 @@ p._nextTurn = function()
 	if(!this._isActive)
 		return;
 
-	this._updateActors();
+	this.updateActors();
 		
 	this._currentActor = TurnManager.getNextActor(this._player, this._actors);	
 	this._currentActor.turnStarted();
@@ -316,24 +345,23 @@ p._createMonsters = function()
 	for(var i=0; i<testNumberMonsters; i++)
 	{
 		var cellPosition = this._map.getFreeCell();
-		this._addActorAtPosition(new Actor("A"), cellPosition[0], cellPosition[1]);	
+		
+		var newActor = new Actor();
+		newActor.create("A");
+		
+		this._addActorAtPosition(newActor, cellPosition[0], cellPosition[1]);	
 	}
 }
 
 p._init = function()
 {	
-	//this._controlsLocked = true;
 	this._setControlLock(true);
-	
+			
 	this._isActive = false;
 
-	this._actionGod = new ActionGod();
-
-	this._map = new LevelMap(this._levelIndex);
+	this._actionGod = new ActionGod(this);
 	
 	this._actors = new CellDataObject();		
-	
-	this._createMonsters();	
 }
 
 //===================================================
@@ -352,3 +380,63 @@ p.getMap = function() {	return this._map; }
 p.getActors = function() { return this._actors; }
 
 p.isLevelActive = function() { return this._isActive; }
+
+//===================================================
+// LOADING & SAVING
+//===================================================
+
+p.getSaveObject = function()
+{
+	var saveObject = {};
+	
+	saveObject._levelIndex = this._levelIndex;
+	
+	// We are saving the actors in an array even though they're in a cellDataObject when stored on the level
+	saveObject._actors = []; 
+	
+	// Save whether the player is on the level or not
+	saveObject._playerOnLevel = (this._player && this._player !== null);
+	
+	// The player might not be on this particular level
+	//if(this._player && this._player !== null)	
+	//	saveObject._player = this._player.getSaveObject()
+	
+	for(var key in this._actors.getData())
+	{
+		// Only bother with actors that are alive still
+		if(this._actors.getElementFromKey(key).isActorAlive())	
+			saveObject._actors.push( this._actors.getElementFromKey(key).getSaveObject() );						
+	}
+	
+	saveObject._map = this._map.getSaveObject();
+	
+	return saveObject;	
+}
+
+p.restoreFromSaveObject = function(_saveObject, _player)
+{
+	this._levelIndex = _saveObject._levelIndex;
+	
+	// If the player is on the level then use the _player object from Game in the level (don't want duplicate players)
+	if(_saveObject._playerOnLevel === true)
+	{
+		this._player = _player;
+	}
+	
+	for(var i=0; i<_saveObject._actors.length; i++)
+	{
+		// Recreate the actor from the saved data
+		var actor = new Actor();
+		actor.restoreFromSaveObject(_saveObject._actors[i]);	
+
+		// If it is the player we don't want the new actor as we already have the player from the Game class (we don't want duplicate player actors as they won't all get updated properly)
+		if(actor.isPlayer() === true)
+			this._actors.setElement(this._player, this._player.getPosition()[0],this._player.getPosition()[1]);				 		
+		else
+			this._actors.setElement(actor, actor.getPosition()[0],actor.getPosition()[1]);				 		
+	}
+	
+	this._map = new LevelMap();
+	this._map.restoreFromSaveObject(_saveObject._map);
+	
+}
