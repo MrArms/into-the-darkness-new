@@ -1,7 +1,10 @@
 		
 ========== Add load and save ===================
 
-Test and check the game in **** and push!!
+Test and check the game in **** and push!! DONE
+
+Think about creating a "data" field for saveable data so we don't have to copy across every field back and forwards which will cause loads of bugs DONE
+	Yeah let's do this DONE
 
 Need to think about random seed stuff for the game - look into this
 	Could save the level seeds at the start
@@ -9,6 +12,10 @@ Need to think about random seed stuff for the game - look into this
 
 
 Then need to set up the game so you can save it (perhaps give the game a random name for the moment) and reload it later on	
+	
+	
+THINK ABOUT STATUS AND EFFECTS "Arrays" being objects where you can quickly search for the effect name eg. effect["counter_attack"]
+		The problem is that they need to be ordered like an array however so perhaps it won't work :(
 	
 BUGS
 

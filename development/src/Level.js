@@ -1,8 +1,6 @@
 
 goog.provide( "tt.Level" );
 
-
-
 //===================================================
 // Constructor
 //===================================================
@@ -257,8 +255,6 @@ p._initialiseActorTimers = function()
 			this._actors[key].setMoveTimerToMonsterStart();				
 	}
 }
-
-
 
 p._nextTurn = function()
 {		

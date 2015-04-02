@@ -30,27 +30,8 @@ Actor.TIMER_TICK = 1;
 Actor.TIMER_MONSTER_START = 1;
 Actor.TIMER_PLAYER_START = 100;
 
-p._char = null;
-// p._baseColour = null;
-
-p._col = null;
-p._row = null;
-
-// Stats
-p._maxHP = null;
-p._currentHP = null;
-
-p._baseSpeed = null;
-p._currentSpeed = null;
-
-p._baseAttackBonus = null;
-p._currentAttackBonus = null;
-
-p._baseDefenceBonus = null;
-p._currentDefenceBonus = null;
-
-// Level based attributes
-p._numberActorsAdjacent = null;
+// This will store any data that needs to be saved as is
+p._data = null;
 
 // Innate effects
 p._innateEffects = null;
@@ -62,11 +43,6 @@ p._charmEffects = null;
 // 		but we only want to add them to the list when the turn ends and the selection is made definite
 p._tempCharmEffects = null;
 
-// Other
-p._isAlive = null;
-// p._hasCounterAttack = null; // NEED TO REIMPLEMENT THIS ****
-p._isPlayer = null;
-p._moveTimer = null;
 p._statusArray = null;
 
 p._currentGameEvent = null;
@@ -77,22 +53,22 @@ p._currentGameEvent = null;
 
 p.create = function(_char)
 {
-	this._char = _char;	
-	this._isPlayer = this._char === "@";
+	this._data._char = _char;
+	this._data._isPlayer = _char === "@";
 	
-	this._maxHP = GameGlobals.actorsData[this._char].max_hp;
-	this._currentHP = this._maxHP;
+	this._data._alignment = GameGlobals.actorsData[this.getChar()].alignment;
 	
-	this._baseSpeed = GameGlobals.actorsData[this._char].speed;
-	this._currentSpeed = this._baseSpeed;
+	this._data._maxHP = GameGlobals.actorsData[this.getChar()].max_hp;
+	this._data._currentHP = this._data._maxHP;
 	
-	this._alignment = GameGlobals.actorsData[this._char].alignment;
+	this._data._baseSpeed = GameGlobals.actorsData[this.getChar()].speed;
+	this._data._currentSpeed = this._data._baseSpeed;
+			
+	this._data._baseAttackBonus = GameGlobals.actorsData[this.getChar()].base_attack;	
+	this._data._currentAttackBonus = this._data._baseAttackBonus;
 	
-	this._baseAttackBonus = GameGlobals.actorsData[this._char].base_attack;
-	this._currentAttackBonus = this._baseAttackBonus;
-
-	this._baseDefenceBonus = GameGlobals.actorsData[this._char].base_defence;
-	this._currentDefenceBonus = this._baseDefenceBonus;
+	this._data._baseDefenceBonus = GameGlobals.actorsData[this.getChar()].base_defence;	
+	this._data._currentDefenceBonus = this._data._baseDefenceBonus;
 	
 	this.addInnateEffects();
 }
@@ -128,10 +104,10 @@ p.addInnateEffects = function()
 	// This is an array of effects that get re-applied every time the actor values are updated
 	this._innateEffects = [];
 
-	for(var i=0; i< GameGlobals.actorsData[this._char].effects.length; i++)	
+	for(var i=0; i< GameGlobals.actorsData[this.getChar()].effects.length; i++)	
 	{
 		var newEffect = new Effect();
-		newEffect.create(GameGlobals.actorsData[this._char].effects[i], -1);	
+		newEffect.create(GameGlobals.actorsData[this.getChar()].effects[i], -1);	
 		this._innateEffects.push(newEffect);
 	}
 }
@@ -194,7 +170,7 @@ p.turnFinished = function()
 	}		
 	
 	// Reset the move counter
-	this._moveTimer = 0;
+	this._resetMoveTimer(); // = 0;
 }
 
 
@@ -223,16 +199,16 @@ p.addGameEvent = function(_gameEvent)
 // Called by using a gameEvent from ActionGod
 p.damage = function(_amount)
 {
-	this._currentHP = Math.max(0, this._currentHP - _amount);
+	this._data._currentHP = Math.max(0, this._data._currentHP - _amount);
 	
-	if(this._currentHP <= 0)
+	if(this._data._currentHP <= 0)
 		this._kill();
 }
 
 // Called by using a gameEvent from ActionGod
 p.heal = function(_amount)
 {
-	this._currentHP = Math.min(this._maxHP, this._currentHP + _amount);
+	this._data._currentHP = Math.min(this._data._maxHP, this._data._currentHP + _amount);
 }
 
 // This updates all values (at the moment just attack and defence bonus) from the status effects, 
@@ -241,8 +217,8 @@ p.heal = function(_amount)
 p.updateValuesFromLevel = function(_map, _actors) 
 {
 	// Reset values first
-	this._currentAttackBonus = this._baseAttackBonus;
-	this._currentDefenceBonus = this._baseDefenceBonus;
+	this._data._currentAttackBonus = this._data._baseAttackBonus;
+	this._data._currentDefenceBonus = this._data._baseDefenceBonus;
 	
 	this._updateNumberAdjacentActors(_actors)
 			
@@ -302,9 +278,11 @@ p.updateSelectedCharms = function(_map, _actors, _charmsList)
 
 p._init = function()
 {			
-	this._isAlive = true;
+	// This will store any data that we want to save in the same form
+	this._data = {};
 	
-	this._moveTimer = 0;
+	this._setActorAlive(true);
+	this._resetMoveTimer();
 		
 	// There are no charms active at the moment
 	this._charmEffects = [];	
@@ -339,25 +317,25 @@ p._getAllEffects = function()
 
 p._updateNumberAdjacentActors = function(_actors)
 {
-	this._numberActorsAdjacent = 0;
+	this._data._numberActorsAdjacent = 0;
 
-	var adjacentCellKeys = Utils.getCellsSurroundingCell(this._col, this._row);
+	var adjacentCellKeys = Utils.getCellsSurroundingCell(this._data._col, this._data._row);
 	
 	for(var i=0; i<adjacentCellKeys.length; i++)
 	{
 		var actorTest = _actors.getElementFromKey(adjacentCellKeys[i]);
 	
 		if(actorTest !== null && actorTest.isActorAlive() === true)		
-			this._numberActorsAdjacent += 1;		
+			this._data._numberActorsAdjacent += 1;		
 	}
 }
 
 p._kill = function()
 {
-	this._isAlive = false;
+	this._setActorAlive(false);
+
+	// this._data._isAlive = false;
 }
-
-
 
 //===================================================
 // Events
@@ -367,44 +345,46 @@ p._kill = function()
 // GETTERS & SETTERS
 //===================================================
 
-p.getChar = function() { return this._char; }
+p.getChar = function() { return this._data._char; }
 
-p.isPlayer = function() { return this._isPlayer; }
+p.isPlayer = function() { return this._data._isPlayer; }
 
-p.setMoveTimerToPlayerStart = function() { this._moveTimer = Actor.TIMER_PLAYER_START; }
+p.setMoveTimerToPlayerStart = function() { this._data._moveTimer = Actor.TIMER_PLAYER_START; }
 
-p.setMoveTimerToMonsterStart = function() { this._moveTimer = Actor.TIMER_MONSTER_START;}
+p.setMoveTimerToMonsterStart = function() { this._data._moveTimer = Actor.TIMER_MONSTER_START;}
 
-p.increaseMoveTimerTick = function() { this._moveTimer += (this._currentSpeed * Actor.TIMER_TICK); }
+p.increaseMoveTimerTick = function() { this._data._moveTimer += (this._data._currentSpeed * Actor.TIMER_TICK); }
 
-p.isReadyToMove = function() { return (this._isAlive === true && this._moveTimer >= Actor.TIMER_MAX); }
+p._resetMoveTimer = function() {this._data._moveTimer = 0;}
 
-// p.isHasCounterAttack = function() { return this._hasCounterAttack; } // NEED TO REPLACE THIS WITH EFFECT JOBBY ***
+p.isReadyToMove = function() { return (this._data._isAlive === true && this._data._moveTimer >= Actor.TIMER_MAX); }
+
+p._setActorAlive = function(_alive) {this._data._isAlive = _alive;}
+
+p.isActorAlive = function() { return this._data._isAlive; }
+
+p.getPosition = function() { return [this._data._col, this._data._row]; }
+
+p.setPosition = function(_col, _row)
+{		
+	this._data._col = _col;
+	this._data._row = _row;
+}
+
+p.getCurrentAttackBonus = function() { return this._data._currentAttackBonus; }
+p.getCurrentDefenceBonus = function() { return this._data._currentDefenceBonus; }
+
+p.setCurrentAttackBonus = function(_value) { this._data._currentAttackBonus = _value; }
+p.setCurrentDefenceBonus = function(_value) { this._data._currentDefenceBonus = _value; }
+
+p.getNumberActorsAdjacent = function() { return this._data._numberActorsAdjacent; }
+
+p.getAlignment = function() { return this._data._alignment; }
 
 // The renderer looks for this to see whether there is any gameEvents to render (eg. damage etc.)
 p.getGameEvent = function() { return this._currentGameEvent; }
 
 p.removeGameEvent = function() { this._currentGameEvent = null; }
-
-p.isActorAlive = function() { return this._isAlive; }
-
-p.getPosition = function() { return [this._col, this._row]; }
-
-p.setPosition = function(_col, _row)
-{		
-	this._col = _col;
-	this._row = _row;
-}
-
-p.getCurrentAttackBonus = function() { return this._currentAttackBonus; }
-p.getCurrentDefenceBonus = function() { return this._currentDefenceBonus; }
-
-p.setCurrentAttackBonus = function(_value) { this._currentAttackBonus = _value; }
-p.setCurrentDefenceBonus = function(_value) { this._currentDefenceBonus = _value; }
-
-p.getNumberActorsAdjacent = function() { return this._numberActorsAdjacent; }
-
-p.getAlignment = function() { return this._alignment; }
 
 //===================================================
 // LOADING & SAVING
@@ -414,28 +394,8 @@ p.getSaveObject = function()
 {
 	var saveObject = {};
 	
-	saveObject._char = this._char;	
-	saveObject._isPlayer = this._isPlayer;
+	saveObject._data = Utils.copyObject(this._data);
 	
-	saveObject._col = this._col;
-	saveObject._row = this._row;
-	
-	saveObject._maxHP = this._maxHP;
-	saveObject._currentHP = this._currentHP;
-	
-	saveObject._baseSpeed = this._baseSpeed;
-	saveObject._currentSpeed = this._currentSpeed;
-	
-	saveObject._alignment = this._alignment;
-	
-	saveObject._baseAttackBonus = this._baseAttackBonus;
-	saveObject._currentAttackBonus = this._currentAttackBonus;
-
-	saveObject._baseDefenceBonus = this._baseDefenceBonus;
-	saveObject._currentDefenceBonus = this._currentDefenceBonus;
-	
-	saveObject._moveTimer = this._moveTimer;
-
 	saveObject._statusArray = [];
 	
 	for(var i=0; i<this._statusArray.length; i++)	
@@ -456,27 +416,7 @@ p.getSaveObject = function()
 
 p.restoreFromSaveObject = function(_saveObject)
 {
-	this._char = _saveObject._char;	
-	this._isPlayer = _saveObject._isPlayer;
-	
-	this._col = _saveObject._col;
-	this._row = _saveObject._row;
-
-	this._maxHP = _saveObject._maxHP;
-	this._currentHP = _saveObject._currentHP;
-	
-	this._baseSpeed = _saveObject._baseSpeed;
-	this._currentSpeed = _saveObject._currentSpeed;
-	
-	this._alignment = _saveObject._alignment;
-	
-	this._baseAttackBonus = _saveObject._baseAttackBonus;
-	this._currentAttackBonus = _saveObject._currentAttackBonus;
-
-	this._baseDefenceBonus = _saveObject._baseDefenceBonus;
-	this._currentDefenceBonus = _saveObject._currentDefenceBonus;
-	
-	this._moveTimer = _saveObject._moveTimer;
+	this._data = Utils.copyObject(_saveObject._data);
 	
 	for(var i=0; i<_saveObject._statusArray.length; i++)	
 	{

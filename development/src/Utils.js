@@ -175,6 +175,18 @@ Utils.getCellsSurroundingCell = function(_col, _row)
 	return returnArray;
 }
 
+// This takes an object and creates a new one using its key value pairs
+Utils.copyObject = function(_object)
+{
+	var newObject = {};
+
+	for(var key in _object)
+	{
+		newObject[key] = _object[key];
+	}
+	
+	return newObject;
+}
 
 /*Utils.hasKeyBeenPressed = function(_event, _symbol)
 {
