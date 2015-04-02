@@ -42,7 +42,7 @@ Utils.GetRandomString = function(_length)
     var possible = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
 
     for( var i=0; i < _length; i++ )
-        text += possible.charAt(Math.floor(Math.random() * possible.length));
+        text += possible.charAt(Math.floor(ROT.RNG.getUniform() * possible.length));
 
     return text;
 }
@@ -54,7 +54,7 @@ Utils.getDistanceBetweenMapPoints = function(_point1, _point2)
 
 Utils.shuffleArray = function(o)
 {
-	for(var j, x, i = o.length; i; j = Math.floor(Math.random() * i), x = o[--i], o[i] = o[j], o[j] = x);
+	for(var j, x, i = o.length; i; j = Math.floor(ROT.RNG.getUniform() * i), x = o[--i], o[i] = o[j], o[j] = x);
     return o;
 }
 
@@ -103,7 +103,7 @@ Utils.distanceBetweenTwoPoints = function(_point1, _point2)
 
 Utils.getRandomArrayValue = function(_array)
 {
-	return _array[(Math.floor(Math.random() * _array.length))];
+	return _array[(Math.floor(ROT.RNG.getUniform() * _array.length))];
 }
 
 Utils.isPointInRectangle = function(_point, _left, _top, _right, _bottom)
@@ -125,7 +125,7 @@ Utils.getValueFromProbability = function(_value)
 	
 	var finalValue = floorValue;
 	
-	var testValue = Math.random();
+	var testValue = ROT.RNG.getUniform();
 	
 	//Utils.console("Math.random() = " + testValue);
 	

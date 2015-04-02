@@ -1,88 +1,39 @@
 		
-========== Add load and save ===================
-
-Test and check the game in **** and push!! DONE
-
-Think about creating a "data" field for saveable data so we don't have to copy across every field back and forwards which will cause loads of bugs DONE
-	Yeah let's do this DONE
-
-Need to think about random seed stuff for the game - look into this
-	Could save the level seeds at the start
-	Also could use that seed to generate contents for chests and drops for monsters when they are created.
-
-
-Then need to set up the game so you can save it (perhaps give the game a random name for the moment) and reload it later on	
-	
-	
-THINK ABOUT STATUS AND EFFECTS "Arrays" being objects where you can quickly search for the effect name eg. effect["counter_attack"]
-		The problem is that they need to be ordered like an array however so perhaps it won't work :(
-	
-BUGS
-
-
-Saving and loading straight away causes a blank screen FIXED
-Saving and loading elsewhere works, but you cannot move the player FIXED
-
-Players are copies of each other rather than the original - need to unify them all DONE
-
-
-Ok the "class" part of a level needs to be separate from the "data" part of a level
-You can create the class which consists of the class methods and the data 
-	Then either initialise through create() method or through a restore() method
-	
-	
-new Level() --- creates an empty level class with no data in it
-level1.create() ---- creates the stuff you want - levelData    (leave this stuff for now - actors, map etc, will do the same for this later on I think)
-level1.restore(_dataObject) - just stores this object where the above data is stored
-
-getDataObject
-		This stores the leveldata in an object and returns it
-restoreFromDataObject
-		This takes the levelData and creates a new levelData from it
-	
-
-	
-Level - class/data object
-	Actors - class/data objects
-	
-	
-Save 
-	returns levelData
-	
-
-Save object
-	Level.levelData (stores levelIndex etc. if that's all you need then just recreate it from the index when you load the level - NAH KEEP FOR THE MOMENT)
-	Level.actors = array containing each actorData object
-	Level.map = mapData object that you can recreate the map from
-	
-Need to serialise CellDataObject for load and save objects and use them in the map
-Then need to finish the Level stuff
-Then do the load/save from Game
-Then need to create and init all class types
-	Level, actors, celldataobjs, status, effects
-	
-	
-Need separate methods for each saveable object
-	_init()  this is stuff that is in both newly created and stored versions of the object
-	.create() this is when creating from scratch
-	.restore() this is when restoring the object from a saved object
-
-
-Could store simple data stuff in a data object for each class
-	eg. in actor all the _maxHP, _currentHP etc. as a dataObject._maxHP etc.
-	Then could save it as one object rather than having to manually copy over the values each time
-	
-Then want to load and save the levels be pressing "S" and "L"
-
-Some info and code on storing and retrieving objects in javascript:
-http://stackoverflow.com/questions/2010892/storing-objects-in-html5-localstorage
-
-
+		
+GET ELLIE TO HIDE TEA		
+		
+Create _data object for Game and Level too so when we add more variables they automatically get saved and restored properly
+Apply to status and effects objects too
 
 ===== Add folders for different parts of the game ====
 
 Design which ones here first before you do anything
+
+Game				
+	Inventory	
+	Renderer			
+	GameGlobals
+	UI
+		
+	Level
+		Status
+		CharmGlobals
+		LevelMap
+		TurnManager
+		AI
+		ActionGod
+		Actor
+		Attack
+		Level
+		GameEvent
+		Game
+		CellDataObject
+		Effect
 	
+Others
+	Main
+	Globals
+	Utils
 
 ==== Adding screen manager and other screens ====
 
@@ -94,180 +45,21 @@ Pass the keyboard and mouse handling to the current screen to be processed
 Need to wait until the full turn is over and then test for player death (when removing dead actors probably)
 Then set the level to inactive (leave level maybe?) then tell the game screen you've died
 
-
-===== Tomorrow  =========
-
-WHY IS NEXT TURN CALLED TWICE???!?!??! Investigate this first SEEMS TO WORK FINE
-
-Decide whether to make getters/setters for actor values and then apply effects in the effects class rather than updateValuesFromEffect in actor DONE
-
-Then check in and PUSH (make a copy first) DONE
-
-Then go through and update the Status/Effect/Charms document properly THAT'LL DO FOR THE MOMENT
-
-1) Think about load/save and record/playthrough
-2) Add some more effects like counter attack (needs a hasEffect method in actor and then needs to be grabbed by Game/attack jobby)
-
-
-Charm names and their effect names need to be different UNLESS we just want one effect per charm - need to think about this
-
-
-Statuses can have multiple effects?
-	So need a list of StatusEffects and a globalList of statuses and which effects they have
-		In the Status we test to see what statusEffects are in affect from
-	NO DON'T MIX THEM UP
-		MAKE THEM ALL SEPARATE STATUS' but allow charms to have multiple status effects
-			As they get applied then they add the status effects to the status list!!!!
-
-Charms have a list of status effects
-	When applied they add to the status effects of the actor
-	When selected they update the display in much the same way as if they were applied, but stuff gets reapplied as the actor takes their turn
-			
-
-Charms .... statusList:{attack:-1}		
-
-Problem - status effects can either be on or off with a counter eg. Poison counter
-	The trouble is that we might want multiple effects that change say attack and we want them to stack
-		eg. attack +2, attack - 1 etc.
-			Need to cater for this as well
-	
-	Could split them into effects and status (again)
-		effects can have multiple values and stack by addition, whereas Status are just a counter
-			effects could work only on attack and defence values (and eventually evasion etc.)
-			
-	Need separate effects list from Status
-		They stack differently, some add together and some don't - need to manage them
-			
-	Charms have EFFECTS ONLY - although some can CAUSE A STATUS on an enemy when resolved
-		eg. poison_brand ---> causes poison on enemy
-			
-	Effects can be innate (not charms)
-	
-An innate effect is like a member of the effects in a charm
-	A charm has a list of effects basically and an actor can also have this effect innately
-			
-NEED TO ADD THE TIMER FOR THE CHARMS LIST!!!
-	As you want them valid until the start of your next turn   <====== THINK ABOUT THIS NEXT ***********
-	
-STATUS' can affect attack/defence values too :/
-Need to apply them too during the turn for certain status? YES I GUESS So
-		What's the difference between one of these status' and an effect? UGH
-		
-		
-Need to updateActors when you change the charms selected****
-	Need an inventory and UI for the charms - tidy up everything else before this ******
-	
-	
-Effects work DURING THE TURN - affect battles etc.
-Status effects work before/after the turn
-
-Effects don't combine in the way status' do. They just go one after each other in a list.
-
-BLESSINGS INSTEAD OF CHARMS?
-
-Need a separate effects class and to deal with them separately
-			
-Tomorrow
-
-Get bravery working add testCard array
-Get the UI updating when necessary for the player attack/defence
-
-AFTER - want a nice big tidy up 
-	Do we want to move the Game stuff into Level where appropriate? Yes I think so
-	
-After that PUSH
-
-After that think about recording/replaying/loading/saving - read up about it
-
-
-
-
-Need the ability to add innate effects to the actors
-	Need to tie this in with the status effects somehow
-	Need a way of getting values for Attack and updating UI when you add cards etc.
-
-1) Need a way of getting all the effects/status' on the actor that can affect stuff (also values need to be added to the actor class)
-		eg. Attack Bonus, Defence Bonus, Accuracy, Evasion JUST DOING ATTACK AND DEFENCE (Bonuses) for the moment
-		
-	Need to update stuff from the map - just doing actors surrounding for the moment
-		Actors, Enemies surrounding
-		Walls surrounding
-		
-Need a function that updates all actors with their surroundings (eg. actors adjacent etc.) - THIS HAPPENS AT THE START OF THE TURN
-	And another one that refreshes their values based on their effects
-		ALL ONE FUNCTION?
-	
-		IT ALSO HAPPENS AFTER EACH ACTION TOO (so number killed etc. increases attack if you have the right effect)
-
-		
-2) Need to display the player values for the above
-
-
-Need a way of calculating effects on the actor to give you 	
-	
-
-The actors take the values from the status effects on them (innate and other)
-		Innate can just create a never ending status effect!!!!!
-	
-	Also the player gets the values from currently selected cards to add to the calculation - JUST CREATE A DUMMY SELECTION AND USE THAT FOR THE MOMENT ******
-
-NEED TO CREATE A SIMPLE UI WITH PLAYER ATT AND DEFENCE BONUS VALUES
-	THEN CREATE A TEST CARD SELECTION DATA (they will have the same key names as status' if that's what they do)
-		THEN TEST BRAVERY IN GAME (make a couple of monsters)
-	
-Should we put all the level logic into Level rather than Game? ******** THINK ABOUT THIS - YES DO THIS AFTER UPDATING ACTOR VALUES FROM EFFECTS
-	
-Ignore UI for the moment (can you partially clear the screen? Would be nice to clear the UI cards, the UI mouse over and game windows separately)
+======= Knockback and counter attack ========
 
 Then need to implement knockback with damage and see if it all holds up
-	
-
-Add attacking monsters (also need to add to them an alignment in case we want to add friendly units or tribes)
-	
-Also perhaps need an array of GameEvents possible on an actor rather than just one	
-	
-PUSH IT FIRST THING WHEN FINISHED THE ABOVE!!!!!!!
-Review level logic in Game.js - should it be moved to the level? Think of the role of each class
-Should CellDataObject.getData() stuff be simplified to be easier to use?
-
-2) Get the actors data from the GameConstants again
-3) Get monsters moving around the map too (using pathfinding as before)
-4) Check in
-5) Implement attacking monsters and them attacking you
-
-Create screen manager, menu, game over and instruction screens and send the game controls to each one (like before)
-	Also think about whether we want 1 renderer or one for each screen
-		SHOULD INSTRUCTIONS EVEN BE A SCREEN? Need them in game too? Or separate help system?
 
 
 
 
-THINK ABOUT SAVING/LOADING, RECORDING and REPLAYING THE GAME TURNS - find out how brogue does it
+====== Level Generation ======
 
+When we do level generation, want to create a series of level seeds and send them to the levels when they are generated
+		Also want to save previous monsters (especially uniques), towns, treasures and drops from previous level creation to make sure we have variety in the levels
+			The game uses random seed AND the previous level data to create a new level
+Could save the level seeds at the start
+Also could use that seed to generate contents for chests and drops for monsters when they are created.
 
-Convert the level._actors array into a CellDataObject DONE
-	It will be easier to render and compare positions for calculations etc. DONE
-
-
-
-
-Put the los functions in the map and update the viewed cells in there - send it the position of the player
-	Renderer should just grab the map and render it
-
-Put free cell functions (ie positioning monsters etc.) in map? Or level?
-
-(think about saving/loading and recording before doing this)
-
-
-What is next? The map and moving about? Camera? These two first.
-
-
-
-
-
-
-
-COMMIT AND PUSH YOUR CHANGES TO GITHUB!!!!
 
 
 
