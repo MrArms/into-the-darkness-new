@@ -261,8 +261,17 @@ p._nextTurn = function()
 	// if the level is not active then don't continue with the turns
 	if(!this._isActive)
 		return;
-
+	
 	this.updateActors();
+	
+	// Here we're going to test if the player is still alive and if not then end the game
+	if(this._player.isActorAlive() === false)
+	{
+		this._playerDiesCallback();
+		
+		// We don't want to continue with the monster turns any more
+		return;		
+	}
 		
 	this._currentActor = TurnManager.getNextActor(this._player, this._actors);	
 	this._currentActor.turnStarted();

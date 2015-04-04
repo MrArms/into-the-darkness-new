@@ -118,8 +118,6 @@ p._saveGame = function(_args)
 	this._saveGameObject = _args[0]; //_saveGameObject;
 }
 
-
-
 p._gameWon = function()
 {
 	var winningScreen = new WinningScreen(this._display);	
@@ -129,7 +127,7 @@ p._gameWon = function()
 p._gameOver = function()
 {
 	var gameOverScreen = new GameOverScreen(this._display);	
-	gameScreen.addCallbackFunction(ScreenManager.RETURN_TO_MENU, this._startMenuScreen.bind(this));	
+	gameOverScreen.addCallbackFunction(ScreenManager.RETURN_TO_MENU, this._startMenuScreen.bind(this));	
 	this._switchScreen(gameOverScreen);
 }
 

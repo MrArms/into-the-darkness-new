@@ -3,18 +3,23 @@ GameScreen and Game split up
 GameScreen deals with load/save for the game so we can cleanly load/save games whilst playing without problems
 It also stores the keymaps for the keyboard controls
 It doesn't do much else
+
+Combine contolsLocked and inGame flags - they do the same thing DONE
 		
 ==== Player dying =====
 
-Need to wait until the full turn is over and then test for player death (when removing dead actors probably)
-Then set the level to inactive (leave level maybe?) then tell the game screen you've died
+Need to wait until the full turn is over and then test for player death (when removing dead actors probably) DONE
+Then set the level to inactive (leave level maybe?) then tell the game screen you've died DONE
 
 ======= Knockback and counter attack ========
 
-Then need to implement knockback with damage and see if it all holds up
+Then need to implement knockback (and double blow) with damage and see if it all holds up
 
 
+====== UI Stuff ========
 
+Need an inventory that contains charms - do we want monsters to have player type inventories? Could make it actor based so could add further party members later for another game....
+Need an interface for displaying charms and selecting them (and with calls to update the character)
 
 ====== Level Generation ======
 

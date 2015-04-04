@@ -33,8 +33,8 @@ p.enter = function()
 
 p.exit = function()
 {	
-	this.signalEndGame.removeAll();
-	this.signalEndGame = null;		
+	// this.signalEndGame.removeAll();
+	// this.signalEndGame = null;		
 
 	Screen.prototype.exit.call(this);	
 }
@@ -62,14 +62,14 @@ p.handleInput = function(inputType, inputData)
 
 p._init = function()
 {
-	this.signalEndGame = new signals.Signal();
+	// this.signalEndGame = new signals.Signal();
 }
 
 //===================================================
 // Events
 //===================================================
 
-p._keydownHandler = function(e)
+p.keydownHandler = function(e)
 {
 	//Utils.console("this._keydownHandler");
 	
