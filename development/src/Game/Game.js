@@ -41,37 +41,7 @@ p._currentLevelIndex = null;
 
 p._renderer = null;
 
-p.FPS = 60;
-
-p._saveGameObject = null;
-
-Game.CONTROL_MOVEMENT = "movement";
-Game.CONTROL_NO_MOVE = "no_move";
-Game.CONTROL_DOWN_STAIRS = "down_stairs";
-Game.CONTROL_UP_STAIRS = "up_stairs";
-
-Game.UTIL_SAVE = "save";
-Game.UTIL_LOAD = "load";
-
-p._keyMap = {};
-
-p._keyMap[ROT.VK_NUMPAD8] = {controlType:Game.CONTROL_MOVEMENT, direction:0};
-p._keyMap[ROT.VK_NUMPAD9] = {controlType:Game.CONTROL_MOVEMENT, direction:1};
-p._keyMap[ROT.VK_NUMPAD6] = {controlType:Game.CONTROL_MOVEMENT, direction:2}; 
-p._keyMap[ROT.VK_NUMPAD3] = {controlType:Game.CONTROL_MOVEMENT, direction:3};
-p._keyMap[ROT.VK_NUMPAD2] = {controlType:Game.CONTROL_MOVEMENT, direction:4}; 
-p._keyMap[ROT.VK_NUMPAD1] = {controlType:Game.CONTROL_MOVEMENT, direction:5};
-p._keyMap[ROT.VK_NUMPAD4] = {controlType:Game.CONTROL_MOVEMENT, direction:6}; 
-p._keyMap[ROT.VK_NUMPAD7] = {controlType:Game.CONTROL_MOVEMENT, direction:7}; 
-
-p._keyMap[ROT.VK_NUMPAD5] = {controlType:Game.CONTROL_MOVEMENT, direction:Game.CONTROL_NO_MOVE}; 
-
-p._keyMap[ROT.VK_D] = {controlType:Game.CONTROL_MOVEMENT, direction:Game.CONTROL_DOWN_STAIRS}; 
-p._keyMap[ROT.VK_U] = {controlType:Game.CONTROL_MOVEMENT, direction:Game.CONTROL_UP_STAIRS}; 
-
-// Load/Save
-p._keyMap[ROT.VK_S] = {controlType:Game.UTIL_SAVE}; 
-p._keyMap[ROT.VK_L] = {controlType:Game.UTIL_LOAD}; 
+// p._saveGameObject = null;
 
 //===================================================
 // Public Methods
@@ -92,6 +62,7 @@ p.create = function()
 	this._levels.push(newLevel);	
 }
 
+// Start after a newly created level has been made
 p.start = function()
 {
 	this._getCurrentLevel().joinLevel(this._player, true);
@@ -100,8 +71,59 @@ p.start = function()
 	this._inGame = true;				
 }
 
+// Restart from a saved game after initialisation
+p.restart = function(_saveGameObject)
+{
+	this.restoreFromSaveObject(_saveGameObject);
+				
+	this._getCurrentLevel().startLevel();
+	
+	this._inGame = true;
+}
+
+p.update = function(e)
+{		
+	if(this._inGame === false)
+		return;
+
+	// Make sure we aren't in the middle of recalculating fov 
+	if(this._getCurrentLevel().getMap().canDraw() === true)		
+	{
+		this._display.clear();
+		this._UI.update(this._player);
+		
+		// Set the camera to point at the player here
+		this._renderer.setMapCameraPosition(this._player.getPosition()[0], this._player.getPosition()[1]);
+		
+		// Need to tidy this up a bit THIS COULD BE IMPROVED SOMETIME
+		this._renderer.update(this._getCurrentLevel().getMap(), this._getCurrentLevel().getActors());
+	}
+	
+	if( this._getCurrentLevel() !== null && this._getCurrentLevel().isLevelActive() )		
+		this._getCurrentLevel().update();			
+}
+
+p.keyDown = function(_keyCode)
+{
+	if(this._inGame === false)
+		return;
+
+	// Check the level exists, is active and the controls are waiting for player input (not locked)
+	if(this._inGame === true && this._getCurrentLevel() !== null && this._getCurrentLevel().getControlLock() === false)
+	{					
+		// Movement gets interpreted by the level
+		if(_keyCode.controlType === GameScreen.CONTROL_MOVEMENT)
+		{										
+			this._getCurrentLevel().interpretPlayerInput(_keyCode);						
+		}							
+	}				
+}
+
 p.destroy = function()
 {
+	// Stops stuff from happening
+	this._inGame = false;
+
 	while(this._levels.length > 0)
 	{
 		var tempLevel = this._levels.pop();
@@ -111,8 +133,10 @@ p.destroy = function()
 
 	this._levels = null;
 		 	
-	//this._player.destroy();
 	this._player = null;	
+	
+	this._renderer = null;
+	this._UI = null;
 }
 
 //===================================================
@@ -120,26 +144,7 @@ p.destroy = function()
 //===================================================
 
 p._init = function(_display)
-{	
-	
-	this._resetVariables();
-	
-	this._display = _display;
-		
-	this._UI = new UI(this._display);
-	this._renderer = new Renderer(this._display);
-			
-	this._handle = this; // Why do we need this exactly?	
-	window.addEventListener('keydown', function(e) { this._handle._keydownHandler(e); }.bind(this), false);
-								
-	setInterval(this._onTimerTick.bind(this), 1000 / this.FPS); // 33 milliseconds = ~ 30 frames per sec
-								
-	// Start the game
-	// this._start();
-}
-
-p._resetVariables = function()
-{
+{		
 	this._inGame = false;
 
 	this._controlsLocked = true;
@@ -147,6 +152,11 @@ p._resetVariables = function()
 	this._doRenderMap = false;
 	
 	this._levels = [];
+	
+	this._display = _display;
+		
+	this._UI = new UI(this._display);
+	this._renderer = new Renderer(this._display);		
 }
 
 p._getCurrentLevel = function()
@@ -187,65 +197,6 @@ p._playerDies = function()
 // Events
 //===================================================
 
-p._onTimerTick = function(e)
-{		
-	if(this._inGame === false)
-		return;
-
-	// Make sure we aren't in the middle of recalculating fov 
-	if(this._getCurrentLevel().getMap().canDraw() === true)		
-	{
-		this._display.clear();
-		this._UI.update(this._player);
-		
-		// Set the camera to point at the player here
-		this._renderer.setMapCameraPosition(this._player.getPosition()[0], this._player.getPosition()[1]);
-		
-		// Need to tidy this up a bit THIS COULD BE IMPROVED SOMETIME
-		this._renderer.update(this._getCurrentLevel().getMap(), this._getCurrentLevel().getActors());
-	}
-	
-	if( this._getCurrentLevel() !== null && this._getCurrentLevel().isLevelActive() )		
-		this._getCurrentLevel().update();			
-}
-
-p._keydownHandler = function(e)
-{
-	// Check the level exists, is active and the controls are waiting for player input (not locked)
-	if(this._inGame === true && this._getCurrentLevel() !== null && this._getCurrentLevel().getControlLock() === false)
-	{				
-		var code = e.keyCode;		
-
-		if ( (code in this._keyMap) )
-		{						
-			// Movement gets interpreted by the level
-			if(this._keyMap[code].controlType === Game.CONTROL_MOVEMENT)
-			{										
-				this._getCurrentLevel().interpretPlayerInput(this._keyMap[code]);						
-			}
-			else if(this._keyMap[code].controlType === Game.UTIL_SAVE)
-			{
-				this._inGame = false;
-				
-				this._saveGameObject = this.getSaveObject();
-				
-				this._inGame = true;
-			}
-			else if(this._saveGameObject !== null && this._keyMap[code].controlType === Game.UTIL_LOAD)
-			{
-				this._inGame = false;
-				
-				this.destroy();
-				this._resetVariables();
-				this.restoreFromSaveObject(this._saveGameObject);
-				
-				this._getCurrentLevel().startLevel();
-				
-				this._inGame = true;
-			}
-		}			
-	}				
-}
 
 //===================================================
 // LOADING & SAVING
@@ -253,6 +204,9 @@ p._keydownHandler = function(e)
 
 p.getSaveObject = function()
 {
+	// Stop the game moving for the moment
+	this._inGame = false;
+
 	var saveObject = {};
 	
 	// Save the current RNG seed
@@ -268,6 +222,8 @@ p.getSaveObject = function()
 	{	
 		 saveObject._levels.push( this._levels[i].getSaveObject() );
 	}
+				
+	this._inGame = true;			
 				
 	return saveObject;
 }
@@ -288,6 +244,4 @@ p.restoreFromSaveObject = function(_saveObject)
 		newLevel.restoreFromSaveObject(_saveObject._levels[i], this._player);
 		this._levels.push(newLevel);
 	}
-	
-	// _saveObject._player.getSaveObject();
 }

@@ -1,7 +1,9 @@
 
 
 goog.provide( "tt.Main" );
+
 goog.require( 'tt.Game' );
+goog.require( 'tt.ScreenManager' );
 
 function Main () // data, devices, canvasID, wrapperDivID ) 
 {
@@ -14,12 +16,16 @@ p._display = null;
 
 p.init = function() //data) 
 {	
-	this._display = new ROT.Display({width: Globals.SCREEN_WIDTH, height: Globals.SCREEN_HEIGHT, fontSize:Globals.FONT_SIZE});
-	document.body.appendChild(this._display.getContainer());
+	//this._display = new ROT.Display({width: Globals.SCREEN_WIDTH, height: Globals.SCREEN_HEIGHT, fontSize:Globals.FONT_SIZE});
+	//document.body.appendChild(this._display.getContainer());
 
-	this._game = new Game(this._display);
-	this._game.create();
-	this._game.start();
+	// this._game = new Game(this._display);
+	// this._game.create();
+	// this._game.start();
+	
+	this.screenManager = new ScreenManager();
+	this.screenManager.init();
+	
 }
 
 goog.exportSymbol( 'tt.Main', Main );

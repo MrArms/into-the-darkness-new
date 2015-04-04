@@ -89,18 +89,18 @@ p.interpretPlayerInput = function(_keyCode)
 		
 	this._setControlLock(true);
 	
-	if(_keyCode.controlType === Game.CONTROL_MOVEMENT)
+	if(_keyCode.controlType === GameScreen.CONTROL_MOVEMENT)
 	{		
-		if(_keyCode.direction === Game.CONTROL_NO_MOVE)		
+		if(_keyCode.direction === GameScreen.CONTROL_NO_MOVE)		
 			this._turnFinished();
-		else if(_keyCode.direction === Game.CONTROL_DOWN_STAIRS)
+		else if(_keyCode.direction === GameScreen.CONTROL_DOWN_STAIRS)
 		{
 			if(this._map.isDownStairs(this._player.getPosition()[0], this._player.getPosition()[1]) )
 				this._leaveLevel(false);
 			else
 				this._setControlLock(false);
 		}		
-		else if(_keyCode.direction === Game.CONTROL_UP_STAIRS)
+		else if(_keyCode.direction === GameScreen.CONTROL_UP_STAIRS)
 		{
 			if(this._map.isUpStairs(this._player.getPosition()[0], this._player.getPosition()[1]) )
 				this._leaveLevel(true);

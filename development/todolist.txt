@@ -1,45 +1,9 @@
+				
+GameScreen and Game split up
+GameScreen deals with load/save for the game so we can cleanly load/save games whilst playing without problems
+It also stores the keymaps for the keyboard controls
+It doesn't do much else
 		
-		
-GET ELLIE TO HIDE TEA		
-		
-Create _data object for Game and Level too so when we add more variables they automatically get saved and restored properly
-Apply to status and effects objects too
-
-===== Add folders for different parts of the game ====
-
-Design which ones here first before you do anything
-
-Game				
-	Inventory	
-	Renderer			
-	GameGlobals
-	UI
-		
-	Level
-		Status
-		CharmGlobals
-		LevelMap
-		TurnManager
-		AI
-		ActionGod
-		Actor
-		Attack
-		Level
-		GameEvent
-		Game
-		CellDataObject
-		Effect
-	
-Others
-	Main
-	Globals
-	Utils
-
-==== Adding screen manager and other screens ====
-
-Copy from previous project - but I don't want signals anymore as they are shite
-Pass the keyboard and mouse handling to the current screen to be processed
-
 ==== Player dying =====
 
 Need to wait until the full turn is over and then test for player death (when removing dead actors probably)

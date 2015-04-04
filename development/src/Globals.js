@@ -33,6 +33,8 @@ Globals.SCREEN_HEIGHT = 40;
 
 Globals.FONT_SIZE = 18;
 
+Globals.FPS = 60;
+
 Globals.COLOUR_WHITE = "#FFF"
 Globals.COLOUR_CYAN = "#1FF"
 
