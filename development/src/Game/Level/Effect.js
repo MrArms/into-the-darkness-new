@@ -5,9 +5,9 @@ goog.provide( "tt.Effect" );
 // Constructor
 //===================================================
 
-Effect = function() //_effectType, _timer)
+Effect = function()
 {
-	//this._init(_effectType, _timer)
+	// this._init(_effectType, _timer)
 }
 
 var p = Effect.prototype;
@@ -22,13 +22,17 @@ p._value = null;
 
 Effect.BRAVERY = "bravery_effect";
 Effect.ATTACK = "attack_effect";
+
+// Not implemented yet
 Effect.DEFENCE = "defence_effect";
+Effect.DOUBLE_BLOW = "double_blow";
+Effect.KNOCKBACK = "knockback";
 
 //===================================================
 // Public Methods
 //===================================================
 
-p.init = function(_effectData, _timer)
+p.create = function(_effectData, _timer)
 {		
 	this._effectType = _effectData.name;
 	

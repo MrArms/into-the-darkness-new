@@ -117,7 +117,7 @@ p.updateActors = function()
 {
 	for(var key in this._actors.getData())
 	{
-		this._actors.getElementFromKey(key).updateValuesFromLevel(this._map, this._actors)
+		this._actors.getElementFromKey(key).updateValuesFromLevel(this); //this._map, this._actors)
 	}
 }
 

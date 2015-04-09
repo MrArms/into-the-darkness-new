@@ -23,5 +23,35 @@ http://brogue.createforumhosting.com/on-the-outlandish-balance-of-brogue-t497.ht
 And in the Angband forums
 http://angband.oook.cz/forum/showthread.php?t=5798&page=2
 
-Card conbinations for restoring lost values - maybe the "attack" and "defence" values can be used as a "force" that can be used in other ways - healing, restoring etc.
+Card conbinations for restoring lost values - maybe the "attack" and "defence" values can be used as a "force" or "guts" that can be used in other ways - healing, restoring etc.
 	Can boost the cards for attack or something else
+	
+	
+
+Design - THIS DETERMINES THE WHOLE FEEL OF THE GAME - broguey or Sil-ly
+	Broguey makes for more interesting games, but encourages start scumming
+		Also prevents players playing the way that they want
+	Sil-ly allows more depth and replayability - more experimentation and the ability to add more content via classes etc. later on
+	Cards for skills? Or a skills tree?
+		The first will mean that cards you find will determine your strategy whereas the second will mean the player gets to decide his strategy
+		
+Relics instead of artifacts
+
+
+
+Class/race differences
+
+Total number charms you can hold
+Bonuses to prayers/spells
+Easier to learn new prayers/spells/melee abilities etc.
+Start will skills already
+Cause more damage through melee, spells etc.
+More mana
+More evasion
+Natural armour
+Starting gear
+
+A randomly generated title screen would be cool (like that latin jobby)
+
+Evasion versus absorption similar to Sil
+	

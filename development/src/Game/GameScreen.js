@@ -14,6 +14,7 @@ goog.require( "tt.GameGlobals" );
 goog.require( "tt.Level" );
 goog.require( "tt.LevelMap" );
 goog.require( "tt.UI" );
+goog.require( "tt.Inventory" );
 
 //===================================================
 // Constructor
@@ -36,10 +37,9 @@ var p = GameScreen.prototype;
 
 p._display = null; 
 p._game = null;
-p._controlsLocked = null;
+p._gameLocked = null;
 p._saveGameObject = null;
-
-
+p._currentMouseCell = null;
 
 GameScreen.CONTROL_MOVEMENT = "movement";
 GameScreen.CONTROL_NO_MOVE = "no_move";
@@ -72,12 +72,13 @@ p._keyMap[ROT.VK_L] = {controlType:GameScreen.UTIL_LOAD};
 // This quits to the main menu
 p._keyMap[ROT.VK_Q] = {controlType:GameScreen.UTIL_QUIT}; 
 
-// p._inGame = null;
 p._player = null;
 p._doRenderMap = null;
 p._levels = null;
 p._currentLevelIndex = null;
 p._renderer = null;
+p._inventory = null;
+p._charmIndicesSelectedArray = null;
  
 //===================================================
 // Public Methods
@@ -90,7 +91,7 @@ p.enter = function()
 
 p.exit = function()
 {
-	this._controlsLocked = true;
+	this._gameLocked = true;
 
 	this.destroy();
 	
@@ -102,7 +103,7 @@ p.destroy = function()
 {
 	// Stops stuff from happening
 	// this._inGame = false;
-	this._controlsLocked = true;
+	this._gameLocked = true;
 
 	while(this._levels.length > 0)
 	{
@@ -129,6 +130,8 @@ p._create = function()
 	this._player = new Actor();
 	this._player.create("@");
 	
+	this._inventory = new Inventory();
+	
 	// Create first level
 	this._currentLevelIndex = 1;
 		
@@ -136,6 +139,11 @@ p._create = function()
 	var newLevel = new Level(this, this._playerLeavesLevel, this._playerDies);
 	newLevel.create(1);	
 	this._levels.push(newLevel);	
+	
+	// Set no charms selected
+	//this._charmIndicesSelectedArray = [];
+	
+	this._resetCharms();
 }
 
 // Start after a newly created level has been made
@@ -148,26 +156,31 @@ p._start = function()
 // Restart from a saved game after initialisation
 p._restart = function(_saveGameObject)
 {
+	// Set no charms selected
+	//this._charmIndicesSelectedArray = [];	
+
 	this.restoreFromSaveObject(_saveGameObject);
 				
 	this._getCurrentLevel().startLevel();
+	
+	this._resetCharms();
 }
 
 
 // This is purely to be able to load/save in game for debug purposes
 p._saveGameCheat = function()
 {
-	this._controlsLocked = true;
+	this._gameLocked = true;
 				
 	this._saveGameObject = this._getSaveObject();
 	
-	this._controlsLocked = false;
+	this._gameLocked = false;
 }
 
 // This is purely to be able to load/save in game for debug purposes
 p._loadGameCheat = function()
 {	
-	this._controlsLocked = true;
+	this._gameLocked = true;
 		
 	if(this._saveGameObject && this._saveGameObject !== null)			
 	{
@@ -175,14 +188,14 @@ p._loadGameCheat = function()
 		this._init(this._display, this._saveGameObject);
 	}
 	else
-		this._controlsLocked = false;				
+		this._gameLocked = false;				
 }
 
 p._saveAndQuitGame = function()
 {
 	// Game is destroyed on exit so no need to do it here
 
-	this._controlsLocked = true;
+	this._gameLocked = true;
 	
 	this._saveGameObject = this._getSaveObject();	
 			
@@ -195,7 +208,7 @@ p._init = function(_display, _saveGameObject)
 	if(_display && _display !== null)
 		this._display = _display;
 
-	this._controlsLocked = true;
+	this._gameLocked = true;
 	
 	this._doRenderMap = false;
 	
@@ -216,7 +229,7 @@ p._init = function(_display, _saveGameObject)
 		this._start();	
 	}	
 	
-	this._controlsLocked = false;
+	this._gameLocked = false;
 }
 
 p._render = function(e)
@@ -225,7 +238,7 @@ p._render = function(e)
 	if(this._getCurrentLevel().getMap().canDraw() === true)		
 	{
 		this._display.clear();
-		this._UI.update(this._player);
+		this._UI.update(this._player, this._inventory, this._currentMouseCell, this._charmIndicesSelectedArray);
 		
 		// Set the camera to point at the player here
 		this._renderer.setMapCameraPosition(this._player.getPosition()[0], this._player.getPosition()[1]);
@@ -242,16 +255,22 @@ p._updateLevel = function(e)
 		this._getCurrentLevel().update();			
 }
 
-p._testUpdateConditions = function()
+/*p._testUpdateConditions = function()
 {
-	// return (this._controlsLocked === false && this._inGame === true);
-	return (this._controlsLocked === false);
+	// return (this._gameLocked === false && this._inGame === true);
+	return (this._gameLocked === false);
+}*/
+
+p._testControlConditions = function()
+{
+	return (this._gameLocked === false && this._getCurrentLevel() !== null && this._getCurrentLevel().getControlLock() === false);
 }
 
 p._inGameControls = function(_keyCode)
 {
 	// Check the level exists, is active and the controls are waiting for player input (not locked)
-	if(this._getCurrentLevel() !== null && this._getCurrentLevel().getControlLock() === false)
+	//if(this._getCurrentLevel() !== null && this._getCurrentLevel().getControlLock() === false)
+	if(this._testControlConditions() === true)
 	{					
 		// Movement gets interpreted by the level
 		if(_keyCode.controlType === GameScreen.CONTROL_MOVEMENT)
@@ -292,7 +311,7 @@ p._playerLeavesLevel = function(_up)
 
 p._playerDies = function()
 {
-	this._controlsLocked = true;
+	this._gameLocked = true;
 	
 	TweenMax.delayedCall(Globals.DELAY_AFTER_PLAYER_DEATH, this._gameOver, [], this);
 }
@@ -307,6 +326,43 @@ p._gameWon = function()
 	this._callbackFunction(ScreenManager.GAME_WON, []);
 }
 
+p._resetCharms = function()
+{
+	this._charmIndicesSelectedArray = [];
+	
+	// Need to update the player here
+	
+	// this._charmIndicesSelectedArray
+	
+	// Need to update the player to have no charms selected
+	this._player.updateSelectedCharms(this._getCurrentLevel(), this._charmIndicesSelectedArray);
+	
+}
+
+// p._toggleCharmSelection = function(_charmIndex)
+p._toggleCharmSelection = function(_charmKey)
+{
+	// test whether the charm is already selected and if so then remove from the array
+	//var tempIndex = Utils.arrayContainsNumber(this._charmIndicesSelectedArray, _charmIndex);
+	var tempIndex = Utils.arrayContainsElement(this._charmIndicesSelectedArray, _charmKey);
+
+	// if(tempIndex !== null)
+	if(tempIndex !== null)
+	{
+		this._charmIndicesSelectedArray.splice(tempIndex, 1);
+	}
+	else
+	{
+		// Only add the charm if we haven't got the maximum number of charms selected already
+		if(this._charmIndicesSelectedArray.length < GameGlobals.MAX_CHARMS_SELECTED)
+			this._charmIndicesSelectedArray.push(_charmKey);
+			// this._charmIndicesSelectedArray.push(_charmIndex);
+	}
+	
+	// Need to update the player with the charms selected here
+	this._player.updateSelectedCharms(this._getCurrentLevel(), this._charmIndicesSelectedArray);
+}
+
 //===================================================
 // Events
 //===================================================
@@ -316,15 +372,14 @@ p.onTimerTick = function(e)
 	if(this._getCurrentLevel() && this._getCurrentLevel() !== null)
 		this._render();
 
-	if( this._controlsLocked === false )
-		this._updateLevel(e);
-			
-		
+	if( this._gameLocked === false )
+		this._updateLevel(e);					
 }
 
 p.keydownHandler = function(e)
 {
-	if( this._controlsLocked === true )
+	//if( this._gameLocked === true )
+	if( this._testControlConditions() === false )
 		return;
 		
 	var code = e.keyCode;	
@@ -348,6 +403,31 @@ p.keydownHandler = function(e)
 	}
 	else
 		this._inGameControls(this._keyMap[code]);					
+}
+
+p.mouseMoveHandler = function(e)
+{
+	if(this._testControlConditions() === true)
+		this._currentMouseCell = this._display.eventToPosition(e);
+	else
+		this._currentMouseCell = null;
+}
+
+p.mouseDownHandler = function(e)
+{
+	if(this._testControlConditions() === true)
+	{
+		var charmIndex = this._UI.checkMouseDown(this._inventory, this._currentMouseCell);
+		
+		if(charmIndex !== null)
+		{
+			var charmKey = this._inventory.getCharmObjectArray()[charmIndex].key;
+		
+			// this._toggleCharmSelection(charmIndex);
+			this._toggleCharmSelection(charmKey);
+			
+		}
+	}
 }
 
 //===================================================

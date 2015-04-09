@@ -1,25 +1,52 @@
+								
+===== Make a start on game "look" for PC ======	DONE			
 				
-GameScreen and Game split up
-GameScreen deals with load/save for the game so we can cleanly load/save games whilst playing without problems
-It also stores the keymaps for the keyboard controls
-It doesn't do much else
+====== UI Stuff ========
 
-Combine contolsLocked and inGame flags - they do the same thing DONE
+
+Need to figure out where this goes in relation to GameScreen and Level _resetCharms
+	(currently in GameScreen, but probably should go in Level? - Could pass the inventory through? Dunno needs thinking about. Maybe just the selected charms.) 
+
+
+Create an inventory with a list of charms and the number of each
+Then create a way of displaying it (in renderer or a separate UI class?)
+
+Knockback 2
+Bloodlust 1
+Charm A   3
+Charm B   1
+etc.
+
+
+Do we want Angband type slots with a maximum number of a particular type of charm? Or just a maximum number of charms altogether
+	Slots reduces choices somewhat in that you have to have a certain number of each type of charm to make it worthwhile to use a slots
+		Also there is a jarring moment when you have to toss a whole stack of something that would probably be useful
+			Also makes rare charms not worth keeping
+			
+Will need a scrolling interface I think for the charms 
+
+
+Need an inventory that contains charms - do we want monsters to have player type inventories? Could make it actor based so could add further party members later for another game....
+	No because a party roguelike will probably share inventories
+Need an interface for displaying charms and selecting them (and with calls to update the character)
+
+MONSTERS will have an inventory too - the same as the player? Or a simpler monster inventory?
+	Making it the same would probably improve the code - and can give monsters charms and items easier
+		Although monsters already can have innate skills and we don't want them to be able to use charms anyway
 		
-==== Player dying =====
+	Can just give them a simple inventory that has charms and items - nothing to do with the player inventory (it doesn't need the same functionality anyway)
 
-Need to wait until the full turn is over and then test for player death (when removing dead actors probably) DONE
-Then set the level to inactive (leave level maybe?) then tell the game screen you've died DONE
+				
+Inventory and UI need to work with load/save game				
+				
+=== Need to show character symbols and colours =====
 
+A colour class might be good, because it holds each shade which you can get and also the colour and text versions of each part				
+				
 ======= Knockback and counter attack ========
 
 Then need to implement knockback (and double blow) with damage and see if it all holds up
 
-
-====== UI Stuff ========
-
-Need an inventory that contains charms - do we want monsters to have player type inventories? Could make it actor based so could add further party members later for another game....
-Need an interface for displaying charms and selecting them (and with calls to update the character)
 
 ====== Level Generation ======
 

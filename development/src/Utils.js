@@ -58,11 +58,23 @@ Utils.shuffleArray = function(o)
     return o;
 }
 
+
 Utils.arrayContainsElement = function(_array, _element)
 {
 	for(var i=0; i<_array.length; i++)
 	{
 		if(_array[i] === _element)
+			return i;
+	}
+	
+	return null;
+}
+
+Utils.arrayContainsNumber = function(_array, _number)
+{
+	for(var i=0; i<_array.length; i++)
+	{
+		if(_array[i] === _number)
 			return i;
 	}
 	
@@ -186,6 +198,38 @@ Utils.copyObject = function(_object)
 	}
 	
 	return newObject;
+}
+
+// Gets the nth field in an object using the _index parameter
+Utils.getObjectItemFromIndex = function(_object, _index)
+{
+	var tempCount = 0;
+	
+	for(var key in _object)
+	{		
+		if(tempCount === _index)
+			return _object[key];	
+			
+		tempCount += 1;
+	}
+	
+	return null;
+}
+
+// Gets the nth field in an object using the _index parameter
+Utils.getObjectKeyFromIndex = function(_object, _index)
+{
+	var tempCount = 0;
+	
+	for(var key in _object)
+	{		
+		if(tempCount === _index)
+			return key;		
+			
+		tempCount += 1;
+	}
+	
+	return null;
 }
 
 /*Utils.hasKeyBeenPressed = function(_event, _symbol)

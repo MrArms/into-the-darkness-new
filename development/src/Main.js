@@ -2,7 +2,7 @@
 
 goog.provide( "tt.Main" );
 
-goog.require( 'tt.Game' );
+// goog.require( 'tt.Game' );
 goog.require( 'tt.ScreenManager' );
 
 function Main () // data, devices, canvasID, wrapperDivID ) 
