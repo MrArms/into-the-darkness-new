@@ -78,7 +78,7 @@ p._levels = null;
 p._currentLevelIndex = null;
 p._renderer = null;
 p._inventory = null;
-p._charmIndicesSelectedArray = null;
+p._charmKeysSelectedArray = null;
  
 //===================================================
 // Public Methods
@@ -96,13 +96,11 @@ p.exit = function()
 	this.destroy();
 	
 	Screen.prototype.exit.call(this);	
-	// this._game = null;
 }
 
 p.destroy = function()
 {
 	// Stops stuff from happening
-	// this._inGame = false;
 	this._gameLocked = true;
 
 	while(this._levels.length > 0)
@@ -118,6 +116,48 @@ p.destroy = function()
 	
 	this._renderer = null;
 	this._UI = null;
+}
+
+
+// This callback just tells the gameScreen that a turn has started
+p.actorTurnStartedCallback = function(_actor)
+{
+	if(_actor.isPlayer() === true)
+	{
+		this._resetCharms();
+	}
+	else
+	{
+	
+	}
+}
+
+p.playerLeavesLevelCallback = function(_up)
+{	
+	if(_up === true)	
+		this._currentLevelIndex += 1;
+	else 
+		this._currentLevelIndex -= 1;
+		
+	if(	this._currentLevelIndex <= 0)
+		Utils.console("Error, level index too low: " + this._currentLevelIndex);
+		
+	// If the level doesn't exist then create it here
+	if(this._getCurrentLevel() === null)		
+	{
+		var newLevel = new Level(this); //, this._actorTurnStartedCallback, this._playerLeavesLevelCallback, this._playerDiesCallback);
+		newLevel.create(this._currentLevelIndex);
+		this._levels.push(newLevel);
+	}
+		
+	this._getCurrentLevel().joinLevel(this._player, _up);
+}
+
+p.playerDiesCallback = function()
+{
+	this._gameLocked = true;
+	
+	TweenMax.delayedCall(Globals.DELAY_AFTER_PLAYER_DEATH, this._gameOver, [], this);
 }
 
 //===================================================
@@ -136,13 +176,11 @@ p._create = function()
 	this._currentLevelIndex = 1;
 		
 	// Create the first level
-	var newLevel = new Level(this, this._playerLeavesLevel, this._playerDies);
+	var newLevel = new Level(this); //, this._actorTurnStartedCallback, this._playerLeavesLevelCallback, this._playerDiesCallback);
 	newLevel.create(1);	
 	this._levels.push(newLevel);	
 	
 	// Set no charms selected
-	//this._charmIndicesSelectedArray = [];
-	
 	this._resetCharms();
 }
 
@@ -150,22 +188,18 @@ p._create = function()
 p._start = function()
 {
 	this._getCurrentLevel().joinLevel(this._player, true);
-	this._getCurrentLevel().startLevel();	
 }
 
 // Restart from a saved game after initialisation
 p._restart = function(_saveGameObject)
-{
-	// Set no charms selected
-	//this._charmIndicesSelectedArray = [];	
-
+{		
 	this.restoreFromSaveObject(_saveGameObject);
-				
-	this._getCurrentLevel().startLevel();
 	
+	// Set no charms selected
 	this._resetCharms();
+	
+	this._getCurrentLevel().startLevel();				
 }
-
 
 // This is purely to be able to load/save in game for debug purposes
 p._saveGameCheat = function()
@@ -238,7 +272,7 @@ p._render = function(e)
 	if(this._getCurrentLevel().getMap().canDraw() === true)		
 	{
 		this._display.clear();
-		this._UI.update(this._player, this._inventory, this._currentMouseCell, this._charmIndicesSelectedArray);
+		this._UI.update(this._player, this._inventory, this._currentMouseCell, this._charmKeysSelectedArray);
 		
 		// Set the camera to point at the player here
 		this._renderer.setMapCameraPosition(this._player.getPosition()[0], this._player.getPosition()[1]);
@@ -246,7 +280,6 @@ p._render = function(e)
 		// Need to tidy this up a bit THIS COULD BE IMPROVED SOMETIME
 		this._renderer.update(this._getCurrentLevel().getMap(), this._getCurrentLevel().getActors());
 	}
-
 }
 
 p._updateLevel = function(e)
@@ -269,7 +302,6 @@ p._testControlConditions = function()
 p._inGameControls = function(_keyCode)
 {
 	// Check the level exists, is active and the controls are waiting for player input (not locked)
-	//if(this._getCurrentLevel() !== null && this._getCurrentLevel().getControlLock() === false)
 	if(this._testControlConditions() === true)
 	{					
 		// Movement gets interpreted by the level
@@ -288,33 +320,7 @@ p._getCurrentLevel = function()
 		return null;	
 }
 
-p._playerLeavesLevel = function(_up)
-{	
-	if(_up === true)	
-		this._currentLevelIndex += 1;
-	else 
-		this._currentLevelIndex -= 1;
-		
-	if(	this._currentLevelIndex <= 0)
-		Utils.console("Error, level index too low: " + this._currentLevelIndex);
-		
-	// If the level doesn't exist then create it here
-	if(this._getCurrentLevel() === null)		
-	{
-		var newLevel = new Level(this, this._playerLeavesLevel, this._playerDies);
-		newLevel.create(this._currentLevelIndex);
-		this._levels.push(newLevel);
-	}
-		
-	this._getCurrentLevel().joinLevel(this._player, _up);
-}
 
-p._playerDies = function()
-{
-	this._gameLocked = true;
-	
-	TweenMax.delayedCall(Globals.DELAY_AFTER_PLAYER_DEATH, this._gameOver, [], this);
-}
 
 p._gameOver = function()
 {
@@ -328,39 +334,30 @@ p._gameWon = function()
 
 p._resetCharms = function()
 {
-	this._charmIndicesSelectedArray = [];
-	
-	// Need to update the player here
-	
-	// this._charmIndicesSelectedArray
+	this._charmKeysSelectedArray = [];
 	
 	// Need to update the player to have no charms selected
-	this._player.updateSelectedCharms(this._getCurrentLevel(), this._charmIndicesSelectedArray);
-	
+	this._player.updateSelectedCharms(this._getCurrentLevel(), this._charmKeysSelectedArray);	
 }
 
-// p._toggleCharmSelection = function(_charmIndex)
 p._toggleCharmSelection = function(_charmKey)
 {
 	// test whether the charm is already selected and if so then remove from the array
-	//var tempIndex = Utils.arrayContainsNumber(this._charmIndicesSelectedArray, _charmIndex);
-	var tempIndex = Utils.arrayContainsElement(this._charmIndicesSelectedArray, _charmKey);
+	var tempIndex = Utils.arrayContainsElement(this._charmKeysSelectedArray, _charmKey);
 
-	// if(tempIndex !== null)
 	if(tempIndex !== null)
 	{
-		this._charmIndicesSelectedArray.splice(tempIndex, 1);
+		this._charmKeysSelectedArray.splice(tempIndex, 1);
 	}
 	else
 	{
 		// Only add the charm if we haven't got the maximum number of charms selected already
-		if(this._charmIndicesSelectedArray.length < GameGlobals.MAX_CHARMS_SELECTED)
-			this._charmIndicesSelectedArray.push(_charmKey);
-			// this._charmIndicesSelectedArray.push(_charmIndex);
+		if(this._charmKeysSelectedArray.length < GameGlobals.MAX_CHARMS_SELECTED)
+			this._charmKeysSelectedArray.push(_charmKey);
 	}
 	
 	// Need to update the player with the charms selected here
-	this._player.updateSelectedCharms(this._getCurrentLevel(), this._charmIndicesSelectedArray);
+	this._player.updateSelectedCharms(this._getCurrentLevel(), this._charmKeysSelectedArray);
 }
 
 //===================================================
@@ -378,7 +375,6 @@ p.onTimerTick = function(e)
 
 p.keydownHandler = function(e)
 {
-	//if( this._gameLocked === true )
 	if( this._testControlConditions() === false )
 		return;
 		
@@ -423,9 +419,7 @@ p.mouseDownHandler = function(e)
 		{
 			var charmKey = this._inventory.getCharmObjectArray()[charmIndex].key;
 		
-			// this._toggleCharmSelection(charmIndex);
-			this._toggleCharmSelection(charmKey);
-			
+			this._toggleCharmSelection(charmKey);			
 		}
 	}
 }
@@ -467,7 +461,7 @@ p.restoreFromSaveObject = function(_saveObject)
 	
 	for(var i=0; i<_saveObject._levels.length; i++)
 	{
-		var newLevel = new Level(this, this._playerLeavesLevel, this._playerDies);
+		var newLevel = new Level(this); //, this._actorTurnStartedCallback, this._playerLeavesLevelCallback, this._playerDiesCallback);
 		newLevel.restoreFromSaveObject(_saveObject._levels[i], this._player);
 		this._levels.push(newLevel);
 	}

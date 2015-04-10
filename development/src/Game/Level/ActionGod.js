@@ -219,7 +219,6 @@ p._resolveAction = function()
 	// We need to update the actors here again as the situation may have changed (if knockback moves an actor or more enemies killed this turn etc.)	
 	if(this._actionQueue.length > 0)
 		this._level.updateActors();
-		//this._actionQueue[0].getLevel().updateActors();
 						
 	// if we have any actions left then we need to start the next one in the queue
 	// Check the actor to perform the action is still alive too

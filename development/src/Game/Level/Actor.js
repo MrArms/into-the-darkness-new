@@ -214,7 +214,6 @@ p.heal = function(_amount)
 // This updates all values (at the moment just attack and defence bonus) from the status effects, 
 //					current charms selected, extra bonuses (monsters killed last turn etc.) and bonuses from the map (eg. number actors adjacent)
 // Charms are only applied temporarily until the end of the turn when they are added to this._charmEffects to continue to work until the start of the next turn
-//p.updateValuesFromLevel = function(_map, _actors) 
 p.updateValuesFromLevel = function(_level) 
 {
 	// Reset values first
@@ -241,7 +240,6 @@ p.updateValuesFromStatus = function(_statusName)
 	// Statuses caused by effects go in here ***
 }
 
-// p.updateSelectedCharms = function(_map, _actors, _charmsList)
 p.updateSelectedCharms = function(_level, _charmsList)
 {
 	// If we're being passed the charms list for the player then add them to the effects list here

@@ -5,10 +5,13 @@ goog.provide( "tt.Level" );
 // Constructor
 //===================================================
 
-Level = function(_game, _leaveLevelCallback, _playerDiesCallback)
+Level = function(_game) //, _actorTurnStarted, _leaveLevelCallback, _playerDiesCallback)
 {		
-	this._leaveLevelCallback = _leaveLevelCallback.bind(_game);
+	this._game = _game;
+
+	/*this._leaveLevelCallback = _leaveLevelCallback.bind(_game);
 	this._playerDiesCallback = _playerDiesCallback.bind(_game);
+	this._actorTurnStartedCallback = _actorTurnStarted.bind(_game);*/
 
 	this._init()
 }
@@ -22,8 +25,11 @@ var p = Level.prototype;
 p._actors = null;
 p._levelIndex = null;
 
+/*p._actorTurnStartedCallback = null;
 p._leaveLevelCallback = null;
-p._playerDiesCallback = null;
+p._playerDiesCallback = null;*/
+
+p._game = null;
 
 p._player = null;
 
@@ -210,7 +216,8 @@ p._leaveLevel = function(_up)
 	
 	this._player = null;
 	
-	this._leaveLevelCallback(_up);
+	//this._leaveLevelCallback(_up);
+	this._game.playerLeavesLevelCallback(_up);
 }
 
 p._addPlayer = function(_player, _atStart)
@@ -261,13 +268,12 @@ p._nextTurn = function()
 	// if the level is not active then don't continue with the turns
 	if(!this._isActive)
 		return;
-	
-	this.updateActors();
-	
+			
 	// Here we're going to test if the player is still alive and if not then end the game
 	if(this._player.isActorAlive() === false)
 	{
-		this._playerDiesCallback();
+		//this._playerDiesCallback();
+		this._game.playerDiesCallback();
 		
 		// We don't want to continue with the monster turns any more
 		return;		
@@ -275,6 +281,12 @@ p._nextTurn = function()
 		
 	this._currentActor = TurnManager.getNextActor(this._player, this._actors);	
 	this._currentActor.turnStarted();
+	
+	this.updateActors();
+	
+	// Tell the gameScreen the turn has started for UI update
+	//this._actorTurnStartedCallback(this._currentActor);
+	this._game.actorTurnStartedCallback(this._currentActor);
 	
 	// Unlock the controls for the player turn
 	if(this._currentActor.isPlayer())

@@ -6,7 +6,13 @@
 
 Need to figure out where this goes in relation to GameScreen and Level _resetCharms
 	(currently in GameScreen, but probably should go in Level? - Could pass the inventory through? Dunno needs thinking about. Maybe just the selected charms.) 
-
+	
+Two choices
+	1) Have a callback in the level telling the GameScreen a new turn has started (and whether it is the player's turn or not) DONE
+	
+Change so instead of the callbacks, the level just calls the appropriate function in game? DONE
+	
+Possible to cheat by saving after selecting charms and then reloading with the bonuses, but without the charms selected? SEEMS OK
 
 Create an inventory with a list of charms and the number of each
 Then create a way of displaying it (in renderer or a separate UI class?)

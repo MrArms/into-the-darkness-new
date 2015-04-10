@@ -35,11 +35,16 @@ Design - THIS DETERMINES THE WHOLE FEEL OF THE GAME - broguey or Sil-ly
 	Cards for skills? Or a skills tree?
 		The first will mean that cards you find will determine your strategy whereas the second will mean the player gets to decide his strategy
 		
+Perhaps can find "skill cards" that you can use to boost your skills as well as levelling?
+		
+		
 Relics instead of artifacts
 
 
 
 Class/race differences
+
+A nice "void" like appearing for unexplored areas
 
 Total number charms you can hold
 Bonuses to prayers/spells

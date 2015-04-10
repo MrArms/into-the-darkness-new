@@ -40,9 +40,9 @@ p.create = function(_effectData, _timer)
 		this._value = _effectData.value;
 	
 	if(_timer && _timer !== null)
-		_timer = _timer
+		this._timer = _timer
 	else
-		_timer = 1;
+		this._timer = 1;
 }
 
 p.reduceTimer = function()
