@@ -72,7 +72,22 @@ CharmGlobals.data["test name 5"] = {name:"Test name 5", description:"Test descri
 CharmGlobals.data["test name 6"] = {name:"Test name 6", description:"Test description", 
 																					effects:[
 																							{name:Effect.ATTACK, value:1}
-																							] };																							
+																							] };	
+
+CharmGlobals.data["test name 7"] = {name:"Test name7", description:"Test description", effects:[{name:Effect.ATTACK, value:1} ] };																							
+CharmGlobals.data["test name 8"] = {name:"Test name8", description:"Test description", effects:[{name:Effect.ATTACK, value:1} ] };																							
+CharmGlobals.data["test name 9"] = {name:"Test name9", description:"Test description", effects:[{name:Effect.ATTACK, value:1} ] };																							
+CharmGlobals.data["test name 10"] = {name:"Test name10", description:"Test description", effects:[{name:Effect.ATTACK, value:1} ] };																							
+CharmGlobals.data["test name 11"] = {name:"Test name11", description:"Test description", effects:[{name:Effect.ATTACK, value:1} ] };																							
+CharmGlobals.data["test name 12"] = {name:"Test name12", description:"Test description", effects:[{name:Effect.ATTACK, value:1} ] };																							
+CharmGlobals.data["test name 13"] = {name:"Test name13", description:"Test description", effects:[{name:Effect.ATTACK, value:1} ] };																							
+CharmGlobals.data["test name 14"] = {name:"Test name14", description:"Test description", effects:[{name:Effect.ATTACK, value:1} ] };																							
+CharmGlobals.data["test name 15"] = {name:"Test name15", description:"Test description", effects:[{name:Effect.ATTACK, value:1} ] };																							
+CharmGlobals.data["test name 16"] = {name:"Test name16", description:"Test description", effects:[{name:Effect.ATTACK, value:1} ] };																							
+CharmGlobals.data["test name 17"] = {name:"Test name17", description:"Test description", effects:[{name:Effect.ATTACK, value:1} ] };																							
+CharmGlobals.data["test name 18"] = {name:"Test name18", description:"Test description", effects:[{name:Effect.ATTACK, value:1} ] };																							
+CharmGlobals.data["test name 19"] = {name:"Test name19", description:"Test description", effects:[{name:Effect.ATTACK, value:1} ] };																							
+CharmGlobals.data["test name 20"] = {name:"Test name20", description:"Test description", effects:[{name:Effect.ATTACK, value:1} ] };																							
 																							
 																							
 

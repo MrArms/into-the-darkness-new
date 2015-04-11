@@ -114,6 +114,8 @@ p.destroy = function()
 		 	
 	this._player = null;	
 	
+	this._inventory = null;
+	
 	this._renderer = null;
 	this._UI = null;
 }
@@ -123,12 +125,27 @@ p.destroy = function()
 p.actorTurnStartedCallback = function(_actor)
 {
 	if(_actor.isPlayer() === true)
-	{
-		this._resetCharms();
+	{		
+		// this._resetCharms();
 	}
 	else
 	{
 	
+	}
+}
+
+p.actorTurnEndsCallback = function(_actor)
+{
+	// Need to remove selected charms from the player 
+	if(_actor.isPlayer() === true)
+	{		
+		if(this._charmKeysSelectedArray.length > 0)
+			this._inventory.removeSelectedCharms(this._charmKeysSelectedArray);
+		this._resetCharms();
+	}
+	else
+	{
+		
 	}
 }
 
@@ -171,6 +188,7 @@ p._create = function()
 	this._player.create("@");
 	
 	this._inventory = new Inventory();
+	this._inventory.create();
 	
 	// Create first level
 	this._currentLevelIndex = 1;
@@ -205,10 +223,21 @@ p._restart = function(_saveGameObject)
 p._saveGameCheat = function()
 {
 	this._gameLocked = true;
+		
+	this._saveGameObject = this._getSaveObject();	
+		
+	// This is purely to be able to load/save in game for debug purposes
+	this._callbackFunction(ScreenManager.SAVE_GAME, [this._saveGameObject]);
+	// this._callbackFunction(ScreenManager.SAVE_GAME, [this._getSaveObject()]);
+
+	this._gameLocked = false;
+
+
+	/*this._gameLocked = true;
 				
 	this._saveGameObject = this._getSaveObject();
 	
-	this._gameLocked = false;
+	this._gameLocked = false;*/
 }
 
 // This is purely to be able to load/save in game for debug purposes
@@ -383,10 +412,7 @@ p.keydownHandler = function(e)
 	// This saves the game to the screenManager, but also saves "in game" if we want to reload in game for debug purposes
 	if(this._keyMap[code].controlType === GameScreen.UTIL_SAVE)
 	{
-		this._saveGameCheat(); 
-		
-		// This is purely to be able to load/save in game for debug purposes
-		this._callbackFunction(ScreenManager.SAVE_GAME, [this._getSaveObject()]);
+		this._saveGameCheat(); 						
 	}
 	// This is purely to be able to load/save in game for debug purposes
 	else if(this._saveGameObject !== null && this._keyMap[code].controlType === GameScreen.UTIL_LOAD)
@@ -439,6 +465,8 @@ p._getSaveObject = function()
 	
 	saveObject._player = this._player.getSaveObject();
 	
+	saveObject._inventory = this._inventory.getSaveObject();
+	
 	saveObject._levels = [];
 	
 	for(var i=0; i<this._levels.length; i++)
@@ -458,6 +486,9 @@ p.restoreFromSaveObject = function(_saveObject)
 	
 	this._player = new Actor();	
 	this._player.restoreFromSaveObject(_saveObject._player);
+	
+	this._inventory = new Inventory();
+	this._inventory.restoreFromSaveObject(_saveObject._inventory);		
 	
 	for(var i=0; i<_saveObject._levels.length; i++)
 	{

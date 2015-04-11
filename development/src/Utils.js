@@ -232,6 +232,32 @@ Utils.getObjectKeyFromIndex = function(_object, _index)
 	return null;
 }
 
+Utils.getNumberItemsInObject = function(_object)
+{
+	var numObjects = 0;
+	
+	for (var key in _object)	
+		numObjects += 1;
+		
+	return numObjects;
+}
+
+Utils.getRandomKeyFromObject = function(_object, _numObjects)
+{	
+	if(!_numObjects || _numObjects === null)
+	{
+		_numObjects = Utils.getNumberItemsInObject(_object);
+	}
+	
+	var tempIndex = Math.floor(ROT.RNG.getUniform() * _numObjects);
+		
+	var tempKey = Utils.getObjectKeyFromIndex(_object, tempIndex);
+	
+	return tempKey;
+}
+
+
+
 /*Utils.hasKeyBeenPressed = function(_event, _symbol)
 {
 	var code = _event.keyCode;

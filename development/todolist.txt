@@ -4,32 +4,14 @@
 ====== UI Stuff ========
 
 
-Need to figure out where this goes in relation to GameScreen and Level _resetCharms
-	(currently in GameScreen, but probably should go in Level? - Could pass the inventory through? Dunno needs thinking about. Maybe just the selected charms.) 
-	
-Two choices
-	1) Have a callback in the level telling the GameScreen a new turn has started (and whether it is the player's turn or not) DONE
-	
-Change so instead of the callbacks, the level just calls the appropriate function in game? DONE
-	
-Possible to cheat by saving after selecting charms and then reloading with the bonuses, but without the charms selected? SEEMS OK
+NEED TO ARRANGE THE CHARMS IN TWO COLOMNS FOR THE MOMENT
+	Need to use _getCharmIndexFromCell in UI for the display and mouse selection of charms (and check mouse over code too)
 
-Create an inventory with a list of charms and the number of each
-Then create a way of displaying it (in renderer or a separate UI class?)
+Need to remove charms once they have been used by the player. DONE
 
-Knockback 2
-Bloodlust 1
-Charm A   3
-Charm B   1
-etc.
+Add load/save of inventory DONE
 
-
-Do we want Angband type slots with a maximum number of a particular type of charm? Or just a maximum number of charms altogether
-	Slots reduces choices somewhat in that you have to have a certain number of each type of charm to make it worthwhile to use a slots
-		Also there is a jarring moment when you have to toss a whole stack of something that would probably be useful
-			Also makes rare charms not worth keeping
-			
-Will need a scrolling interface I think for the charms 
+Will need a scrolling interface I think for the charms - not sure about this.... perhaps leave UI design for later on and get the game going more now
 
 
 Need an inventory that contains charms - do we want monsters to have player type inventories? Could make it actor based so could add further party members later for another game....

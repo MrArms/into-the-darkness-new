@@ -8,8 +8,9 @@ var GameGlobals = {};
 
 GameGlobals.visionRadius = 10;
 
-GameGlobals.MAX_CHARMS = 40;
-GameGlobals.START_CHARMS = 20;
+GameGlobals.MAX_CHARMS = 50;
+GameGlobals.START_CHARMS = 40;
+GameGlobals.MAX_DIFFERENT_CHARMS = 10;
 
 GameGlobals.MAX_CHARMS_SELECTED = 3;
 

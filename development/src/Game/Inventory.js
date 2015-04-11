@@ -37,7 +37,7 @@ p.addCharms = function(_charmKey, _number)
 {
 	var numberCharmsAdded = 0;
 
-	if(this._getTotalNumberCharms() < GameGlobals.MAX_CHARMS)
+	if(this._getTotalNumberCharms() < GameGlobals.MAX_CHARMS && this._charmObjectArray.length < GameGlobals.MAX_DIFFERENT_CHARMS)
 	{
 		var charmIndex = this._hasCharm(_charmKey);
 		
@@ -60,29 +60,50 @@ p.addCharms = function(_charmKey, _number)
 	return numberCharmsAdded;	
 }
 
+p.removeSelectedCharms = function(_charmKeyDeleteArray)
+{
+	for(var i=0; i<_charmKeyDeleteArray.length; i++)
+	{
+		this._removeCharm(_charmKeyDeleteArray[i]);
+	}
+	
+}
+
+p.create = function()
+{		
+	this._initialiseCharms();
+}
+
 //===================================================
 // Private Methods
 //===================================================
 
+p._removeCharm = function(_charmKey)
+{	
+	// for(var key in this._charmObjectArray)
+	for(var i=0; i<this._charmObjectArray.length; i++)
+	{
+		if(this._charmObjectArray[i].key === _charmKey)
+		{
+			this._charmObjectArray[i].number -= 1;
+			
+			if(this._charmObjectArray[i].number <= 0)			
+				this._charmObjectArray.splice(i, 1);
+				
+			return;
+		}	
+	}	
+}
+
 // This creates some (random?) charms to start with
 p._initialiseCharms = function()
 {
-	// Gets number of charms available
-	
-	var numCharms = 0;
-	
-	for (var key in CharmGlobals.data)
-	{
-		numCharms += 1;
-	}
+	// Gets number of charms available	
+	var numCharms = Utils.getNumberItemsInObject(CharmGlobals.data);
 	
 	for(var i=0; i<GameGlobals.START_CHARMS; i++)
 	{
-		var tempIndex = Math.floor(ROT.RNG.getUniform() * numCharms);
-		
-		//var tempCharmData = Utils.getObjectItemFromIndex(CharmGlobals.data, tempIndex);
-		
-		var tempCharmKey = Utils.getObjectKeyFromIndex(CharmGlobals.data, tempIndex);
+		var tempCharmKey = Utils.getRandomKeyFromObject(CharmGlobals.data, numCharms);
 		
 		this.addCharms(tempCharmKey, 1);
 	}
@@ -114,11 +135,44 @@ p._hasCharm = function(_charmKey)
 p._init = function()
 {
 	this._charmObjectArray = [];
-	
-	this._initialiseCharms();
 }
 
 //===================================================
 // Events
 //===================================================
 
+//===================================================
+// LOADING & SAVING
+//===================================================
+
+p.getSaveObject = function()
+{
+	var saveObject = {};
+	
+	saveObject._charmObjectArray = []; 
+
+	for(var i=0; i<this._charmObjectArray.length; i++)
+	{
+		var newObject = {};
+		
+		newObject.key = this._charmObjectArray[i].key;
+		newObject.number = this._charmObjectArray[i].number;
+		
+		saveObject._charmObjectArray.push(newObject);
+	}	
+	
+	return saveObject;
+}
+
+p.restoreFromSaveObject = function(_saveObject)
+{
+	for(var i=0; i<_saveObject._charmObjectArray.length; i++)
+	{
+		var newObject = {};
+		
+		newObject.key = _saveObject._charmObjectArray[i].key;
+		newObject.number = _saveObject._charmObjectArray[i].number;
+		
+		this._charmObjectArray.push(newObject);
+	}	
+}

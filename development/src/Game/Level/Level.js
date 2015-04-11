@@ -272,7 +272,6 @@ p._nextTurn = function()
 	// Here we're going to test if the player is still alive and if not then end the game
 	if(this._player.isActorAlive() === false)
 	{
-		//this._playerDiesCallback();
 		this._game.playerDiesCallback();
 		
 		// We don't want to continue with the monster turns any more
@@ -285,7 +284,6 @@ p._nextTurn = function()
 	this.updateActors();
 	
 	// Tell the gameScreen the turn has started for UI update
-	//this._actorTurnStartedCallback(this._currentActor);
 	this._game.actorTurnStartedCallback(this._currentActor);
 	
 	// Unlock the controls for the player turn
@@ -338,12 +336,19 @@ p._turnFinished = function()
 	
 	// Need to update the map viewable tiles here
 	this._updateVisibleMapFromPlayerPosition();
-	
+			
 	// Check for delay after the actions have been resolved - only have a delay for some actions (not move as it would be too annoying)
 	if(this._actionGod.getAfterAnimWaitTime() > 0)
+	{
+		//this._game.actorTurnEndsCallback(this._currentActor);
+		TweenMax.delayedCall(this._actionGod.getAfterAnimWaitTime(), this._game.actorTurnEndsCallback, [this._currentActor], this);	
 		TweenMax.delayedCall(this._actionGod.getAfterAnimWaitTime(), this._nextTurn, [], this);	
+	}
 	else
-		this._nextTurn();	
+	{
+		this._game.actorTurnEndsCallback(this._currentActor);
+		this._nextTurn();			
+	}
 }
 
 p._removeDeadActors = function()

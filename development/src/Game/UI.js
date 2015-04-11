@@ -20,9 +20,11 @@ var p = UI.prototype;
 //===================================================
 
 p.X_START = 80;
+p.X_SECOND_COL = 97;
 p.Y_START = 10;
 p.Y_CHARM_DISPLAY_START = 20; //p.Y_START + 20;
 p.CHARM_DISPLAY_WIDTH = 15; //p.Y_START + 20;
+
 
 //===================================================
 // Public Methods
@@ -38,7 +40,16 @@ p.update = function(_player, _inventory, _currentMouseCell, _charmIndicesSelecte
 // This just returns the index of a charm if it is clicked on
 p.checkMouseDown = function(_inventory, _currentMouseCell)
 {
-	if(_currentMouseCell !== null && _currentMouseCell[0] >= this.X_START && _currentMouseCell[0] <= this.X_START + this.CHARM_DISPLAY_WIDTH)
+
+	if(_currentMouseCell !== null)
+	{
+		return this._getCharmIndexFromCell(_inventory, _currentMouseCell[0], _currentMouseCell[1]);
+	}
+
+	return null;
+
+
+	/*if(_currentMouseCell !== null && _currentMouseCell[0] >= this.X_START && _currentMouseCell[0] <= this.X_START + this.CHARM_DISPLAY_WIDTH)
 	{
 		var indexYCell =  _currentMouseCell[1] - this.Y_CHARM_DISPLAY_START
 	
@@ -46,13 +57,42 @@ p.checkMouseDown = function(_inventory, _currentMouseCell)
 			return 	indexYCell;
 	}
 	
-	return null;
-
+	return null;*/
 }
 
 //===================================================
 // Private Methods
 //===================================================
+
+// This takes a screen cell coordinate and returns an index of a charm if it is "over" the text of the charm
+// Used for mousing over and clicking charm names
+p._getCharmIndexFromCell = function(_inventory, _col, _row)
+{
+	var numberInCol = Math.ceil(GameGlobals.MAX_DIFFERENT_CHARMS/2);
+	
+	var tempCol = null;
+	
+	// Are we in the first or second colomn of charms as displayed
+	if(_col >= this.X_START && _col <= this.X_START + this.CHARM_DISPLAY_WIDTH)
+		tempCol = 0;
+	else if(_col >= this.X_SECOND_COL && _col <= this.X_SECOND_COL + this.CHARM_DISPLAY_WIDTH)
+		tempCol = 1;
+	else
+		return null;
+		
+	if(_row >= this.Y_CHARM_DISPLAY_START && _row <= this.Y_CHARM_DISPLAY_START + numberInCol)
+	{
+		var indexYCell =  _row - this.Y_CHARM_DISPLAY_START;
+		
+		if(tempCol === 1)	
+			indexYCell = indexYCell + numberInCol;	
+			
+		if(indexYCell <= _inventory.getCharmObjectArray().length - 1)
+			return indexYCell;		
+	}
+	
+	return null;	
+}
 
 p._updateStatDisplay = function(_player)
 {
@@ -66,15 +106,35 @@ p._updateCharmDisplay = function(_inventory, _currentMouseCell, _charmIndicesSel
 
 	var currentYPosition = this.Y_CHARM_DISPLAY_START;
 	
-	for(var i=0; i<charmObjectArray.length; i++)
+	var numberInCol = Math.ceil(GameGlobals.MAX_DIFFERENT_CHARMS/2);
+	
+	// The first colomn of charms 
+	for(var i=0; i< Math.min(numberInCol, charmObjectArray.length); i++)
 	{			
-		// var isSelected = (Utils.arrayContainsNumber(_charmIndicesSelectedArray, i) !== null);
 		var isSelected = (Utils.arrayContainsElement(_charmIndicesSelectedArray, charmObjectArray[i].key) !== null);
 	
 		this._showCharmItem(this.X_START, currentYPosition, charmObjectArray[i], _currentMouseCell, isSelected);	
 
 		currentYPosition += 1;
 	}
+	
+	// If we need the second colomn of charms
+	if(charmObjectArray.length > numberInCol)
+	{
+		currentYPosition = this.Y_CHARM_DISPLAY_START;
+				
+		for(var i=0; i< charmObjectArray.length - numberInCol; i++)
+		{			
+			var isSelected = (Utils.arrayContainsElement(_charmIndicesSelectedArray, charmObjectArray[i+numberInCol].key) !== null);
+	
+			this._showCharmItem(this.X_SECOND_COL, currentYPosition, charmObjectArray[i+numberInCol], _currentMouseCell, isSelected);	
+
+			currentYPosition += 1;			
+		}		
+	}
+	
+	if(charmObjectArray.length > GameGlobals.MAX_DIFFERENT_CHARMS)
+		Utils.console("Error. More charm objects in array than the max allowed!");	
 }
 
 p._showCharmItem = function(_xPos, _yPos, _charmItem, _currentMouseCell, _isSelected)
