@@ -36,10 +36,10 @@ Globals.FONT_SIZE = 18;
 
 Globals.FPS = 60;
 
-Globals.COLOUR_WHITE = "#FFF"
-Globals.COLOUR_CYAN = "#1FF"
+/*Globals.COLOUR_WHITE = "#FFF"
+Globals.COLOUR_CYAN = "#1FF"*/
 
-Globals.TEXT_COLOUR_WHITE =   "%c{" + Globals.COLOUR_WHITE + "}";
+// Globals.TEXT_COLOUR_WHITE =   "%c{" + Globals.COLOUR_WHITE + "}";
 
 // This could be a variable eventually and called when loading in different files from the main menu (if we want that functionality)
 Globals.SAVE_GAME_NAME = "SAVE1";

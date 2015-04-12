@@ -1,36 +1,14 @@
 								
-===== Make a start on game "look" for PC ======	DONE			
-				
+		
 ====== UI Stuff ========
 
+Colour class that gives shades, "#FFF" and the text versions.	DONE
+ 
+Make the characters display their symbols and colours DONE
 
-NEED TO ARRANGE THE CHARMS IN TWO COLOMNS FOR THE MOMENT
-	Need to use _getCharmIndexFromCell in UI for the display and mouse selection of charms (and check mouse over code too)
+========= Save and load to the disk =======
 
-Need to remove charms once they have been used by the player. DONE
-
-Add load/save of inventory DONE
-
-Will need a scrolling interface I think for the charms - not sure about this.... perhaps leave UI design for later on and get the game going more now
-
-
-Need an inventory that contains charms - do we want monsters to have player type inventories? Could make it actor based so could add further party members later for another game....
-	No because a party roguelike will probably share inventories
-Need an interface for displaying charms and selecting them (and with calls to update the character)
-
-MONSTERS will have an inventory too - the same as the player? Or a simpler monster inventory?
-	Making it the same would probably improve the code - and can give monsters charms and items easier
-		Although monsters already can have innate skills and we don't want them to be able to use charms anyway
-		
-	Can just give them a simple inventory that has charms and items - nothing to do with the player inventory (it doesn't need the same functionality anyway)
-
-				
-Inventory and UI need to work with load/save game				
-				
-=== Need to show character symbols and colours =====
-
-A colour class might be good, because it holds each shade which you can get and also the colour and text versions of each part				
-				
+			
 ======= Knockback and counter attack ========
 
 Then need to implement knockback (and double blow) with damage and see if it all holds up

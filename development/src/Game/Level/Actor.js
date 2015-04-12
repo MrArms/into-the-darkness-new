@@ -56,6 +56,8 @@ p.create = function(_char)
 	this._data._char = _char;
 	this._data._isPlayer = _char === "@";
 	
+	this._data._colour =  GameGlobals.actorsData[this.getChar()].colour;
+	
 	this._data._alignment = GameGlobals.actorsData[this.getChar()].alignment;
 	
 	this._data._maxHP = GameGlobals.actorsData[this.getChar()].max_hp;
@@ -347,6 +349,8 @@ p._kill = function()
 //===================================================
 
 p.getChar = function() { return this._data._char; }
+
+p.getColour = function() { return this._data._colour; }
 
 p.isPlayer = function() { return this._data._isPlayer; }
 
