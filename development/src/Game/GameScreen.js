@@ -15,6 +15,7 @@ goog.require( "tt.Level" );
 goog.require( "tt.LevelMap" );
 goog.require( "tt.UI" );
 goog.require( "tt.Inventory" );
+goog.require( "tt.ColourGlobals" );
 
 //===================================================
 // Constructor
@@ -408,6 +409,10 @@ p.keydownHandler = function(e)
 		return;
 		
 	var code = e.keyCode;	
+			
+	// If the key pressed isn't in the keymap then just return
+	if(! this._keyMap[code] || this._keyMap[code] === null)
+		return;
 		
 	// This saves the game to the screenManager, but also saves "in game" if we want to reload in game for debug purposes
 	if(this._keyMap[code].controlType === GameScreen.UTIL_SAVE)
