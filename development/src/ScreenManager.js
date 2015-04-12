@@ -73,6 +73,8 @@ p.init = function()
 
 p._startMenuScreen = function()
 {
+	this._getSavedGameObject();
+
 	var saveGameAvailable = (this._saveGameObject !== null);
 
 	var menuScreen = new MenuScreen(this._display, saveGameAvailable);
@@ -91,8 +93,22 @@ p._startGame = function()
 	this._switchScreen(gameScreen);
 }
 
+p._getSavedGameObject = function()
+{	
+	if(this._saveGameObject && this._saveGameObject !== null) 
+		return;
+	else
+	{
+		var retrievedObject = localStorage.getItem('saveGame');
+		
+		if(retrievedObject && retrievedObject !== null)
+			this._saveGameObject = JSON.parse(retrievedObject);
+	}
+}
+
 p._restoreGame = function()
 {
+	// First look for a local saved game here
 	if(this._saveGameObject && this._saveGameObject !== null)
 	{
 		var gameScreen = this._createGameScreen(this._saveGameObject);		
@@ -115,7 +131,10 @@ p._createGameScreen = function(_saveGameObject)
 
 p._saveGame = function(_args)
 {
-	this._saveGameObject = _args[0]; //_saveGameObject;
+	this._saveGameObject = _args[0]; 
+	
+	// Put the object into storage
+	localStorage.setItem('saveGame', JSON.stringify(this._saveGameObject));
 }
 
 p._gameWon = function()

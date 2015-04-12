@@ -1,13 +1,7 @@
-								
-		
-====== UI Stuff ========
-
-Colour class that gives shades, "#FFF" and the text versions.	DONE
- 
-Make the characters display their symbols and colours DONE
-
+										
 ========= Save and load to the disk =======
 
+	DONE :D :D :D
 			
 ======= Knockback and counter attack ========
 
