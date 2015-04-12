@@ -7,6 +7,8 @@
 
 Then need to implement knockback (and double blow) with damage and see if it all holds up
 
+Could make "double blow" double action and make it more flexible and interesting - so double healing etc.
+	Also probably easier to code as you just store the action and do everything twice (can even move twice)
 
 ====== Level Generation ======
 

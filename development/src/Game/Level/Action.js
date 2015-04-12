@@ -30,6 +30,7 @@ p._level = null;
 Action.ATTACK = "attack";
 Action.STATUS = "status";
 Action.MOVE = "move";
+Action.MOVE_WAIT = "move_wait"; // A movement that we want to wait to see the effect (eg. after knockback)
 
 //===================================================
 // Public Methods
@@ -80,7 +81,7 @@ p._init = function(_actionType, _args)
 		this._targets = _args[0];
 		this._status = _args[1];
 	}
-	else if(_actionType === Action.MOVE)
+	else if(_actionType === Action.MOVE || _actionType === Action.MOVE_WAIT)
 	{		
 		this._targets = _args[0];
 		this._newPositions = _args[1];

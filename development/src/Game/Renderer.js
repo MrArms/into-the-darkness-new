@@ -119,24 +119,25 @@ p._renderActorCell = function(_map, _actorsCellObject, _col, _row)
 				
 			// Draw the number over the defenders head here
 			else if(gameEvent.getEventType() === GameEvent.DAMAGE)
-				this._drawCell(_col, _row, gameEvent.getDamage(), ColourGlobals.getColour(ColourGlobals.COLOUR_RED), ColourGlobals.getColour(ColourGlobals.COLOUR_BLACK));
+				this._drawCell(_col, _row, gameEvent.getDamage(), ColourGlobals.getColour(ColourGlobals.COLOUR_RED)); //, ColourGlobals.getColour(ColourGlobals.COLOUR_BLACK));
 			
 			// Draw the number over the actors head here
 			else if(gameEvent.getEventType() === GameEvent.HEAL)
-				this._drawCell(_col, _row, gameEvent.getHealAmount(), ColourGlobals.getColour(ColourGlobals.COLOUR_GREEN_HEAL), ColourGlobals.getColour(ColourGlobals.COLOUR_BLACK));
+				this._drawCell(_col, _row, gameEvent.getHealAmount(), ColourGlobals.getColour(ColourGlobals.COLOUR_GREEN_HEAL)); //, ColourGlobals.getColour(ColourGlobals.COLOUR_BLACK));
 				
 			else if(gameEvent.getEventType() === GameEvent.POISON_DAMAGE)
-				this._drawCell(_col, _row, gameEvent.getDamage(), ColourGlobals.getColour(ColourGlobals.COLOUR_GREEN_POISON), ColourGlobals.getColour(ColourGlobals.COLOUR_BLACK));
+				this._drawCell(_col, _row, gameEvent.getDamage(), ColourGlobals.getColour(ColourGlobals.COLOUR_GREEN_POISON)); //, ColourGlobals.getColour(ColourGlobals.COLOUR_BLACK));
 				
 			// Just showing a normal background for actors "animating" their move for the moment
 			// Note you can get the new position by calling gameEvent.getNewPosition() if needed
-			else if(gameEvent.getEventType() === GameEvent.MOVEMENT)
-				this._drawCell(_col, _row, tempChar, tempColour, ColourGlobals.getColour(ColourGlobals.COLOUR_BLACK) );
+			else if(gameEvent.getEventType() === GameEvent.MOVEMENT || gameEvent.getEventType() === GameEvent.MOVEMENT_WAIT)			
+				//this._drawCell(gameEvent.getNewPosition()[0], gameEvent.getNewPosition()[1], tempChar, tempColour); //, ColourGlobals.getColour(ColourGlobals.COLOUR_BLACK) );
+				this._drawCell(_col, _row, tempChar, tempColour); //, ColourGlobals.getColour(ColourGlobals.COLOUR_BLACK) );
 	
 		}	
 		// No game event so just draw the actor as usual
 		else
-			this._drawCell(_col, _row, tempChar, tempColour, ColourGlobals.getColour(ColourGlobals.COLOUR_BLACK) );		
+			this._drawCell(_col, _row, tempChar, tempColour); //, ColourGlobals.getColour(ColourGlobals.COLOUR_BLACK) );		
 	}	
 }
 

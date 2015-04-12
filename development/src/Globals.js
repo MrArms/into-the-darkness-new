@@ -20,7 +20,7 @@ var p = Globals.prototype;
 // Slight delay before letting the next character move - this is really only for debug purposes as it is too annoying otherwise 
 Globals.END_TURN_DELAY = 0.0; //1.0;
 Globals.GAME_EVENT_ANIM_LENGTH = 0.2; //0.05; //0.35;
-Globals.DELAY_BETWEEN_ACTIONS = 0.2; //0.25;
+Globals.DELAY_BETWEEN_ACTIONS = 0.0; //0.1; //0.25;
 Globals.DELAY_AFTER_PLAYER_DEATH = 0.8; //0.25;
 
 Globals.MAP_START_COL = 5;

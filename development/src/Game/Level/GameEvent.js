@@ -40,9 +40,10 @@ GameEvent.DAMAGE = "damage";
 GameEvent.HEAL = "heal";
 GameEvent.POISON_DAMAGE = "poison_damage";
 GameEvent.MOVEMENT = "movement";
+GameEvent.MOVEMENT_WAIT = "movement_wait"; // A movement that we want to wait to see the effect (eg. after knockback)
 
 GameEvent.ANIM_ATTACK = 5;
-GameEvent.ANIM_TIME_DAMAGE = 20;
+GameEvent.ANIM_TIME_DAMAGE = 20; //20;
 
 GameEvent.ANIM_TIME_HEAL = 20;
 GameEvent.ANIM_TIME_POISON_DAMAGE = 20;
@@ -108,7 +109,7 @@ p.resolveGameEvent = function()
 	{
 		this._actor.heal( this.getHealAmount() );
 	}
-	else if(this._eventType === GameEvent.MOVEMENT)
+	else if(this._eventType === GameEvent.MOVEMENT || this._eventType === GameEvent.MOVEMENT_WAIT)
 	{
 		this._level.moveActor(this._actor, this._newPosition);
 	}
@@ -174,6 +175,14 @@ p._init = function(_eventType, _args)
 	{
 		this._timer = GameEvent.ANIM_TIME_MOVEMENT;
 		this._afterAnimWaitTime = 0; // Don't want to wait after the turn has finished (too annoying)
+		this._newPosition = _args[0];
+		this._level = _args[1];
+	}
+	// This is the same as a movement gameEvent except we want to wait at the end
+	else if(_eventType === GameEvent.MOVEMENT_WAIT)
+	{
+		this._timer = GameEvent.ANIM_TIME_MOVEMENT;
+		this._afterAnimWaitTime = GameEvent.ANIM_AFTER_ACTION_WAIT_TIME; 
 		this._newPosition = _args[0];
 		this._level = _args[1];
 	}

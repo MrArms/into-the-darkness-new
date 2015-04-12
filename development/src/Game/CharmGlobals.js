@@ -14,10 +14,7 @@ var CharmGlobals = {};
 
 CharmGlobals.data = {};
 
-
-
 // NOTE that when you have multiple effects in a charm they get applied in the order that they are list in
-
 CharmGlobals.data[Charm.MIGHT] = {name:"Attack +2", description:"Increases your attack by 2", 
 																					effects:[
 																							{name:Effect.ATTACK, value:2}
@@ -45,7 +42,7 @@ CharmGlobals.data[Charm.FORTIFY] = {name:"Fortify", description:"Increases defen
 																							{name:Effect.DEFENCE, value:2}
 																							] };	
 
-CharmGlobals.data["test name 1"] = {name:"Test name 1", description:"Test description", 
+/*CharmGlobals.data["test name 1"] = {name:"Test name 1", description:"Test description", 
 																					effects:[
 																							{name:Effect.DEFENCE, value:1}
 																							] };		
@@ -87,7 +84,7 @@ CharmGlobals.data["test name 16"] = {name:"Test name16", description:"Test descr
 CharmGlobals.data["test name 17"] = {name:"Test name17", description:"Test description", effects:[{name:Effect.ATTACK, value:1} ] };																							
 CharmGlobals.data["test name 18"] = {name:"Test name18", description:"Test description", effects:[{name:Effect.ATTACK, value:1} ] };																							
 CharmGlobals.data["test name 19"] = {name:"Test name19", description:"Test description", effects:[{name:Effect.ATTACK, value:1} ] };																							
-CharmGlobals.data["test name 20"] = {name:"Test name20", description:"Test description", effects:[{name:Effect.ATTACK, value:1} ] };																							
+CharmGlobals.data["test name 20"] = {name:"Test name20", description:"Test description", effects:[{name:Effect.ATTACK, value:1} ] };	*/																						
 																							
 																							
 

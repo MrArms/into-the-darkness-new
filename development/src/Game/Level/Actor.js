@@ -221,14 +221,13 @@ p.updateValuesFromLevel = function(_level)
 	// Reset values first
 	this._data._currentAttackBonus = this._data._baseAttackBonus;
 	this._data._currentDefenceBonus = this._data._baseDefenceBonus;
-	
-	// this._updateNumberAdjacentActors(_actors)
+		
 	this._updateNumberAdjacentActors(_level.getActors());
 			
 	// IF WE WANT TO APPLY STATUSES TO THE ACTORS HERE TOO ***
 	// this.updateValuesFromStatus
 			
-	var allEffects = this._getAllEffects(); //_charmsList);		
+	var allEffects = this._getAllEffects(); 
 			
 	// Now apply the effects in order	
 	for(var i=0; i<allEffects.length; i++)		
@@ -237,11 +236,26 @@ p.updateValuesFromLevel = function(_level)
 		//this._updateValuesFromEffect(allEffects[i]);	
 }
 
+p.hasEffect = function(_effectName)
+{
+	var allEffects = this._getAllEffects(); 
+
+	for(var i=0; i<allEffects.length; i++)		
+		{
+			if(allEffects[i].getEffectType() === _effectName)
+				return true;			
+		}
+		
+	return false;			
+}
+
 p.updateValuesFromStatus = function(_statusName)
 {
 	// Statuses caused by effects go in here ***
 }
 
+// This sends the charms that the actor has selected and updates the values of the actor
+// Currently only used on the player
 p.updateSelectedCharms = function(_level, _charmsList)
 {
 	// If we're being passed the charms list for the player then add them to the effects list here

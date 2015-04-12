@@ -52,6 +52,14 @@ Utils.getDistanceBetweenMapPoints = function(_point1, _point2)
 	return Math.max(Math.abs(_point1[0] - _point2[0]), Math.abs(_point1[1] - _point2[1]));
 }
 
+Utils.getPositionBehindSecondPointFromFirst = function(_point1, _point2)
+{
+	var diff1 = _point2[0] - _point1[0];
+	var diff2 = _point2[1] - _point1[1];
+	
+	return [_point2[0] + diff1, _point2[1] + diff2];
+}
+
 Utils.shuffleArray = function(o)
 {
 	for(var j, x, i = o.length; i; j = Math.floor(ROT.RNG.getUniform() * i), x = o[--i], o[i] = o[j], o[j] = x);

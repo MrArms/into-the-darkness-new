@@ -85,8 +85,7 @@ p.update = function()
 		{
 			this._currentState = this.STATE_WAITING_AFTER_ACTION;
 			this._resolveAction();
-		}
-		
+		}		
 	}
 }
 
@@ -123,6 +122,43 @@ p._setMaxAnimTime = function(_gameEvent)
 	this._afterAnimWaitTime = Math.max(this._afterAnimWaitTime, _gameEvent.getAfterAnimWaitTime());	
 }
 
+p._knockbackStuff = function(_currentAction, _currentTarget, _damage)
+{
+	// First test if the defender is adjacent to the attacker (can only knockback adjacent enemies)
+	var targetPos = _currentTarget.getPosition();
+	var attackerPos = _currentAction.getActor().getPosition();
+										
+	if(Utils.getDistanceBetweenMapPoints(targetPos, attackerPos) === 1)
+	{
+		// Now need to test whether the space behind the defender is empty or not
+		var cellBehindDefender = Utils.getPositionBehindSecondPointFromFirst(attackerPos, targetPos);
+	
+		var actors = this._level.getActors();
+	
+		var cellActor = this._level.getActors().getElementFromValues(cellBehindDefender[0], cellBehindDefender[1]);
+	
+		if(this._level.getMap().canWalk(cellBehindDefender[0], cellBehindDefender[1]) && cellActor === null)
+		{				
+			this.addAction(new Action(_currentTarget, Action.MOVE_WAIT, [[ _currentTarget ], [cellBehindDefender], this._level] ) );	
+		
+			// Add a new gameEvent to move the actor
+			/*var newMoveGameEvent = new GameEvent(_currentTarget, GameEvent.MOVEMENT, [cellBehindDefender, this._level]);
+		
+			// Add it to the actor so the renderer can display the gameEvent 
+			_currentTarget.addGameEvent(newMoveGameEvent);		
+			
+			this._addGameEvent( newMoveGameEvent );*/
+		}	
+		// At the moment just increase the damage to the defender by 1
+		else
+		{
+			_damage = _damage + 1;
+		}	
+	}
+	
+	return _damage;
+}
+
 p._processAction = function()
 {
 	// Get the action and remove it from the queue
@@ -134,9 +170,13 @@ p._processAction = function()
 		for(var i=0; i<currentAction.getTargets().length; i++)
 		{
 			var currentTarget = currentAction.getTargets()[i];
-			
+									
 			var damage = Attack.resolve(currentAction.getActor(), currentTarget);
 			
+			// Need to test if the attacker has knockback here
+			if(currentAction.getActor().hasEffect(Effect.KNOCKBACK))			
+				damage = this._knockbackStuff(currentAction, currentTarget, damage);
+													
 			// Show the attacker is attacking
 			var newAttackGameEvent = new GameEvent(currentAction.getActor(), GameEvent.ATTACK, []);
 			
@@ -145,16 +185,13 @@ p._processAction = function()
 			
 			this._addGameEvent( newAttackGameEvent );
 			
-			//this._gameEventList.push( newAttackGameEvent );
-			
 			// Show the target is hit
 			var newDamageGameEvent = new GameEvent(currentTarget, GameEvent.DAMAGE, [damage]);
 						
 			// Add it to the actor so the renderer can display the gameEvent 			
 			currentTarget.addGameEvent(newDamageGameEvent);	
 
-			this._addGameEvent( newDamageGameEvent );
-			// this._gameEventList.push( newDamageGameEvent );											
+			this._addGameEvent( newDamageGameEvent );											
 			
 			// If the target has a counter attack then add it here CURRENTLY REMOVED, BUT WILL PUT BACK IN *********
 			if( currentTarget.isActorAlive() === true && false) // && currentTarget.isHasCounterAttack() )
@@ -168,25 +205,28 @@ p._processAction = function()
 		var newGameEvent = currentAction.getStatus().getGameEventFromStatus(currentAction.getActor());
 		currentAction.getActor().addGameEvent(newGameEvent);
 		this._addGameEvent( newGameEvent );
-		// this._gameEventList.push( newGameEvent );	
 	}
 	// The targets are what moves here and not the actor making the action (it could be knockback for example)
-	else if(currentAction.getActionType() === Action.MOVE)
+	else if(currentAction.getActionType() === Action.MOVE || currentAction.getActionType() === Action.MOVE_WAIT)
 	{
 		for(var i=0; i<currentAction.getTargets().length; i++)
 		{
 			var currentTarget = currentAction.getTargets()[i];
 			var newPosition = currentAction.getNewPositions()[i];
+					
+			var gameEventType = currentAction.getActionType() === Action.MOVE ? GameEvent.MOVEMENT : GameEvent.MOVEMENT_WAIT;
+			
+			/*if(currentAction.getActionType() === Action.MOVE_WAIT)
+				gameEventType = GameEvent.MOVEMENT_WAIT;*/
 	
 			// We should have already checked that the destination position is vacant before we even created the action, so no need to check it here
-			var newMovementGameEvent = new GameEvent(currentTarget, GameEvent.MOVEMENT, [newPosition, currentAction.getLevel()]);
+			var newMovementGameEvent = new GameEvent(currentTarget, gameEventType, [newPosition, currentAction.getLevel()]);
 			
 			// Add it to the actor so the renderer can display the gameEvent
 			currentTarget.addGameEvent(newMovementGameEvent);				
 			// this._gameEventList.push( newMovementGameEvent );	
 			this._addGameEvent( newMovementGameEvent );	
-		}
-	
+		}	
 	}
 	
 	// If we need to wait for an animation then do it here
@@ -226,14 +266,30 @@ p._resolveAction = function()
 	{			
 		// We put a slight delay between actions
 		TweenMax.delayedCall(Globals.DELAY_BETWEEN_ACTIONS, this._processAction, [], this);		
+		// TweenMax.delayedCall(Globals.DELAY_BETWEEN_ACTIONS + this._afterAnimWaitTime, this._processAction, [], this);		
 	}
 	// Otherwise tell the game that the "turn" that contained all the actions in the actionQueue (and any ones subsequently added to it) has completely finished
 	else
 	{
+		var tempWaitTime = this._afterAnimWaitTime / Globals.FPS;
+	
 		this._reset();
-		this._endCallback();					
+		
+		if(tempWaitTime && tempWaitTime > 0)			
+			TweenMax.delayedCall(tempWaitTime, this._endCallback, [], this);
+		else
+			this._endCallback();
+		
+		// TweenMax.delayedCall(this._afterAnimWaitTime, this._endCallback, [], this);
+		//this._afterAnimWaitTime
+							
 	}
 }
+
+/*p._crappyFunction = function()
+{
+	this._endCallback();
+}*/
 
 p._init = function()
 {	

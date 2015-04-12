@@ -2,11 +2,14 @@
 
 Inventory
 
-Normal inventory stuff - items and equipment (can use consumbales)
+Normal inventory stuff - items and equipment (can use consumbles)
 Charms - separate and have a maximum amount you can use
 
 Xp gained is like in Sil and you have Xp to next card too (granted by the gods) - so killing the same monsters over and over gets you less cards?
 Although the monsters may drop some too
+
+Things that breath give you a warning, they stop and start up before breathing, and then have to rest for a turn or two
+	They can only breath every so often so if you get in quick then you can kill them before they breath again
 
 
 Skill points can be re-assigned? Not sure might be interesting.
