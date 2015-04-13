@@ -90,8 +90,7 @@ p.addAction = function(_action)
 
 p.update = function()
 {
-	if(this._currentState === this.STATE_IDLE || this._currentState === this.STATE_PROCESSING
-														|| this._currentState === this.STATE_WAITING_AFTER_ACTION)
+	if(this._currentState === this.STATE_IDLE || this._currentState === this.STATE_PROCESSING || this._currentState === this.STATE_WAITING_AFTER_ACTION)
 		return;
 		
 	else if(this._currentState === this.STATE_WAITING_FOR_ANIM)
@@ -209,6 +208,7 @@ p._resolveKnockback = function(_currentAction, _currentTarget, _damage)
 	return _damage;
 }
 
+// This needs breaking up into different functions *****
 p._processAction = function()
 {
 	// Get the action and remove it from the queue
@@ -221,8 +221,6 @@ p._processAction = function()
 		
 		var attackTargets = Attack.getAttackTargets(currentAction.getActor(), this._level.getActors(), targetCell);
 		
-		// var currentAction.getActor()
-	
 		for(var i=0; i<attackTargets.length; i++)
 		{	
 			var currentTarget = attackTargets[i];
@@ -247,8 +245,11 @@ p._processAction = function()
 			// Add it to the actor so the renderer can display the gameEvent 			
 			currentTarget.addGameEvent(newDamageGameEvent);	
 
-			this._addGameEvent( newDamageGameEvent );											
-			
+			this._addGameEvent( newDamageGameEvent );	
+
+			if(damage >= currentTarget.getCurrentHP())
+				currentAction.getActor().madeKill();
+					
 			// If the target has a counter attack then add it here (check we're in the first action round to prevent endless counter loops)
 			if( this._actionRound === 1 && currentTarget.isActorAlive() === true && currentTarget.hasEffect(Effect.COUNTER_ATTACK)) // && currentTarget.isHasCounterAttack() )
 			{				
@@ -260,12 +261,9 @@ p._processAction = function()
 					// If the defender has double move then they get two counter attacks 
 					if(currentTarget.hasEffect(Effect.DOUBLE_MOVE))
 						this.addAction(new Action(currentTarget, Action.ATTACK, [ currentAction.getActor().getPosition() ]) ); 	
-				}
-					//this.addAction(new Action(currentTarget, Action.ATTACK, [[ currentAction.getActor() ]]) ); 															
+				}					
 			}
-		}	
-		
-		// If it is a double blow then add the original attack again here
+		}					
 	}
 	else if(currentAction.getActionType() === Action.STATUS)
 	{			

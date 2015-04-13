@@ -25,6 +25,8 @@ Effect.ATTACK = "attack_effect";
 Effect.KNOCKBACK = "knockback";
 Effect.COUNTER_ATTACK = "counter_attack";
 Effect.DEFENCE = "defence_effect";
+Effect.ADRENALINE = "adrenaline";
+Effect.POISON_BRAND = "poison_brand";
 
 // Not implemented yet
 Effect.DOUBLE_MOVE = "double_move";

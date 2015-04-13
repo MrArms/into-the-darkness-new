@@ -22,6 +22,7 @@ Or perhaps skills are reliant on equipment.
 Mind you I like the idea of a skill system with points that you assign. Let's you build up a character gradually. Spells/prayers etc.
 Could avoid the class/race stuff at the start perhaps....
 
+Monsters have a AI field that tells the player what they are likely to do next (can't be sure as depends on what the player does)
 
 Monsters that buff/debuff all actors adjacent/in los - makes for a lot of tactically interesting dynamics
 

@@ -10,6 +10,8 @@ Charm.KNOCKBACK = "knockback";
 Charm.DOUBLE_MOVE = "double_move";
 Charm.FORTIFY = "fortify";
 Charm.COUNTER_ATTACK = "counter_attack";
+Charm.ADRENALINE = "adrenaline";
+Charm.POISON_BRAND = "poison";
 
 var CharmGlobals = {};
 
@@ -32,6 +34,8 @@ CharmGlobals.data[Charm.DOUBLE_MOVE] = {name:"Double move", description:"Perform
 																							
 CharmGlobals.data[Charm.KNOCKBACK] = {name:"Knockback", description:"Knocks opponent back if possible, otherwise damages opponent", effects:[{name:Effect.KNOCKBACK}] };
 CharmGlobals.data[Charm.COUNTER_ATTACK] = {name:"Counter Attack", description:"Counter attacks when attacked in melee", effects:[{name:Effect.COUNTER_ATTACK}] };
+CharmGlobals.data[Charm.ADRENALINE] = {name:"Adrenaline", description:"You get an extra turn if you kill a monster this turn", effects:[{name:Effect.ADRENALINE}] };
+CharmGlobals.data[Charm.POISON_BRAND] = {name:"Poison brand", description:"Brand your attacks with poison", effects:[{name:Effect.POISON_BRAND}] };
 																							
 CharmGlobals.data[Charm.FORTIFY] = {name:"Fortify", description:"Increases defence by 2", 
 																					effects:[

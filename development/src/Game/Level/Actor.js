@@ -72,6 +72,10 @@ p.create = function(_char)
 	this._data._baseDefenceBonus = GameGlobals.actorsData[this.getChar()].base_defence;	
 	this._data._currentDefenceBonus = this._data._baseDefenceBonus;
 	
+	this._data._enemiesKilledThisTurn = 0;
+	this._data._enemiesKilledThisPass = 0; // This is for adrenaline
+	this._data._enemiesKilledLastTurn = 0;
+	
 	this.addInnateEffects();
 }
 
@@ -136,18 +140,39 @@ p.getEndTurnStatusActions = function()
 	return returnActionArray;
 }
 
+// Made much more complicated by adrenaline
 p.turnStarted = function()
 {	
 	// Clear old temporary charm effects
 	this._tempCharmEffects = [];
-
+		
+	var adrenalineKill = false;	
+		
+	if(this.hasEffect(Effect.ADRENALINE))
+	{
+		adrenalineKill = (this._data._enemiesKilledThisPass > 0);
+		
+		this._data._enemiesKilledThisTurn += this._data._enemiesKilledThisPass;		
+		this._data._enemiesKilledThisPass = 0;
+	}
+	
+	// Reset enemies killed if we haven't made an adrenaline kill
+	if(adrenalineKill === false)
+	{
+		this._data._enemiesKilledLastTurn = this._data._enemiesKilledThisTurn;
+		this._data._enemiesKilledThisTurn = 0;
+	}
+	
 	// Update charm effects here - it should remove all the charms currently as they only last 1 turn, but we could introduce longer charm effects eventually
 	for(var i=this._charmEffects.length - 1; i>=0; i--)
 	{
-		this._charmEffects[i].reduceTimer();
+		if(adrenalineKill === false || !this._charmEffects[i].getEffectType() === Effect.ADRENALINE)
+		{	
+			this._charmEffects[i].reduceTimer();
 		
-		if(this._charmEffects[i].isActive() === false)
-			this._charmEffects.splice(i, 1);
+			if(this._charmEffects[i].isActive() === false)
+				this._charmEffects.splice(i, 1);
+		}
 	}	
 }
 
@@ -171,8 +196,16 @@ p.turnFinished = function()
 			this._statusArray.splice(i, 1);		
 	}		
 	
-	// Reset the move counter
-	this._resetMoveTimer(); // = 0;
+	// Don't reset the timer if 
+	if(!this.hasEffect(Effect.ADRENALINE) || this._data._enemiesKilledThisPass === 0)
+	{			
+		// Reset the move counter
+		this._resetMoveTimer(); 
+	}
+	else
+	{
+		
+	}
 }
 
 
@@ -234,6 +267,15 @@ p.updateValuesFromLevel = function(_level)
 		allEffects[i].applyEffectToActor(this);
 	
 		//this._updateValuesFromEffect(allEffects[i]);	
+}
+
+// This gets called when the actor makes a kill
+p.madeKill = function()
+{
+	if(this.hasEffect(Effect.ADRENALINE))
+		this._data._enemiesKilledThisPass += 1;
+	else
+		this._data._enemiesKilledThisTurn += 1;							
 }
 
 p.hasEffect = function(_effectName)
@@ -389,6 +431,11 @@ p.setPosition = function(_col, _row)
 	this._data._col = _col;
 	this._data._row = _row;
 }
+
+p.getCurrentHP = function() { return this._data._currentHP;}
+p.getMaxHP = function() { return this._data._maxHP;}
+
+p.getEnemiesKilledThisTurn = function(){ return this._data._enemiesKilledThisTurn; }
 
 p.getCurrentAttackBonus = function() { return this._data._currentAttackBonus; }
 p.getCurrentDefenceBonus = function() { return this._data._currentDefenceBonus; }

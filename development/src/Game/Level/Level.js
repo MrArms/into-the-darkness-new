@@ -412,7 +412,7 @@ p._removeDeadActors = function()
 
 p._createMonsters = function()
 {
-	var testNumberMonsters = 1;
+	var testNumberMonsters = 5;
 
 	for(var i=0; i<testNumberMonsters; i++)
 	{

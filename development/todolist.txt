@@ -1,35 +1,14 @@
 										
-========= Save and load to the disk =======
+==== More card types ======
 
-	DONE :D :D :D
+Regain - get back health from previous turn if you aren't damaged this turn
+Payback - damage attackers as they damage you.
+Adrenelin - keep getting free turns for each turn you kill a monster (just don't reduce the move timer or the adrenaline timer)	DONE									
+	Also would be good to build up monsters killed this "turn" so they don't reset
+		Will need to show the ADRENALINE effect on the HUD in that case as it can continue several turns
+			Can you use other cards in the meantime?
 			
-======= Knockback and counter attack ========
-
-Counter-attack. DONE
-Knockback DONE
-Double-blow DONE (ish)
-
-Where should the _meleeAttack function go?
-
-Need to think about when the targets for melee are chosen
-At the moment it is done when the actions are created, but it doesn't work as opponents could be knocked back for a second blow and not be hit
-	So the action for hit needs a target cell and also an attack pattern that gets resolved as the action happens
-	
-Also would be good if the AI used _meleeAttack as well as the player - should the AI return something other than an action? Or the action has a target cell instead? <-- BEST IDEA
-	Need to test double move for the AI too.... NO THE AI WILL NOT HAVE DOUBLE MOVE - some are faster and that's enough
-
-Also need to check double move with movement DONE and any other moves. NOT IMPLEMENTED YET
-
-Need to test other attack patterns with knockback etc. DONE
-
-Double move with counter attack? Could be interesting. DONE
-
-Then need to implement knockback (and double blow) with damage and see if it all holds up DONE
-
-Could make "double blow" double action and make it more flexible and interesting - so double healing etc.
-	Also probably easier to code as you just store the action and do everything twice (can even move twice) DONE (apart from other non-implemented moves)		
-	
-BUG Can click below the last charm in the left hand colomn to toggle the first in the right hand colomn.
+Poison - how does this work again?
 
 ====== Level Generation ======
 

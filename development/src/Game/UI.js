@@ -86,6 +86,12 @@ p._updateStatDisplay = function(_player)
 {
 	this._display.drawText(this.X_START, this.Y_START, "Attack Bonus " + _player.getCurrentAttackBonus() );
 	this._display.drawText(this.X_START, this.Y_START + 1, "Defence Bonus " + _player.getCurrentDefenceBonus() );
+	this._display.drawText(this.X_START, this.Y_START + 2, "Kills this turn " + _player.getEnemiesKilledThisTurn() );
+		
+	if(_player.hasEffect(Effect.ADRENALINE))
+		this._display.drawText(this.X_START, this.Y_START + 3, "ADRENALINE");
+		
+	
 }
 
 p._updateCharmDisplay = function(_inventory, _currentMouseCell, _charmIndicesSelectedArray)
