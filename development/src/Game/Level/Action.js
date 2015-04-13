@@ -21,7 +21,13 @@ var p = Action.prototype;
 //===================================================
 
 p._actor = null;
+
+// For Action.ATTACK
+p._targetCell = null;
+//p._attackPattern = null;
+
 p._targets = null;
+
 p._actionType = null;
 p._status = null;
 p._newPositions = null;
@@ -36,35 +42,7 @@ Action.MOVE_WAIT = "move_wait"; // A movement that we want to wait to see the ef
 // Public Methods
 //===================================================
 
-p.getActionType = function()
-{
-	return this._actionType;
-}
 
-p.getActor = function()
-{
-	return this._actor;
-}
-
-p.getTargets = function()
-{
-	return this._targets;
-}
-
-p.getStatus = function()
-{
-	return this._status;
-}
-
-p.getNewPositions = function()
-{
-	return this._newPositions;
-}
-
-p.getLevel = function()
-{
-	return this._level;
-}
 
 //===================================================
 // Private Methods
@@ -74,7 +52,8 @@ p._init = function(_actionType, _args)
 {		
 	if(_actionType === Action.ATTACK)
 	{
-		this._targets = _args[0];
+		this._targetCell = _args[0];
+		//this._attackPattern = _args[1];
 	}
 	else if(_actionType === Action.STATUS)
 	{		
@@ -93,3 +72,22 @@ p._init = function(_actionType, _args)
 // Events
 //===================================================
 
+//===================================================
+// GETTERS & SETTERS
+//===================================================
+
+p.getActionType = function() { return this._actionType;}
+
+p.getActor = function() { return this._actor; }
+
+p.getTargetCell = function() { return this._targetCell; }
+
+// p.getAttackPattern = function() { return this._attackPattern; }
+
+p.getTargets = function() { return this._targets; }
+
+p.getStatus = function() { return this._status; }
+
+p.getNewPositions = function() { return this._newPositions; }
+
+p.getLevel = function() { return this._level; }

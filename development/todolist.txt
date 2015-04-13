@@ -16,15 +16,18 @@ At the moment it is done when the actions are created, but it doesn't work as op
 	So the action for hit needs a target cell and also an attack pattern that gets resolved as the action happens
 	
 Also would be good if the AI used _meleeAttack as well as the player - should the AI return something other than an action? Or the action has a target cell instead? <-- BEST IDEA
-	Need to test double move for the AI too....
+	Need to test double move for the AI too.... NO THE AI WILL NOT HAVE DOUBLE MOVE - some are faster and that's enough
 
-Also need to check double move with movement and any other moves (for player and AI).
+Also need to check double move with movement DONE and any other moves. NOT IMPLEMENTED YET
 
-Then need to implement knockback (and double blow) with damage and see if it all holds up
+Need to test other attack patterns with knockback etc. DONE
+
+Double move with counter attack? Could be interesting. DONE
+
+Then need to implement knockback (and double blow) with damage and see if it all holds up DONE
 
 Could make "double blow" double action and make it more flexible and interesting - so double healing etc.
-	Also probably easier to code as you just store the action and do everything twice (can even move twice)
-	
+	Also probably easier to code as you just store the action and do everything twice (can even move twice) DONE (apart from other non-implemented moves)		
 	
 BUG Can click below the last charm in the left hand colomn to toggle the first in the right hand colomn.
 

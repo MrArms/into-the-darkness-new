@@ -216,10 +216,16 @@ p._processAction = function()
 	
 	// Need to get the event list for the action and any subsequent actions need to be added to the action queue	
 	if(currentAction.getActionType() === Action.ATTACK)
-	{							
-		for(var i=0; i<currentAction.getTargets().length; i++)
-		{
-			var currentTarget = currentAction.getTargets()[i];
+	{					
+		var targetCell = currentAction.getTargetCell();
+		
+		var attackTargets = Attack.getAttackTargets(currentAction.getActor(), this._level.getActors(), targetCell);
+		
+		// var currentAction.getActor()
+	
+		for(var i=0; i<attackTargets.length; i++)
+		{	
+			var currentTarget = attackTargets[i];
 									
 			var damage = Attack.resolve(currentAction.getActor(), currentTarget);
 			
@@ -248,7 +254,14 @@ p._processAction = function()
 			{				
 				// If the attacker is able to knockback the defender then the defender cannot counter attack 
 				if(!currentAction.getActor().hasEffect(Effect.KNOCKBACK) || !this._knockbackCellFree(currentAction.getActor(), currentTarget)) 
-					this.addAction(new Action(currentTarget, Action.ATTACK, [[ currentAction.getActor() ]]) ); 															
+				{
+					this.addAction(new Action(currentTarget, Action.ATTACK, [ currentAction.getActor().getPosition() ]) ); 
+
+					// If the defender has double move then they get two counter attacks 
+					if(currentTarget.hasEffect(Effect.DOUBLE_MOVE))
+						this.addAction(new Action(currentTarget, Action.ATTACK, [ currentAction.getActor().getPosition() ]) ); 	
+				}
+					//this.addAction(new Action(currentTarget, Action.ATTACK, [[ currentAction.getActor() ]]) ); 															
 			}
 		}	
 		

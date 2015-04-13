@@ -40,24 +40,12 @@ p.update = function(_player, _inventory, _currentMouseCell, _charmIndicesSelecte
 // This just returns the index of a charm if it is clicked on
 p.checkMouseDown = function(_inventory, _currentMouseCell)
 {
-
 	if(_currentMouseCell !== null)
 	{
 		return this._getCharmIndexFromCell(_inventory, _currentMouseCell[0], _currentMouseCell[1]);
 	}
 
 	return null;
-
-
-	/*if(_currentMouseCell !== null && _currentMouseCell[0] >= this.X_START && _currentMouseCell[0] <= this.X_START + this.CHARM_DISPLAY_WIDTH)
-	{
-		var indexYCell =  _currentMouseCell[1] - this.Y_CHARM_DISPLAY_START
-	
-		 if(indexYCell >= 0 && indexYCell <= _inventory.getCharmObjectArray().length - 1)
-			return 	indexYCell;
-	}
-	
-	return null;*/
 }
 
 //===================================================
@@ -80,7 +68,7 @@ p._getCharmIndexFromCell = function(_inventory, _col, _row)
 	else
 		return null;
 		
-	if(_row >= this.Y_CHARM_DISPLAY_START && _row <= this.Y_CHARM_DISPLAY_START + numberInCol)
+	if(_row >= this.Y_CHARM_DISPLAY_START && _row < this.Y_CHARM_DISPLAY_START + numberInCol)
 	{
 		var indexYCell =  _row - this.Y_CHARM_DISPLAY_START;
 		

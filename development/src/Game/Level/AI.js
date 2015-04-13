@@ -52,8 +52,8 @@ AI.getMove = function(_actor, _allActors, _player, _level, _map)
 	// Here if the monster is one tile away then he'll attack
 	else if(AI.globalPathStorage.length === 2)
 	{
-		// return (new Action(_actor, Action.ATTACK, [[ playerPos ]] ) );		   
-		return (new Action(_actor, Action.ATTACK, [[ _player ]] ) );		   
+		// return (new Action(_actor, Action.ATTACK, [[ _player ]] ) );		   
+		return (new Action(_actor, Action.ATTACK, [ playerPos ] ) );		   
 	}
 	else
 	{

@@ -22,6 +22,13 @@ Or perhaps skills are reliant on equipment.
 Mind you I like the idea of a skill system with points that you assign. Let's you build up a character gradually. Spells/prayers etc.
 Could avoid the class/race stuff at the start perhaps....
 
+
+Monsters that buff/debuff all actors adjacent/in los - makes for a lot of tactically interesting dynamics
+
+Double move doubles charge effect if you move and attack in one turn
+
+Counter gets attack pattern
+
 Could AVOID consumables and use cards cleverly to restore SP and HP!!!! 
 Can use cards to boost attacks or heal yourself instead perhaps or both with certain combos... could combine with actions you can perform (abilities, prayers etc.)
 

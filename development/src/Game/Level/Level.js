@@ -166,7 +166,7 @@ p._processPlayerMove = function(_keyCode)
 			this._playerMovesIntoOccupiedCell(newCol, newRow, actor);		
 		// Here the cell is empty and walkable and so we can move into it
 		else		
-			this._movePlayerIntoEmptyCell(newCol, newRow);		
+			this._movePlayerIntoEmptyCell(diff);			
 	}			
 	// We are trying to walk into an unwalkable cell here 
 	else
@@ -183,13 +183,7 @@ p._playerMovesIntoOccupiedCell = function(_newCol, _newRow, _actor)
 	// If it is different then attack the actor
 	if( this._player.getAlignment() !== _actor.getAlignment() )
 	{
-		this._meleeAttack(this._player, [_newCol, _newRow])
-	
-		// Eventually we will get the attack targets using skills and status data
-		/*var targets = Attack.getAttackTargets(this._player, this._actors, [_newCol, _newRow], Attack.SINGLE_TARGET_PATTERN);
-	
-		this._actionGod.addAction(new Action(this._currentActor, Action.ATTACK, [targets] ) );	
-		this._actionGod.startAction(this._turnActionFinished.bind(this) );*/
+		this._checkForDoubleMoveAndStart(this._player, Action.ATTACK, [[_newCol, _newRow]]);
 	}
 	else
 	{												
@@ -198,21 +192,19 @@ p._playerMovesIntoOccupiedCell = function(_newCol, _newRow, _actor)
 	}
 }
 
-// Eventually probably want the AI to share this function if they are going to be able to do the double move, but for the moment this is player only
-p._meleeAttack = function(_attacker, _targetCell)
+// This checks for a double move 
+p._checkForDoubleMoveAndStart = function(_actor, _actionType, _args)
 {
-	// Eventually we will get the attack targets using skills and status data
-	var targets = Attack.getAttackTargets(_attacker, this._actors, _targetCell, Attack.SINGLE_TARGET_PATTERN);
+	this._actionGod.addAction(new Action(_actor, _actionType, _args )); 
 	
-	this._actionGod.addAction(new Action(this._currentActor, Action.ATTACK, [targets] ) );
-	
-	if(_attacker.hasEffect(Effect.DOUBLE_MOVE))
-	{
-		this._doubleMoveAction = new Action(this._currentActor, Action.ATTACK, [targets] );	
+	// Only moves are double moves (movement is done elsewhere)
+	if(_actor.hasEffect(Effect.DOUBLE_MOVE) && _actionType === Action.ATTACK)
+	{			
+		this._doubleMoveAction = new Action(_actor, _actionType, _args ); 
 		this._actionGod.startAction(this._doubleMove.bind(this));		
 	}
 	else
-		this._actionGod.startAction(this._turnActionFinished.bind(this)); // _attacker.hasEffect(Effects.DOUBLE_MOVE))				
+		this._actionGod.startAction(this._turnActionFinished.bind(this)); 
 }
 
 p._doubleMove = function(_actor)
@@ -221,11 +213,52 @@ p._doubleMove = function(_actor)
 	this._actionGod.startAction(this._turnActionFinished.bind(this));	
 }
 
-p._movePlayerIntoEmptyCell = function(_newCol, _newRow)
+// This is massively complicated by the double move effect
+// Could be tidied up somewhat
+p._movePlayerIntoEmptyCell = function(_diff)
 {
-	// Need to create an action and gameEvent here somehow :/
-	this._actionGod.addAction(new Action(this._player, Action.MOVE, [[ this._player ], [[_newCol, _newRow]], this] ) );	
-	this._actionGod.startAction(this._turnActionFinished.bind(this) );
+	var oldPos = this._player.getPosition();
+
+	var newCol = oldPos[0] + _diff[0];
+	var newRow = oldPos[1] + _diff[1];
+	
+	this._actionGod.addAction(new Action(this._player, Action.MOVE, [[ this._player ], [[newCol, newRow]], this] ) );
+	
+	// This is a bit duplicated from _processPlayerMove but is probably the best way of doing things
+	if(this._player.hasEffect(Effect.DOUBLE_MOVE))
+	{
+		var secondCol = oldPos[0] + _diff[0] * 2;
+		var secondRow = oldPos[1] + _diff[1] * 2;
+		
+		if(this._map.canWalk(secondCol, secondRow))
+		{				
+			var actor = this._actors.getElementFromValues(secondCol, secondRow);
+			
+			if(actor !== null)
+			{
+				// Only attack the actor if it is of a different alignment
+				if(this._player.getAlignment() !== actor.getAlignment())
+				{
+					this._doubleMoveAction = new Action(this._player, Action.ATTACK, [[secondCol, secondRow]] ); 
+					this._actionGod.startAction(this._doubleMove.bind(this));
+				}					
+				else				
+					this._actionGod.startAction(this._turnActionFinished.bind(this) );					
+			}
+			// Move into the second space here
+			else
+			{
+				this._doubleMoveAction = new Action(this._player, Action.MOVE, [[ this._player ], [[secondCol, secondRow]], this] );
+				this._actionGod.startAction(this._doubleMove.bind(this));
+			}
+		}
+		else				
+			this._actionGod.startAction(this._turnActionFinished.bind(this) );
+	}
+	else
+	{		
+		this._actionGod.startAction(this._turnActionFinished.bind(this) );
+	}
 }
 
 p._leaveLevel = function(_up)
@@ -236,7 +269,6 @@ p._leaveLevel = function(_up)
 	
 	this._player = null;
 	
-	//this._leaveLevelCallback(_up);
 	this._game.playerLeavesLevelCallback(_up);
 }
 
