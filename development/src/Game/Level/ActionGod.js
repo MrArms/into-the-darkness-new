@@ -53,29 +53,13 @@ p.STATE_WAITING_AFTER_ACTION = "waiting_after_action";
 // Public Methods
 //===================================================
 
-p.startAction = function(_endCallback) //, _doubleMove)
+p.startAction = function(_endCallback)
 {
 	// This stores which action round we're in and is used to prevent endless counter attack loops
 	this._actionRound = 1;
 
 	this._endCallback = _endCallback;
-	
-	/*if(!_doubleMove || _doubleMove === null)
-		this._doubleMove = false;
-	else
-		this._doubleMove = _doubleMove;
 		
-	// If it is a double move then we need to get the initial action to duplicate for later
-	if(this._doubleMove === true)
-	{
-		this._doubleActionQueue = [];
-		
-		for(var i=0; i<this._actionQueue.length; i++)
-		{
-			this._doubleActionQueue.push(this._actionQueue[i].getActionType);
-		}
-	}*/
-
 	this._gameEventList = [];		
 	
 	// Processes the first action in the list (there's only one at the moment)
@@ -113,9 +97,12 @@ p.update = function()
 	}
 }
 
-p.getAfterAnimWaitTime = function()
+
+
+p.addGameEvent = function(_gameEvent)
 {
-	return this._afterAnimWaitTime;
+	this._gameEventList.push( _gameEvent );
+	this._setMaxAnimTime( _gameEvent );
 }
 
 //===================================================
@@ -132,80 +119,12 @@ p._reset = function()
 	this._actionQueue = [];
 }
 
-p._addGameEvent = function(_gameEvent)
-{
-	this._gameEventList.push( _gameEvent );
-	this._setMaxAnimTime( _gameEvent );
-}
-
 // Takes the maximum anim time from all the game events (they can all be different length animations)
 p._setMaxAnimTime = function(_gameEvent)
 {
 	this._waitForAnim = this._waitForAnim || (_gameEvent.getTimer() > 0);	
 
 	this._afterAnimWaitTime = Math.max(this._afterAnimWaitTime, _gameEvent.getAfterAnimWaitTime());	
-}
-
-p._targetAdjacent = function(_attacker, _defender)
-{
-	var targetPos = _defender.getPosition();
-	var attackerPos = _attacker.getPosition();
-	
-	return (Utils.getDistanceBetweenMapPoints(targetPos, attackerPos) === 1);
-}
-
-p._getKnockbackCell = function(_attacker, _defender)
-{
-	var targetPos = _defender.getPosition();
-	var attackerPos = _attacker.getPosition();
-	
-	return Utils.getPositionBehindSecondPointFromFirst(attackerPos, targetPos);
-}
-
-p._knockbackCellFree = function(_attacker, _defender)
-{
-	var knockbackCell = this._getKnockbackCell(_attacker, _defender);
-	
-	var cellActor = this._level.getActors().getElementFromValues(knockbackCell[0], knockbackCell[1]);
-
-	return (this._level.getMap().canWalk(knockbackCell[0], knockbackCell[1]) && cellActor === null);											
-}
-
-p._resolveKnockback = function(_currentAction, _currentTarget, _damage)
-{
-	var tempAttacker = _currentAction.getActor();
-
-	if(this._targetAdjacent(tempAttacker, _currentTarget))
-	{
-		if(this._knockbackCellFree(tempAttacker, _currentTarget))
-		{
-			this.addAction(new Action(_currentTarget, Action.MOVE_WAIT, [[ _currentTarget ], [this._getKnockbackCell(tempAttacker, _currentTarget)], this._level] ) );
-		}		
-		else
-		{	
-			// Need to test if we're hitting into another actor
-			var knockbackCell = this._getKnockbackCell(tempAttacker, _currentTarget);			
-			var cellActor = this._level.getActors().getElementFromValues(knockbackCell[0], knockbackCell[1]);
-			
-			// Need to damage the actor we're bashing into here too
-			if(cellActor !== null)
-			{
-				var tempBumpeeDamage = 1;
-			
-				var newDamageGameEvent = new GameEvent(cellActor, GameEvent.DAMAGE, [tempBumpeeDamage]);
-						
-				// Add it to the actor so the renderer can display the gameEvent 			
-				cellActor.addGameEvent(newDamageGameEvent);	
-
-				this._addGameEvent( newDamageGameEvent );
-			}
-			
-			// Increasing the damage on the first target here
-			_damage = _damage + 1;
-		}
-	}
-	
-	return _damage;
 }
 
 // This needs breaking up into different functions *****
@@ -216,60 +135,14 @@ p._processAction = function()
 	
 	// Need to get the event list for the action and any subsequent actions need to be added to the action queue	
 	if(currentAction.getActionType() === Action.ATTACK)
-	{					
-		var targetCell = currentAction.getTargetCell();
-		
-		var attackTargets = Attack.getAttackTargets(currentAction.getActor(), this._level.getActors(), targetCell);
-		
-		for(var i=0; i<attackTargets.length; i++)
-		{	
-			var currentTarget = attackTargets[i];
-									
-			var damage = Attack.resolve(currentAction.getActor(), currentTarget);
-			
-			// Need to test if the attacker has knockback here
-			if(currentAction.getActor().hasEffect(Effect.KNOCKBACK))			
-				damage = this._resolveKnockback(currentAction, currentTarget, damage);
-													
-			// Show the attacker is attacking
-			var newAttackGameEvent = new GameEvent(currentAction.getActor(), GameEvent.ATTACK, []);
-			
-			// Add it to the actor so the renderer can display the gameEvent 
-			currentAction.getActor().addGameEvent(newAttackGameEvent);		
-			
-			this._addGameEvent( newAttackGameEvent );
-			
-			// Show the target is hit
-			var newDamageGameEvent = new GameEvent(currentTarget, GameEvent.DAMAGE, [damage]);
-						
-			// Add it to the actor so the renderer can display the gameEvent 			
-			currentTarget.addGameEvent(newDamageGameEvent);	
-
-			this._addGameEvent( newDamageGameEvent );	
-
-			if(damage >= currentTarget.getCurrentHP())
-				currentAction.getActor().madeKill();
-					
-			// If the target has a counter attack then add it here (check we're in the first action round to prevent endless counter loops)
-			if( this._actionRound === 1 && currentTarget.isActorAlive() === true && currentTarget.hasEffect(Effect.COUNTER_ATTACK)) // && currentTarget.isHasCounterAttack() )
-			{				
-				// If the attacker is able to knockback the defender then the defender cannot counter attack 
-				if(!currentAction.getActor().hasEffect(Effect.KNOCKBACK) || !this._knockbackCellFree(currentAction.getActor(), currentTarget)) 
-				{
-					this.addAction(new Action(currentTarget, Action.ATTACK, [ currentAction.getActor().getPosition() ]) ); 
-
-					// If the defender has double move then they get two counter attacks 
-					if(currentTarget.hasEffect(Effect.DOUBLE_MOVE))
-						this.addAction(new Action(currentTarget, Action.ATTACK, [ currentAction.getActor().getPosition() ]) ); 	
-				}					
-			}
-		}					
+	{				
+		Attack.processAttack(this._level, this, currentAction);
 	}
 	else if(currentAction.getActionType() === Action.STATUS)
 	{			
 		var newGameEvent = currentAction.getStatus().getGameEventFromStatus(currentAction.getActor());
 		currentAction.getActor().addGameEvent(newGameEvent);
-		this._addGameEvent( newGameEvent );
+		this.addGameEvent( newGameEvent );
 	}
 	// The targets are what moves here and not the actor making the action (it could be knockback for example)
 	else if(currentAction.getActionType() === Action.MOVE || currentAction.getActionType() === Action.MOVE_WAIT)
@@ -287,7 +160,7 @@ p._processAction = function()
 			// Add it to the actor so the renderer can display the gameEvent
 			currentTarget.addGameEvent(newMovementGameEvent);				
 			// this._gameEventList.push( newMovementGameEvent );	
-			this._addGameEvent( newMovementGameEvent );	
+			this.addGameEvent( newMovementGameEvent );	
 		}	
 	}
 	
@@ -362,3 +235,10 @@ p._init = function()
 // Events
 //===================================================
 
+//===================================================
+// GETTERS & SETTERS
+//===================================================
+
+p.getAfterAnimWaitTime = function() {return this._afterAnimWaitTime;}
+
+p.getActionRound = function() {return this._actionRound;}

@@ -1,14 +1,24 @@
-										
-==== More card types ======
 
-Regain - get back health from previous turn if you aren't damaged this turn
-Payback - damage attackers as they damage you.
-Adrenelin - keep getting free turns for each turn you kill a monster (just don't reduce the move timer or the adrenaline timer)	DONE									
-	Also would be good to build up monsters killed this "turn" so they don't reset
-		Will need to show the ADRENALINE effect on the HUD in that case as it can continue several turns
-			Can you use other cards in the meantime?
-			
-Poison - how does this work again?
+==== Tidy up ======
+
+Sort out actionGod, perhaps certain things can be moved to the Attack class DO THIS FIRST DONE
+
+Think about animations and how we will want to implement them from where we are
+	Will probably do them in terms of frames - so 10 frames of this colour/char combo then 15 of this etc.
+		Could change the frame rate to the same as the animation? Might make moving annoying
+	Could make an animation "frame" 10 normal frames or something
+
+
+Poison - how does this work again? Added poison charm/effect, but it isn't implemented yet - need an animation for actually getting poisoned? Is it a separate action?
+	Could just keep it simple for now I guess
+	Make the attack itself poison green showing it has poisoned the defender - create a POISON_ATTACK action and that can be animated differently
+	
+Let's make some interesting animations for what we've got
+	Attack
+	Death	
+	Poison attack - could be two stage so normal damage and then a green * or something showing that they are poisoned
+	The "Add status" could be an ACTION 
+	Poison status damage
 
 ====== Level Generation ======
 
