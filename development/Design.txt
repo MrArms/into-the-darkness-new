@@ -12,6 +12,11 @@ Things that breath give you a warning, they stop and start up before breathing, 
 	They can only breath every so often so if you get in quick then you can kill them before they breath again
 
 
+Multiple counter-attacks from charms + equipment(does it reset with each attack or total for the turn?)
+
+Effect
+If a monster attacks and doesn't damage you last turn then X
+	
 Skill points can be re-assigned? Not sure might be interesting.
 Or perhaps skills are reliant on equipment.
 Mind you I like the idea of a skill system with points that you assign. Let's you build up a character gradually. Spells/prayers etc.

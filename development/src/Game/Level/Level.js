@@ -5,13 +5,9 @@ goog.provide( "tt.Level" );
 // Constructor
 //===================================================
 
-Level = function(_game) //, _actorTurnStarted, _leaveLevelCallback, _playerDiesCallback)
+Level = function(_game) 
 {		
 	this._game = _game;
-
-	/*this._leaveLevelCallback = _leaveLevelCallback.bind(_game);
-	this._playerDiesCallback = _playerDiesCallback.bind(_game);
-	this._actorTurnStartedCallback = _actorTurnStarted.bind(_game);*/
 
 	this._init()
 }
@@ -25,10 +21,6 @@ var p = Level.prototype;
 p._actors = null;
 p._levelIndex = null;
 
-/*p._actorTurnStartedCallback = null;
-p._leaveLevelCallback = null;
-p._playerDiesCallback = null;*/
-
 p._game = null;
 
 p._player = null;
@@ -38,6 +30,9 @@ p._controlsLocked = null;
 p._isActive = null;
 
 p._actionGod = null;
+
+// This stores when we have a double move we want to perform again
+p._doubleMoveAction = null;
 
 p._map = null;
 
@@ -188,17 +183,42 @@ p._playerMovesIntoOccupiedCell = function(_newCol, _newRow, _actor)
 	// If it is different then attack the actor
 	if( this._player.getAlignment() !== _actor.getAlignment() )
 	{
+		this._meleeAttack(this._player, [_newCol, _newRow])
+	
 		// Eventually we will get the attack targets using skills and status data
-		var targets = Attack.getAttackTargets(this._player, this._actors, [_newCol, _newRow], Attack.SINGLE_TARGET_PATTERN);
+		/*var targets = Attack.getAttackTargets(this._player, this._actors, [_newCol, _newRow], Attack.SINGLE_TARGET_PATTERN);
 	
 		this._actionGod.addAction(new Action(this._currentActor, Action.ATTACK, [targets] ) );	
-		this._actionGod.startAction(this._turnActionFinished.bind(this) );
+		this._actionGod.startAction(this._turnActionFinished.bind(this) );*/
 	}
 	else
 	{												
 		// Just unlock controls for the moment (as you haven't made a move since we do nothing to friendly actors)
 		this._setControlLock(false);					
 	}
+}
+
+// Eventually probably want the AI to share this function if they are going to be able to do the double move, but for the moment this is player only
+p._meleeAttack = function(_attacker, _targetCell)
+{
+	// Eventually we will get the attack targets using skills and status data
+	var targets = Attack.getAttackTargets(_attacker, this._actors, _targetCell, Attack.SINGLE_TARGET_PATTERN);
+	
+	this._actionGod.addAction(new Action(this._currentActor, Action.ATTACK, [targets] ) );
+	
+	if(_attacker.hasEffect(Effect.DOUBLE_MOVE))
+	{
+		this._doubleMoveAction = new Action(this._currentActor, Action.ATTACK, [targets] );	
+		this._actionGod.startAction(this._doubleMove.bind(this));		
+	}
+	else
+		this._actionGod.startAction(this._turnActionFinished.bind(this)); // _attacker.hasEffect(Effects.DOUBLE_MOVE))				
+}
+
+p._doubleMove = function(_actor)
+{
+	this._actionGod.addAction(this._doubleMoveAction);
+	this._actionGod.startAction(this._turnActionFinished.bind(this));	
 }
 
 p._movePlayerIntoEmptyCell = function(_newCol, _newRow)
@@ -277,6 +297,8 @@ p._nextTurn = function()
 		// We don't want to continue with the monster turns any more
 		return;		
 	}
+	
+	this._doubleMoveAction = null;
 		
 	this._currentActor = TurnManager.getNextActor(this._player, this._actors);	
 	this._currentActor.turnStarted();
@@ -289,9 +311,6 @@ p._nextTurn = function()
 	// Unlock the controls for the player turn
 	if(this._currentActor.isPlayer())
 	{
-		// TEST STUFF
-		//this._player.updateSelectedCharms(this._map, this._actors, [Charm.BRAVERY]);
-	
 		this._setControlLock(false);
 	}
 	// Otherwise get the AI move and start to perform it
@@ -340,9 +359,8 @@ p._turnFinished = function()
 	// Check for delay after the actions have been resolved - only have a delay for some actions (not move as it would be too annoying)
 	if(this._actionGod.getAfterAnimWaitTime() > 0)
 	{
-		//this._game.actorTurnEndsCallback(this._currentActor);
-		TweenMax.delayedCall(this._actionGod.getAfterAnimWaitTime(), this._game.actorTurnEndsCallback, [this._currentActor], this);	
-		TweenMax.delayedCall(this._actionGod.getAfterAnimWaitTime(), this._nextTurn, [], this);	
+		TweenMax.delayedCall(this._actionGod.getAfterAnimWaitTime, this._game.actorTurnEndsCallback, [this._currentActor], this);	
+		TweenMax.delayedCall(this._actionGod.getAfterAnimWaitTime, this._nextTurn, [], this);	
 	}
 	else
 	{
@@ -419,10 +437,6 @@ p.getSaveObject = function()
 	// Save whether the player is on the level or not
 	saveObject._playerOnLevel = (this._player && this._player !== null);
 	
-	// The player might not be on this particular level
-	//if(this._player && this._player !== null)	
-	//	saveObject._player = this._player.getSaveObject()
-	
 	for(var key in this._actors.getData())
 	{
 		// Only bother with actors that are alive still
@@ -459,6 +473,5 @@ p.restoreFromSaveObject = function(_saveObject, _player)
 	}
 	
 	this._map = new LevelMap();
-	this._map.restoreFromSaveObject(_saveObject._map);
-	
+	this._map.restoreFromSaveObject(_saveObject._map);	
 }

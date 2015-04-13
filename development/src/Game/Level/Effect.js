@@ -22,11 +22,13 @@ p._value = null;
 
 Effect.BRAVERY = "bravery_effect";
 Effect.ATTACK = "attack_effect";
+Effect.KNOCKBACK = "knockback";
+Effect.COUNTER_ATTACK = "counter_attack";
+Effect.DEFENCE = "defence_effect";
 
 // Not implemented yet
-Effect.DEFENCE = "defence_effect";
-Effect.DOUBLE_BLOW = "double_blow";
-Effect.KNOCKBACK = "knockback";
+Effect.DOUBLE_MOVE = "double_move";
+
 
 //===================================================
 // Public Methods

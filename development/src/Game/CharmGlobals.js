@@ -7,8 +7,9 @@ Charm = {};
 Charm.BRAVERY = "bravery";
 Charm.MIGHT = "might";
 Charm.KNOCKBACK = "knockback";
-Charm.DOUBLE_BLOW = "double_blow";
+Charm.DOUBLE_MOVE = "double_move";
 Charm.FORTIFY = "fortify";
+Charm.COUNTER_ATTACK = "counter_attack";
 
 var CharmGlobals = {};
 
@@ -27,15 +28,10 @@ CharmGlobals.data[Charm.BRAVERY] = {name:"Bravery", description:"+1 attack for e
 																							] };
 																				
 // Not implemented yet																				
-CharmGlobals.data[Charm.DOUBLE_BLOW] = {name:"Double Blow", description:"Performs two attacks", 
-																					effects:[
-																							{name:Effect.DOUBLE_BLOW}
-																							] };
+CharmGlobals.data[Charm.DOUBLE_MOVE] = {name:"Double move", description:"Performs two moves", effects:[{name:Effect.DOUBLE_MOVE}] };
 																							
-CharmGlobals.data[Charm.KNOCKBACK] = {name:"Knockback", description:"Knocks opponent back if possible, otherwise damages opponent", 
-																					effects:[
-																							{name:Effect.KNOCKBACK}
-																							] };
+CharmGlobals.data[Charm.KNOCKBACK] = {name:"Knockback", description:"Knocks opponent back if possible, otherwise damages opponent", effects:[{name:Effect.KNOCKBACK}] };
+CharmGlobals.data[Charm.COUNTER_ATTACK] = {name:"Counter Attack", description:"Counter attacks when attacked in melee", effects:[{name:Effect.COUNTER_ATTACK}] };
 																							
 CharmGlobals.data[Charm.FORTIFY] = {name:"Fortify", description:"Increases defence by 2", 
 																					effects:[

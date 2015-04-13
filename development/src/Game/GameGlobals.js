@@ -21,8 +21,8 @@ GameGlobals.actorsData = {};
 
 /*GameGlobals.actorsData["@"] = {max_hp:50, base_attack:3, base_defence:1, speed:Actor.NORMAL_SPEED, alignment:"GOOD", name:"Player", colour:Globals.COLOUR_WHITE, 
 																															effects:[
-																																	{name:"bravery", value:1},
-																																	{name:"attack", value:1},
+																																	{Effect.ATTACK, value:1},
+																																	{Effect.COUNTER_ATTACK},
 																																	]};*/
 																																	
 GameGlobals.actorsData["@"] = {max_hp:50, base_attack:3, base_defence:1, speed:Actor.NORMAL_SPEED, alignment:"GOOD", name:"Player", colour:ColourGlobals.COLOUR_WHITE, effects:[]};

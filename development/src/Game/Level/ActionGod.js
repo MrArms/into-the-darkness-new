@@ -33,6 +33,12 @@ p._afterAnimWaitTime = null;
 
 p._actionQueue = null;
 
+p._actionRound = null;
+
+// If it is a double move then duplicate the action queue for use at the end
+p._doubleMove = null;
+p._doubleActionQueue = null;
+
 // A list of gameEvents which are things that happen to an actor that also can be grabbed by the renderer to animate
 // When the animations have played on the actors then the actors get updated with the event
 // Game events contain the actor that the event is on
@@ -47,9 +53,28 @@ p.STATE_WAITING_AFTER_ACTION = "waiting_after_action";
 // Public Methods
 //===================================================
 
-p.startAction = function(_endCallback)
+p.startAction = function(_endCallback) //, _doubleMove)
 {
+	// This stores which action round we're in and is used to prevent endless counter attack loops
+	this._actionRound = 1;
+
 	this._endCallback = _endCallback;
+	
+	/*if(!_doubleMove || _doubleMove === null)
+		this._doubleMove = false;
+	else
+		this._doubleMove = _doubleMove;
+		
+	// If it is a double move then we need to get the initial action to duplicate for later
+	if(this._doubleMove === true)
+	{
+		this._doubleActionQueue = [];
+		
+		for(var i=0; i<this._actionQueue.length; i++)
+		{
+			this._doubleActionQueue.push(this._actionQueue[i].getActionType);
+		}
+	}*/
 
 	this._gameEventList = [];		
 	
@@ -122,38 +147,63 @@ p._setMaxAnimTime = function(_gameEvent)
 	this._afterAnimWaitTime = Math.max(this._afterAnimWaitTime, _gameEvent.getAfterAnimWaitTime());	
 }
 
-p._knockbackStuff = function(_currentAction, _currentTarget, _damage)
+p._targetAdjacent = function(_attacker, _defender)
 {
-	// First test if the defender is adjacent to the attacker (can only knockback adjacent enemies)
-	var targetPos = _currentTarget.getPosition();
-	var attackerPos = _currentAction.getActor().getPosition();
-										
-	if(Utils.getDistanceBetweenMapPoints(targetPos, attackerPos) === 1)
+	var targetPos = _defender.getPosition();
+	var attackerPos = _attacker.getPosition();
+	
+	return (Utils.getDistanceBetweenMapPoints(targetPos, attackerPos) === 1);
+}
+
+p._getKnockbackCell = function(_attacker, _defender)
+{
+	var targetPos = _defender.getPosition();
+	var attackerPos = _attacker.getPosition();
+	
+	return Utils.getPositionBehindSecondPointFromFirst(attackerPos, targetPos);
+}
+
+p._knockbackCellFree = function(_attacker, _defender)
+{
+	var knockbackCell = this._getKnockbackCell(_attacker, _defender);
+	
+	var cellActor = this._level.getActors().getElementFromValues(knockbackCell[0], knockbackCell[1]);
+
+	return (this._level.getMap().canWalk(knockbackCell[0], knockbackCell[1]) && cellActor === null);											
+}
+
+p._resolveKnockback = function(_currentAction, _currentTarget, _damage)
+{
+	var tempAttacker = _currentAction.getActor();
+
+	if(this._targetAdjacent(tempAttacker, _currentTarget))
 	{
-		// Now need to test whether the space behind the defender is empty or not
-		var cellBehindDefender = Utils.getPositionBehindSecondPointFromFirst(attackerPos, targetPos);
-	
-		var actors = this._level.getActors();
-	
-		var cellActor = this._level.getActors().getElementFromValues(cellBehindDefender[0], cellBehindDefender[1]);
-	
-		if(this._level.getMap().canWalk(cellBehindDefender[0], cellBehindDefender[1]) && cellActor === null)
-		{				
-			this.addAction(new Action(_currentTarget, Action.MOVE_WAIT, [[ _currentTarget ], [cellBehindDefender], this._level] ) );	
-		
-			// Add a new gameEvent to move the actor
-			/*var newMoveGameEvent = new GameEvent(_currentTarget, GameEvent.MOVEMENT, [cellBehindDefender, this._level]);
-		
-			// Add it to the actor so the renderer can display the gameEvent 
-			_currentTarget.addGameEvent(newMoveGameEvent);		
-			
-			this._addGameEvent( newMoveGameEvent );*/
-		}	
-		// At the moment just increase the damage to the defender by 1
-		else
+		if(this._knockbackCellFree(tempAttacker, _currentTarget))
 		{
+			this.addAction(new Action(_currentTarget, Action.MOVE_WAIT, [[ _currentTarget ], [this._getKnockbackCell(tempAttacker, _currentTarget)], this._level] ) );
+		}		
+		else
+		{	
+			// Need to test if we're hitting into another actor
+			var knockbackCell = this._getKnockbackCell(tempAttacker, _currentTarget);			
+			var cellActor = this._level.getActors().getElementFromValues(knockbackCell[0], knockbackCell[1]);
+			
+			// Need to damage the actor we're bashing into here too
+			if(cellActor !== null)
+			{
+				var tempBumpeeDamage = 1;
+			
+				var newDamageGameEvent = new GameEvent(cellActor, GameEvent.DAMAGE, [tempBumpeeDamage]);
+						
+				// Add it to the actor so the renderer can display the gameEvent 			
+				cellActor.addGameEvent(newDamageGameEvent);	
+
+				this._addGameEvent( newDamageGameEvent );
+			}
+			
+			// Increasing the damage on the first target here
 			_damage = _damage + 1;
-		}	
+		}
 	}
 	
 	return _damage;
@@ -175,7 +225,7 @@ p._processAction = function()
 			
 			// Need to test if the attacker has knockback here
 			if(currentAction.getActor().hasEffect(Effect.KNOCKBACK))			
-				damage = this._knockbackStuff(currentAction, currentTarget, damage);
+				damage = this._resolveKnockback(currentAction, currentTarget, damage);
 													
 			// Show the attacker is attacking
 			var newAttackGameEvent = new GameEvent(currentAction.getActor(), GameEvent.ATTACK, []);
@@ -193,9 +243,13 @@ p._processAction = function()
 
 			this._addGameEvent( newDamageGameEvent );											
 			
-			// If the target has a counter attack then add it here CURRENTLY REMOVED, BUT WILL PUT BACK IN *********
-			if( currentTarget.isActorAlive() === true && false) // && currentTarget.isHasCounterAttack() )
-				this.addAction(new Action(currentTarget, Action.ATTACK, [[ currentAction.getActor() ]]) ); 					
+			// If the target has a counter attack then add it here (check we're in the first action round to prevent endless counter loops)
+			if( this._actionRound === 1 && currentTarget.isActorAlive() === true && currentTarget.hasEffect(Effect.COUNTER_ATTACK)) // && currentTarget.isHasCounterAttack() )
+			{				
+				// If the attacker is able to knockback the defender then the defender cannot counter attack 
+				if(!currentAction.getActor().hasEffect(Effect.KNOCKBACK) || !this._knockbackCellFree(currentAction.getActor(), currentTarget)) 
+					this.addAction(new Action(currentTarget, Action.ATTACK, [[ currentAction.getActor() ]]) ); 															
+			}
 		}	
 		
 		// If it is a double blow then add the original attack again here
@@ -216,9 +270,6 @@ p._processAction = function()
 					
 			var gameEventType = currentAction.getActionType() === Action.MOVE ? GameEvent.MOVEMENT : GameEvent.MOVEMENT_WAIT;
 			
-			/*if(currentAction.getActionType() === Action.MOVE_WAIT)
-				gameEventType = GameEvent.MOVEMENT_WAIT;*/
-	
 			// We should have already checked that the destination position is vacant before we even created the action, so no need to check it here
 			var newMovementGameEvent = new GameEvent(currentTarget, gameEventType, [newPosition, currentAction.getLevel()]);
 			
@@ -264,8 +315,12 @@ p._resolveAction = function()
 	// Check the actor to perform the action is still alive too
 	if(this._actionQueue.length > 0)
 	{			
+		this._actionRound += 1;
+	
+		var tempWaitTime = Globals.DELAY_BETWEEN_ACTIONS + this._afterAnimWaitTime / Globals.FPS;
+	
 		// We put a slight delay between actions
-		TweenMax.delayedCall(Globals.DELAY_BETWEEN_ACTIONS, this._processAction, [], this);		
+		TweenMax.delayedCall(tempWaitTime, this._processAction, [], this);		
 		// TweenMax.delayedCall(Globals.DELAY_BETWEEN_ACTIONS + this._afterAnimWaitTime, this._processAction, [], this);		
 	}
 	// Otherwise tell the game that the "turn" that contained all the actions in the actionQueue (and any ones subsequently added to it) has completely finished
@@ -278,11 +333,7 @@ p._resolveAction = function()
 		if(tempWaitTime && tempWaitTime > 0)			
 			TweenMax.delayedCall(tempWaitTime, this._endCallback, [], this);
 		else
-			this._endCallback();
-		
-		// TweenMax.delayedCall(this._afterAnimWaitTime, this._endCallback, [], this);
-		//this._afterAnimWaitTime
-							
+			this._endCallback();							
 	}
 }
 
