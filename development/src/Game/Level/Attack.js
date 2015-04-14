@@ -129,8 +129,11 @@ Attack.processOneAttackTarget = function(_level, _actionGod, _attacker, _defende
 	_defender.addGameEvent(newDamageGameEvent);	
 	_actionGod.addGameEvent( newDamageGameEvent );	
 
-	if(damage >= _defender.getCurrentHP())
-		_attacker.madeKill();
+	/*if(damage >= _defender.getCurrentHP())	
+	{	
+		//_attacker.madeKill();		
+		//_actionGod.addAction(new Action(_defender, Action.DEATH, []) ); 
+	}*/
 			
 	Attack.testAndProcessCounterAttack(_actionGod, _level, _attacker, _defender);	
 

@@ -37,6 +37,8 @@ Action.ATTACK = "attack";
 Action.STATUS = "status";
 Action.MOVE = "move";
 Action.MOVE_WAIT = "move_wait"; // A movement that we want to wait to see the effect (eg. after knockback)
+Action.DEATH = "death";
+// Action.XP_GAIN = "xp_gain";
 
 //===================================================
 // Public Methods
@@ -66,6 +68,14 @@ p._init = function(_actionType, _args)
 		this._newPositions = _args[1];
 		this._level = _args[2];
 	}
+	else if(_actionType === Action.DEATH)
+	{
+		this._targetCell = _args[0];
+	}
+	/*else if(_actionType === Action.XP_GAIN)
+	{
+		this._targetCell = _args[0];
+	}*/
 }
 
 //===================================================

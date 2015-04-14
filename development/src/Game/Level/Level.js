@@ -450,6 +450,7 @@ p.getControlLock = function() { return this._controlsLocked; }
 p.getMap = function() {	return this._map; }
 
 p.getActors = function() { return this._actors; }
+p.getPlayer = function() { return this._player; }
 
 p.isLevelActive = function() { return this._isActive; }
 

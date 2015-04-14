@@ -1,15 +1,57 @@
 
 ==== Tidy up ======
 
-Sort out actionGod, perhaps certain things can be moved to the Attack class DONE
-
-Need to sort out the delay at the end of knockback - put in animation? Dunno DONE
-	Could just add a dummy Action after knockback perhaps
-	Or a move type that moves before the animation? Dunno
-
 Need animations that work on more than one tiles
 
+Need to unify names for gameEvent, actions and animations - also a faster way of creating them would be good
+
+Possibly need the ability to "play" two or more actions at the same time
+	Then will not need multiple targets in particular actions 
+		THAT IS WHAT THE GameEvents are for in the first place, playing multiple animations at the same time
+			Just make an Action create more GameEvents if you want more animations at the same time
+			
+Could do with a MULTIPLE DEATH animation for all the dead actors in that moment
+	Then it won't look so annoying when you kill multiple monsters in one go
+		Add all the deaths up in ActionGod._resolveAction and then send the gameEvent an array rather than a singular things
+		
+HOW'S ABOUT
+	GameEvents just take multiple animations on multiple actors - that way damage and death can happen together?
+		Would need to redo how DEATH actions are created however - I don't mind them getting attacked and then dying
+			Or create a DAMAGE_DEATH gameEvent instead of having them separate
+			
+We will need an overview thingy to combine multiple gameEvents that take up more than one tile
+	
+Create and TEST multiple hits (whirlwind attack for the moment)
+
+Need to rename MOVE_WAIT to something more appropriate
+
+
+Need to work out when actors die - calculate in Attack?
+
+Need a death animation regardless of how the actor dies (could be an attack, status effect etc.)
+	The gameEvent needs to tell the ActionGod a new Death action has been created. NAH
+	
+Could add on xp ups to the player where relevant
+
+
+
+	
+When you create the damage event also add a death action to the ActionGod.
+	Same with status effects (will need to test this out afterwards)
+	
+This is better because all the actions get created automatically 
+	Want the gameEvent that causes damage to also create a DEATH action if necessary
+		Also adds to the number of actors the player has killed this turn (if it isn't the player)
+		
+THE LEVEL CAN CREATE THE DEATH ACTIONS! No that's bad too as if you kill an actor and then continue your turn the dead actor will still be sitting there
+	PUT IT IN THE ACTION GOD
+
+Problem is that GameEvents and Actors are dumb regarding the ActionGod currently		
+		
+
 Need dying animation
+	Create an action? Or a gameEvent?
+		An action I think.
 Need status "contracted" animation
 
 

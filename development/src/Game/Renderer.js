@@ -111,7 +111,7 @@ p._renderActorCell = function(_map, _actorsCellObject, _col, _row)
 		
 		var tempColour = tempActor.getColour();
 	
-		if(gameEvent !== null)
+		if(gameEvent !== null && gameEvent.animationActive() === true)
 		{
 			// Just draw the attacker as normal here
 			if(gameEvent.getEventType() === GameEvent.ATTACK)
@@ -133,6 +133,9 @@ p._renderActorCell = function(_map, _actorsCellObject, _col, _row)
 			else if(gameEvent.getEventType() === GameEvent.MOVEMENT || gameEvent.getEventType() === GameEvent.MOVEMENT_WAIT)			
 				//this._drawCell(gameEvent.getNewPosition()[0], gameEvent.getNewPosition()[1], tempChar, tempColour); //, ColourGlobals.getColour(ColourGlobals.COLOUR_BLACK) );
 				this._drawCell(_col, _row, tempChar, tempColour); //, ColourGlobals.getColour(ColourGlobals.COLOUR_BLACK) );
+			else		
+				this._drawCell(_col, _row, gameEvent.getChar(), gameEvent.getForegroundColour(), gameEvent.getBackgroundColour());
+			
 	
 		}	
 		// No game event so just draw the actor as usual

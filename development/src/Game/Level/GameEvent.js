@@ -46,6 +46,8 @@ GameEvent.HEAL = "heal";
 GameEvent.POISON_DAMAGE = "poison_damage";
 GameEvent.MOVEMENT = "movement";
 GameEvent.MOVEMENT_WAIT = "movement_wait"; // A movement that we want to wait to see the effect (eg. after knockback)
+GameEvent.DEATH = "death"; 
+GameEvent.XP_GAIN = "xp_gain"; 
 
 GameEvent.ANIM_ATTACK = 5;
 // GameEvent.ANIM_TIME_DAMAGE = 30; //20;
@@ -53,8 +55,9 @@ GameEvent.ANIM_ATTACK = 5;
 GameEvent.ANIM_TIME_HEAL = 20;
 GameEvent.ANIM_TIME_POISON_DAMAGE = 20;
 GameEvent.ANIM_TIME_MOVEMENT = 0; //5;
+GameEvent.ANIM_TIME_MOVEMENT_WAIT = 20; //5;
 
-GameEvent.ANIM_AFTER_ACTION_WAIT_TIME = 20;
+//GameEvent.ANIM_AFTER_ACTION_WAIT_TIME = 20;
 
 //===================================================
 // Public Methods
@@ -88,6 +91,10 @@ p.resolveGameEvent = function()
 	else if(this._eventType === GameEvent.MOVEMENT) // || this._eventType === GameEvent.MOVEMENT_WAIT)
 	{
 		this._level.moveActor(this._actor, this._newPosition);
+	}
+	else if(this._eventType === GameEvent.DEATH)
+	{
+		this._actor.kill();
 	}
 	
 	this._actor.removeGameEvent();
@@ -129,6 +136,11 @@ p.getBackgroundColour = function()
 p.getForegroundColour = function()
 {
 	return this._animation.getForegroundColourFromFrame(this._timer);
+}
+
+p.doesDamage = function()
+{
+	return (this.getEventType() === GameEvent.POISON_DAMAGE || this.getEventType() === GameEvent.DAMAGE);
 }
 
 //===================================================
@@ -179,10 +191,20 @@ p._init = function(_eventType, _args)
 	// This is the same as a movement gameEvent except we want to wait at the end
 	else if(_eventType === GameEvent.MOVEMENT_WAIT)
 	{
-		this._endTimer = 20; //GameEvent.ANIM_TIME_MOVEMENT;
+		this._endTimer = GameEvent.ANIM_TIME_MOVEMENT_WAIT;
 		//this._afterAnimWaitTime = GameEvent.ANIM_AFTER_ACTION_WAIT_TIME; 
 		this._newPosition = _args[0];
 		this._level = _args[1];
+	}
+	else if(_eventType === GameEvent.DEATH)
+	{
+		this._animation = new Animation(Anim.DEATH);	
+		this._endTimer = this._animation.getAnimationLength();	
+	}
+	else if(_eventType === GameEvent.XP_GAIN)
+	{
+		this._animation = new Animation(Anim.XP_GAIN);	
+		this._endTimer = this._animation.getAnimationLength();	
 	}
 }
 

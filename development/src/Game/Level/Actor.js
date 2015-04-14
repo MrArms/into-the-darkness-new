@@ -63,6 +63,8 @@ p.create = function(_char)
 	this._data._maxHP = GameGlobals.actorsData[this.getChar()].max_hp;
 	this._data._currentHP = this._data._maxHP;
 	
+	this._data._isAlive = true;
+	
 	this._data._baseSpeed = GameGlobals.actorsData[this.getChar()].speed;
 	this._data._currentSpeed = this._data._baseSpeed;
 			
@@ -236,8 +238,8 @@ p.damage = function(_amount)
 {
 	this._data._currentHP = Math.max(0, this._data._currentHP - _amount);
 	
-	if(this._data._currentHP <= 0)
-		this._kill();
+	//if(this._data._currentHP <= 0)
+	//	this._kill();
 }
 
 // Called by using a gameEvent from ActionGod
@@ -389,7 +391,7 @@ p._updateNumberAdjacentActors = function(_actors)
 	}
 }
 
-p._kill = function()
+p.kill = function()
 {
 	this._setActorAlive(false);
 

@@ -72,6 +72,11 @@ p.addAction = function(_action)
 	this._actionQueue.push(_action);
 }
 
+p.addActionAtFront = function(_action)
+{	
+	this._actionQueue.unshift(_action);
+}
+
 p.update = function()
 {
 	// Check whether an action is ongoing
@@ -85,29 +90,6 @@ p.update = function()
 		else
 			this._resolveAction();		
 	}
-	
-
-	/*if(this._currentState === this.STATE_IDLE || this._currentState === this.STATE_PROCESSING || this._currentState === this.STATE_WAITING_AFTER_ACTION)
-		return;
-		
-	else if(this._currentState === this.STATE_WAITING_FOR_ANIM)
-	{		
-		var animRunning = false;
-	
-		for(var i=0; i<this._gameEventList.length; i++)
-		{
-			this._gameEventList[i].updateAnimation();
-			
-			if(this._gameEventList[i].animationActive())
-				animRunning = true;
-		}
-		
-		if(animRunning === false)
-		{
-			this._currentState = this.STATE_WAITING_AFTER_ACTION;
-			this._resolveAction();
-		}		
-	}*/
 }
 
 p.addGameEvent = function(_gameEvent)
@@ -122,26 +104,8 @@ p.addGameEvent = function(_gameEvent)
 
 p._reset = function()
 {
-	//this._resetAnimTimers();
-
 	this._actionQueue = [];
 }
-
-/*p._resetAnimTimers = function()
-{
-	this._currentState = this.STATE_IDLE;
-	
-	this._waitForAnim = false; // This tells us whether to wait for an animation
-	this._afterAnimWaitTime = 0; // This tells us whether to pause at the end of the animation before another action or next turn is called
-}*/
-
-// Takes the maximum anim time from all the game events (they can all be different length animations)
-/*p._setMaxAnimTime = function(_gameEvent)
-{
-	this._waitForAnim = this._waitForAnim || (_gameEvent.getTimer() > 0);	
-
-	this._afterAnimWaitTime = Math.max(this._afterAnimWaitTime, _gameEvent.getAfterAnimWaitTime());	
-}*/
 
 p._animationsActive = function()
 {
@@ -157,9 +121,6 @@ p._animationsActive = function()
 // This needs breaking up into different functions *****
 p._processAction = function()
 {
-	// Reset any anim delay etc. here
-	//this._resetAnimTimers();
-
 	// Get the action and remove it from the queue
 	var currentAction = this._actionQueue.splice(0, 1)[0];
 	
@@ -197,17 +158,32 @@ p._processAction = function()
 			this.addGameEvent( newMovementGameEvent );	
 		}	
 	}
+	else if(currentAction.getActionType() === Action.DEATH)
+	{
+		var newDeathEvent = new GameEvent(currentAction.getActor(), GameEvent.DEATH, []);
+		currentAction.getActor().addGameEvent(newDeathEvent);							
+		this.addGameEvent( newDeathEvent );
+		
+		// If want the XP_GAIN animation to play at the same time then create the GameEvent for it here
+		
+		if(currentAction.getActor().isPlayer() === false && currentAction.getActor().isActorAlive() === true)
+		{		
+			var newXPGainEvent = new GameEvent(this._level.getPlayer(), GameEvent.XP_GAIN, []);
+			this._level.getPlayer().addGameEvent(newXPGainEvent);							
+			this.addGameEvent( newXPGainEvent );
+
+			this._level.getPlayer().madeKill();	
+		}		
+	}
+	/*else if(currentAction.getActionType() === Action.XP_GAIN)
+	{
+		var newXPGainEvent = new GameEvent(currentAction.getActor(), GameEvent.XP_GAIN, []);
+		currentAction.getActor().addGameEvent(newXPGainEvent);							
+		this.addGameEvent( newXPGainEvent );
+	}*/
 			
 	if(!this._animationsActive())
 		this._resolveAction();	
-	
-	// If we need to wait for an animation then do it here
-	/*if(this._waitForAnim === true)	
-		this._currentState = this.STATE_WAITING_FOR_ANIM;
-	
-	// Otherwise go straight to the next part
-	else	
-		this._resolveAction();*/
 }
 
 // This applies the action to the actors after the animation has been completed
@@ -216,6 +192,24 @@ p._resolveAction = function()
 	for(var i=0; i<this._gameEventList.length; i++)
 	{		
 		this._gameEventList[i].resolveGameEvent();	
+										
+		// If the game event does damage then we need to check whether the actor involved has died or not
+		// If so then we need to add a DEATH action 
+		// This is a little bit clunky in here :/
+		if(this._gameEventList[i].doesDamage())
+		{						
+			if(this._gameEventList[i].getActor().getCurrentHP() <= 0)
+			{
+				this.addActionAtFront(new Action(this._gameEventList[i].getActor(), Action.DEATH, []));		
+								
+				// A bit hacky really				
+				/*if(this._gameEventList[i].getActor().isPlayer() === false)
+				{				
+					this.addAction(new Action(this._level.getPlayer(), Action.XP_GAIN, []));		
+					this._level.getPlayer().madeKill();						
+				}*/
+			}			
+		}
 	}
 	
 	this._gameEventList = [];
@@ -224,7 +218,7 @@ p._resolveAction = function()
 	// If we ever want to add an action that is performed after the death of an actor (eg. resurrect, explode) then we'll need to change this part here
 	for(var j=this._actionQueue.length - 1; j>=0; j--)
 	{
-		if(this._actionQueue[j].getActor().isActorAlive() === false)		
+		if(this._actionQueue[j].getActor().isActorAlive() === false) // && this._actionQueue[j].getActionType() !== Action.DEATH)		
 			this._actionQueue.splice(j, 1);					
 	}
 	
@@ -238,10 +232,10 @@ p._resolveAction = function()
 	{						
 		this._actionRound += 1;
 	
-		var tempWaitTime = Globals.DELAY_BETWEEN_ACTIONS; // + this._afterAnimWaitTime / Globals.FPS;
+		// var tempWaitTime = Globals.DELAY_BETWEEN_ACTIONS; // + this._afterAnimWaitTime / Globals.FPS;
 	
 		// We put a slight delay between actions
-		TweenMax.delayedCall(tempWaitTime, this._processAction, [], this);				
+		TweenMax.delayedCall( Globals.DELAY_BETWEEN_ACTIONS, this._processAction, [], this);				
 	}
 	// Otherwise tell the game that the "turn" that contained all the actions in the actionQueue (and any ones subsequently added to it) has completely finished
 	else
@@ -249,16 +243,6 @@ p._resolveAction = function()
 		this._reset();
 		this._endCallback();
 	}
-	/*{
-		var tempWaitTime = this._afterAnimWaitTime / Globals.FPS;
-	
-		this._reset();
-		
-		if(tempWaitTime && tempWaitTime > 0)			
-			TweenMax.delayedCall(tempWaitTime, this._endCallback, [], this);
-		else
-			this._endCallback();							
-	}*/
 }
 
 p._init = function()
