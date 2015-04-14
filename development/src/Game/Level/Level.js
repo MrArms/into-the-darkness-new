@@ -389,16 +389,16 @@ p._turnFinished = function()
 	this._updateVisibleMapFromPlayerPosition();
 			
 	// Check for delay after the actions have been resolved - only have a delay for some actions (not move as it would be too annoying)
-	if(this._actionGod.getAfterAnimWaitTime() > 0)
+	/*if(this._actionGod.getAfterAnimWaitTime() > 0)
 	{
 		TweenMax.delayedCall(this._actionGod.getAfterAnimWaitTime, this._game.actorTurnEndsCallback, [this._currentActor], this);	
 		TweenMax.delayedCall(this._actionGod.getAfterAnimWaitTime, this._nextTurn, [], this);	
 	}
 	else
-	{
+	{*/
 		this._game.actorTurnEndsCallback(this._currentActor);
 		this._nextTurn();			
-	}
+	//}
 }
 
 p._removeDeadActors = function()
@@ -412,7 +412,7 @@ p._removeDeadActors = function()
 
 p._createMonsters = function()
 {
-	var testNumberMonsters = 5;
+	var testNumberMonsters = 1;
 
 	for(var i=0; i<testNumberMonsters; i++)
 	{

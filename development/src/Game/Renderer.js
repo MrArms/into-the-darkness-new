@@ -118,9 +118,9 @@ p._renderActorCell = function(_map, _actorsCellObject, _col, _row)
 				this._drawCell(_col, _row, tempChar, ColourGlobals.getColour(ColourGlobals.COLOUR_BLACK), tempColour );
 				
 			// Draw the number over the defenders head here
-			else if(gameEvent.getEventType() === GameEvent.DAMAGE)
-				this._drawCell(_col, _row, gameEvent.getDamage(), ColourGlobals.getColour(ColourGlobals.COLOUR_RED)); //, ColourGlobals.getColour(ColourGlobals.COLOUR_BLACK));
-			
+			else if(gameEvent.getEventType() === GameEvent.DAMAGE)			
+				// this._drawCell(_col, _row, gameEvent.getDamage(), ColourGlobals.getColour(ColourGlobals.COLOUR_RED)); //, ColourGlobals.getColour(ColourGlobals.COLOUR_BLACK));
+				this._drawCell(_col, _row, gameEvent.getChar(), gameEvent.getForegroundColour(), gameEvent.getBackgroundColour()); //, ColourGlobals.getColour(ColourGlobals.COLOUR_BLACK));			
 			// Draw the number over the actors head here
 			else if(gameEvent.getEventType() === GameEvent.HEAL)
 				this._drawCell(_col, _row, gameEvent.getHealAmount(), ColourGlobals.getColour(ColourGlobals.COLOUR_GREEN_HEAL)); //, ColourGlobals.getColour(ColourGlobals.COLOUR_BLACK));

@@ -3,6 +3,15 @@
 
 Sort out actionGod, perhaps certain things can be moved to the Attack class DONE
 
+Need to sort out the delay at the end of knockback - put in animation? Dunno DONE
+	Could just add a dummy Action after knockback perhaps
+	Or a move type that moves before the animation? Dunno
+
+Need animations that work on more than one tiles
+
+Need dying animation
+Need status "contracted" animation
+
 
 Melee animation 
 
