@@ -433,6 +433,7 @@ p.setPosition = function(_col, _row)
 }
 
 p.getCurrentHP = function() { return this._data._currentHP;}
+
 p.getMaxHP = function() { return this._data._maxHP;}
 
 p.getEnemiesKilledThisTurn = function(){ return this._data._enemiesKilledThisTurn; }

@@ -97,8 +97,6 @@ p.update = function()
 	}
 }
 
-
-
 p.addGameEvent = function(_gameEvent)
 {
 	this._gameEventList.push( _gameEvent );
@@ -111,12 +109,17 @@ p.addGameEvent = function(_gameEvent)
 
 p._reset = function()
 {
+	this._resetAnimTimers();
+
+	this._actionQueue = [];
+}
+
+p._resetAnimTimers = function()
+{
 	this._currentState = this.STATE_IDLE;
 	
 	this._waitForAnim = false; // This tells us whether to wait for an animation
 	this._afterAnimWaitTime = 0; // This tells us whether to pause at the end of the animation before another action or next turn is called
-
-	this._actionQueue = [];
 }
 
 // Takes the maximum anim time from all the game events (they can all be different length animations)
@@ -130,6 +133,9 @@ p._setMaxAnimTime = function(_gameEvent)
 // This needs breaking up into different functions *****
 p._processAction = function()
 {
+	// Reset any anim delay etc. here
+	this._resetAnimTimers();
+
 	// Get the action and remove it from the queue
 	var currentAction = this._actionQueue.splice(0, 1)[0];
 	
@@ -158,8 +164,7 @@ p._processAction = function()
 			var newMovementGameEvent = new GameEvent(currentTarget, gameEventType, [newPosition, currentAction.getLevel()]);
 			
 			// Add it to the actor so the renderer can display the gameEvent
-			currentTarget.addGameEvent(newMovementGameEvent);				
-			// this._gameEventList.push( newMovementGameEvent );	
+			currentTarget.addGameEvent(newMovementGameEvent);							
 			this.addGameEvent( newMovementGameEvent );	
 		}	
 	}
@@ -198,14 +203,13 @@ p._resolveAction = function()
 	// if we have any actions left then we need to start the next one in the queue
 	// Check the actor to perform the action is still alive too
 	if(this._actionQueue.length > 0)
-	{			
+	{						
 		this._actionRound += 1;
 	
 		var tempWaitTime = Globals.DELAY_BETWEEN_ACTIONS + this._afterAnimWaitTime / Globals.FPS;
 	
 		// We put a slight delay between actions
-		TweenMax.delayedCall(tempWaitTime, this._processAction, [], this);		
-		// TweenMax.delayedCall(Globals.DELAY_BETWEEN_ACTIONS + this._afterAnimWaitTime, this._processAction, [], this);		
+		TweenMax.delayedCall(tempWaitTime, this._processAction, [], this);				
 	}
 	// Otherwise tell the game that the "turn" that contained all the actions in the actionQueue (and any ones subsequently added to it) has completely finished
 	else
@@ -220,11 +224,6 @@ p._resolveAction = function()
 			this._endCallback();							
 	}
 }
-
-/*p._crappyFunction = function()
-{
-	this._endCallback();
-}*/
 
 p._init = function()
 {	

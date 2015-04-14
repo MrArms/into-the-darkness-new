@@ -47,20 +47,23 @@ Attack.isKnockbackCellFree = function(_level, _attacker, _defender)
 	return (_level.getMap().canWalk(knockbackCell[0], knockbackCell[1]) && cellActor === null);											
 }
 
-Attack.resolveKnockback = function(_level, _actionGod, _currentAction, _currentTarget, _damage)
+Attack.canKnockback = function(_level, _attacker, _defender)
 {
-	var tempAttacker = _currentAction.getActor();
+	return (_attacker.hasEffect(Effect.KNOCKBACK) && Attack.isKnockbackCellFree(_level, _attacker, _defender));
+}
 
-	if(Attack.targetAdjacent(tempAttacker, _currentTarget))
+Attack.resolveKnockback = function(_level, _actionGod, _attacker, _defender, _damage)
+{
+	if(Attack.targetAdjacent(_attacker, _defender))
 	{
-		if(Attack.isKnockbackCellFree(_level, tempAttacker, _currentTarget))
+		if(Attack.isKnockbackCellFree(_level, _attacker, _defender))
 		{
-			_actionGod.addAction(new Action(_currentTarget, Action.MOVE_WAIT, [[ _currentTarget ], [Attack.getKnockbackCell(tempAttacker, _currentTarget)], _level] ) );
+			_actionGod.addAction(new Action(_defender, Action.MOVE_WAIT, [[ _defender ], [Attack.getKnockbackCell(_attacker, _defender)], _level] ) );
 		}		
 		else
 		{	
 			// Need to test if we're hitting into another actor
-			var knockbackCell = Attack.getKnockbackCell(tempAttacker, _currentTarget);			
+			var knockbackCell = Attack.getKnockbackCell(_attacker, _defender);			
 			var cellActor = _level.getActors().getElementFromValues(knockbackCell[0], knockbackCell[1]);
 			
 			// Need to damage the actor we're bashing into here too
@@ -84,54 +87,68 @@ Attack.resolveKnockback = function(_level, _actionGod, _currentAction, _currentT
 	return _damage;
 }
 
+// This is made more complicated by the double_move effect
+Attack.testAndProcessCounterAttack = function(_actionGod, _level, _attacker, _defender)
+{
+	// If the target has a counter attack then add it here (check we're in the first action round to prevent endless counter loops)
+	if( _actionGod.getActionRound() === 1 && _defender.isActorAlive() === true && _defender.hasEffect(Effect.COUNTER_ATTACK)) 
+	{
+		// If the attacker is able to knockback the defender then the defender cannot counter attack 
+		if(!_attacker.hasEffect(Effect.KNOCKBACK) || !Attack.isKnockbackCellFree(_level, _attacker, _defender)) 
+		{
+			_actionGod.addAction(new Action(_defender, Action.ATTACK, [ _attacker.getPosition() ]) ); 
+
+			// If the defender has double move then they get two counter attacks, but not if the defender can knock them back
+			if(_defender.hasEffect(Effect.DOUBLE_MOVE))
+			{		
+				// Test for knockback here and if not then add the attack as normal
+				if(!Attack.canKnockback(_level, _defender, _attacker))
+					_actionGod.addAction(new Action(_defender, Action.ATTACK, [ _attacker.getPosition() ]) ); 				
+			}
+		}	
+	}
+}
+
+Attack.processOneAttackTarget = function(_level, _actionGod, _attacker, _defender)
+{
+	var damage = Attack.calculateBaseDamage(_attacker, _defender);
+		
+	// Need to test if the attacker has knockback here
+	if(_attacker.hasEffect(Effect.KNOCKBACK))			
+		damage = Attack.resolveKnockback(_level, _actionGod, _attacker, _defender, damage);
+											
+	// Show the attacker is attacking
+	var newAttackGameEvent = new GameEvent(_attacker, GameEvent.ATTACK, []);	
+	// Add it to the actor so the renderer can display the gameEvent 
+	_attacker.addGameEvent(newAttackGameEvent);			
+	_actionGod.addGameEvent( newAttackGameEvent );
+	
+	// Show the target is hit
+	var newDamageGameEvent = new GameEvent(_defender, GameEvent.DAMAGE, [damage]);				
+	// Add it to the actor so the renderer can display the gameEvent 			
+	_defender.addGameEvent(newDamageGameEvent);	
+	_actionGod.addGameEvent( newDamageGameEvent );	
+
+	if(damage >= _defender.getCurrentHP())
+		_attacker.madeKill();
+			
+	Attack.testAndProcessCounterAttack(_actionGod, _level, _attacker, _defender);	
+
+}
+
 Attack.processAttack = function(_level, _actionGod, _action)
 {
 	var targetCell = _action.getTargetCell();
 		
-	var attackTargets = Attack.getAttackTargets(_action.getActor(), _level.getActors(), targetCell);
+	var attacker = _action.getActor();
+		
+	var attackTargets = Attack.getAttackTargets(attacker, _level.getActors(), targetCell);
 	
 	for(var i=0; i<attackTargets.length; i++)
-	{	
+	{				
 		var currentTarget = attackTargets[i];
-								
-		var damage = Attack.calculateBaseDamage(_action.getActor(), currentTarget);
 		
-		// Need to test if the attacker has knockback here
-		if(_action.getActor().hasEffect(Effect.KNOCKBACK))			
-			damage = Attack.resolveKnockback(_level, _actionGod, _action, currentTarget, damage);
-												
-		// Show the attacker is attacking
-		var newAttackGameEvent = new GameEvent(_action.getActor(), GameEvent.ATTACK, []);
-		
-		// Add it to the actor so the renderer can display the gameEvent 
-		_action.getActor().addGameEvent(newAttackGameEvent);		
-		
-		_actionGod.addGameEvent( newAttackGameEvent );
-		
-		// Show the target is hit
-		var newDamageGameEvent = new GameEvent(currentTarget, GameEvent.DAMAGE, [damage]);
-					
-		// Add it to the actor so the renderer can display the gameEvent 			
-		currentTarget.addGameEvent(newDamageGameEvent);	
-
-		_actionGod.addGameEvent( newDamageGameEvent );	
-
-		if(damage >= currentTarget.getCurrentHP())
-			_action.getActor().madeKill();
-				
-		// If the target has a counter attack then add it here (check we're in the first action round to prevent endless counter loops)
-		if( _actionGod.getActionRound() === 1 && currentTarget.isActorAlive() === true && currentTarget.hasEffect(Effect.COUNTER_ATTACK)) // && currentTarget.isHasCounterAttack() )
-		{				
-			// If the attacker is able to knockback the defender then the defender cannot counter attack 
-			if(!_action.getActor().hasEffect(Effect.KNOCKBACK) || !Attack.isKnockbackCellFree(_action.getActor(), currentTarget)) 
-			{
-				_actionGod.addAction(new Action(currentTarget, Action.ATTACK, [ _action.getActor().getPosition() ]) ); 
-
-				// If the defender has double move then they get two counter attacks 
-				if(currentTarget.hasEffect(Effect.DOUBLE_MOVE))
-					_actionGod.addAction(new Action(currentTarget, Action.ATTACK, [ _action.getActor().getPosition() ]) ); 	
-			}					
-		}
+		Attack.processOneAttackTarget(_level, _actionGod, attacker, currentTarget);							
 	}			
 }
 
@@ -141,7 +158,7 @@ Attack.calculateBaseDamage = function(_attacker, _defender)
 	return 3;		
 }
 
-Attack.getAttackTargets = function(_attacker, _actors, _targetCell) //, _attackType)
+Attack.getAttackTargets = function(_attacker, _actors, _targetCell)
 {
 	var targets = null;
 
@@ -164,7 +181,8 @@ Attack.getSingleTarget = function(_attacker, _actors, _targetCell)
 
 	var newTarget = _actors.getElementFromValues(_targetCell[0], _targetCell[1]);
 	
-	if(newTarget !== null)	
+	// Need to make sure the actor hasn't been killed already this turn 
+	if(newTarget !== null && newTarget.isActorAlive() === true)	
 		targets.push( newTarget );
 		
 	return targets;

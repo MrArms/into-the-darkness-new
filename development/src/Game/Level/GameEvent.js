@@ -3,7 +3,7 @@ goog.provide( "tt.GameEvent" );
 
 // These are events in game that are performed on an actor
 // So for example damage, death (not currently implemented), poison damage etc.
-// They are grabbed by the renderer to show anamations, actor states etc.
+// They are grabbed by the renderer to show animations, actor states etc.
 // There is a timer on them that shows how long they last 
 
 //===================================================

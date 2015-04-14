@@ -1,7 +1,53 @@
 
 ==== Tidy up ======
 
-Sort out actionGod, perhaps certain things can be moved to the Attack class DO THIS FIRST DONE
+Sort out actionGod, perhaps certain things can be moved to the Attack class DONE
+
+
+Melee animation 
+
+
+Add some more charms with effects
+Get poison working again - FIND OUT HOW IT WORKED BEFORE !!!!!!!!!!!!!!!!!
+
+	Here's how it was done before
+		_actor.addStatus(Status.POISON, 3);
+		
+	Maybe need a create status effect or action? The timing might be quite tricky however
+		Perhaps actors can have multiple effects rather than just one and they take different lengths of time
+			Or even one after the other
+				So an actor that is hit and then shows that they are poisoned
+		
+		Or perhaps keep it simple and combine the two somehow			Hit + paralysis
+			Hit + poison etc.
+			
+	Need to think about ranged effects and animations that span multiple tiles too :/
+		The renderer can grab an actor but still render multiple tiles at once
+		
+	Need to keep going backwards and forwards with the animation making it look good
+	
+	I think a separate action for causing status effects might be good
+	Also an animation for death too
+	
+	Also getting the lighting in might be good - for now just a general ambient light and light surrounding the player (and perhaps some monsters)
+	
+	
+	Need an animation class that has timer, char, foreground colour and background colour values that change over time
+	Then need something to control all the animations - the renderer grabs the animations
+		Perhaps a gameEvent could be this? It has an update function that gets updated every frame (not by the renderer itself)
+			The actionGod could update all the gameEvents and also check that they are finished before continuing
+	
+	Change it so the wait at the end is just part of the animation?
+	
+	The end turn wait is done twice currently, once in the actionGod and once in the Level afterwards
+	
+Melee animation - 
+
+BUG currently still counters twice with double_move and counter_attack even if the defender dies on the first counter FIXED
+
+Should possibly think about an animation pass - get things working and remember how stuff you've written works
+	Get some cool animations going - write up how it all works
+		Need to get the visuals going as we go along to avoid massive rewrites later on
 
 Think about animations and how we will want to implement them from where we are
 	Will probably do them in terms of frames - so 10 frames of this colour/char combo then 15 of this etc.
