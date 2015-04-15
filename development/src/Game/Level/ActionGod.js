@@ -39,6 +39,8 @@ p._actionRound = null;
 p._doubleMove = null;
 p._doubleActionQueue = null;
 
+p._currentAction = null;
+
 // A list of gameEvents which are things that happen to an actor that also can be grabbed by the renderer to animate
 // When the animations have played on the actors then the actors get updated with the event
 // Game events contain the actor that the event is on
@@ -104,6 +106,7 @@ p.addGameEvent = function(_gameEvent)
 
 p._reset = function()
 {
+	this._currentAction = null;
 	this._actionQueue = [];
 }
 
@@ -111,7 +114,7 @@ p._animationsActive = function()
 {
 	for(var i=0; i<this._gameEventList.length; i++)
 	{		
-		if(this._gameEventList[i].animationActive())
+		if(this._gameEventList[i].animationOrTimerActive())
 			return true;
 	}
 			
@@ -122,59 +125,81 @@ p._animationsActive = function()
 p._processAction = function()
 {
 	// Get the action and remove it from the queue
-	var currentAction = this._actionQueue.splice(0, 1)[0];
+	this._currentAction = this._actionQueue.splice(0, 1)[0];
 	
 	// Need to get the event list for the action and any subsequent actions need to be added to the action queue	
-	if(currentAction.getActionType() === Action.ATTACK)
+	if(this._currentAction.getActionType() === Action.ATTACK)
 	{				
-		Attack.processAttack(this._level, this, currentAction);
+		Attack.processAttack(this._level, this, this._currentAction);
 	}
-	else if(currentAction.getActionType() === Action.STATUS)
+	else if(this._currentAction.getActionType() === Action.STATUS)
 	{			
-		var newGameEvent = currentAction.getStatus().getGameEventFromStatus(currentAction.getActor());
-		currentAction.getActor().addGameEvent(newGameEvent);
+		var newGameEvent = this._currentAction.getStatus().getGameEventFromStatus(this._currentAction.getActor());
+		this._currentAction.getActor().addGameEvent(newGameEvent);
 		this.addGameEvent( newGameEvent );
 	}
 	// The targets are what moves here and not the actor making the action (it could be knockback for example)
-	else if(currentAction.getActionType() === Action.MOVE || currentAction.getActionType() === Action.MOVE_WAIT)
+	else if(this._currentAction.getActionType() === Action.MOVE || this._currentAction.getActionType() === Action.MOVE_WAIT)
 	{
-		for(var i=0; i<currentAction.getTargets().length; i++)
+		for(var i=0; i<this._currentAction.getTargets().length; i++)
 		{
-			var currentTarget = currentAction.getTargets()[i];
-			var newPosition = currentAction.getNewPositions()[i];
+			var currentTarget = this._currentAction.getTargets()[i];
+			var newPosition = this._currentAction.getNewPositions()[i];
 					
-			var gameEventType = currentAction.getActionType() === Action.MOVE ? GameEvent.MOVEMENT : GameEvent.MOVEMENT_WAIT;
+			var gameEventType = this._currentAction.getActionType() === Action.MOVE ? GameEvent.MOVEMENT : GameEvent.MOVEMENT_WAIT;
 			
 			// For knockback etc. move the actor before the animation plays
 			// A little hacky, but it should be ok hopefully
-			if(currentAction.getActionType() === Action.MOVE_WAIT)
+			if(this._currentAction.getActionType() === Action.MOVE_WAIT)
 				this._level.moveActor(currentTarget, newPosition);
 			
 			// We should have already checked that the destination position is vacant before we even created the action, so no need to check it here
-			var newMovementGameEvent = new GameEvent(currentTarget, gameEventType, [newPosition, currentAction.getLevel()]);
+			var newMovementGameEvent = new GameEvent(currentTarget, gameEventType, [newPosition, this._currentAction.getLevel()]);
 			
 			// Add it to the actor so the renderer can display the gameEvent
 			currentTarget.addGameEvent(newMovementGameEvent);							
 			this.addGameEvent( newMovementGameEvent );	
 		}	
 	}
-	else if(currentAction.getActionType() === Action.DEATH)
+	else if(this._currentAction.getActionType() === Action.DEATH)
 	{
-		var newDeathEvent = new GameEvent(currentAction.getActor(), GameEvent.DEATH, []);
-		currentAction.getActor().addGameEvent(newDeathEvent);							
-		this.addGameEvent( newDeathEvent );
+		var playerXPGain = false;
+	
+		var currentTargets = this._currentAction.getTargets();
+	
+		// At the moment XP gain is shown on the player at the same time as the kills are madeKill
+		// However we can great a separate Action called Action.XP_GAIN for it if we want it to happen afterwards
+		for(var i=0; i<currentTargets.length; i++)
+		{
+			var currentActor = currentTargets[i];
 		
-		// If want the XP_GAIN animation to play at the same time then create the GameEvent for it here
-		
-		if(currentAction.getActor().isPlayer() === false && currentAction.getActor().isActorAlive() === true)
-		{		
-			var newXPGainEvent = new GameEvent(this._level.getPlayer(), GameEvent.XP_GAIN, []);
-			this._level.getPlayer().addGameEvent(newXPGainEvent);							
+			var newDeathEvent = new GameEvent(currentTargets[i], GameEvent.DEATH, []);
+			currentActor.addGameEvent(newDeathEvent);							
+			this.addGameEvent( newDeathEvent );
+			
+			if(this._currentAction.getActor().isPlayer() === true && currentTargets[i].isActorAlive() === true)
+			{
+				playerXPGain = true;				
+				this._currentAction.getActor().madeKill();	
+			}			
+		}
+			
+		if(playerXPGain === true)
+		{						
+			var newXPGainEvent = new GameEvent(this._currentAction.getActor(), GameEvent.XP_GAIN, []);
+			this._currentAction.getActor().addGameEvent(newXPGainEvent);							
 			this.addGameEvent( newXPGainEvent );
-
-			this._level.getPlayer().madeKill();	
 		}		
 	}
+	else if(this._currentAction.getActionType() === Action.DELAY)
+	{
+		var newDelayGameEvent = new GameEvent(this._currentAction.getActor(), GameEvent.DELAY, [this._currentAction.getDelay()]);
+	
+		//TweenMax.delayedCall(this._currentAction.getDelay(), this._resolveAction, [], this);
+		
+		//return;	
+	}
+	
 	/*else if(currentAction.getActionType() === Action.XP_GAIN)
 	{
 		var newXPGainEvent = new GameEvent(currentAction.getActor(), GameEvent.XP_GAIN, []);
@@ -189,6 +214,9 @@ p._processAction = function()
 // This applies the action to the actors after the animation has been completed
 p._resolveAction = function()
 {
+	// We need to store which actors have HP < 0 and create a DEATH action for each of them
+	var deadActorsList = [];
+
 	for(var i=0; i<this._gameEventList.length; i++)
 	{		
 		this._gameEventList[i].resolveGameEvent();	
@@ -196,21 +224,18 @@ p._resolveAction = function()
 		// If the game event does damage then we need to check whether the actor involved has died or not
 		// If so then we need to add a DEATH action 
 		// This is a little bit clunky in here :/
-		if(this._gameEventList[i].doesDamage())
+		//if(this._gameEventList[i].doesDamage()) // Is necessary unfortunately
+		if(this._gameEventList[i].getEventType() !== GameEvent.DEATH) // Is necessary unfortunately
 		{						
-			if(this._gameEventList[i].getActor().getCurrentHP() <= 0)
+			if(this._gameEventList[i].getActor().waitingToDie() === true)
 			{
-				this.addActionAtFront(new Action(this._gameEventList[i].getActor(), Action.DEATH, []));		
-								
-				// A bit hacky really				
-				/*if(this._gameEventList[i].getActor().isPlayer() === false)
-				{				
-					this.addAction(new Action(this._level.getPlayer(), Action.XP_GAIN, []));		
-					this._level.getPlayer().madeKill();						
-				}*/
+				deadActorsList.push(this._gameEventList[i].getActor());
 			}			
 		}
 	}
+	
+	if(deadActorsList.length > 0)
+		this.addActionAtFront(new Action(this._currentAction.getActor(), Action.DEATH, [deadActorsList]));	
 	
 	this._gameEventList = [];
 

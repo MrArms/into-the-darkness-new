@@ -434,6 +434,8 @@ p.setPosition = function(_col, _row)
 	this._data._row = _row;
 }
 
+p.waitingToDie = function() { return (this._data._currentHP <= 0 && this.isActorAlive() === true) ;}
+
 p.getCurrentHP = function() { return this._data._currentHP;}
 
 p.getMaxHP = function() { return this._data._maxHP;}

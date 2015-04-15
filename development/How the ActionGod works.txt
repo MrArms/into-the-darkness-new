@@ -5,6 +5,8 @@ Action - an action that an actor performs - eg. attack, move etc. The command th
 				So when an actor attacks multiple enemies that is one action
 				
 GameEvent - something that happens to an actor eg. Take damage, die, movement - this is the effect on the actor
+	GameEvents are used to animate stuff before resolving on the actor - you can give one Action multiple GameEvents which means you can have multiple animations happening at the same time
+		This happens when multiple actors die in the same turn and also when you multiple targets are attacked
 
 You create an action and associate it with an actor - eg. Actor 1 attacks actors 2,3,4
 

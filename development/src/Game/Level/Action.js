@@ -27,6 +27,7 @@ p._targetCell = null;
 //p._attackPattern = null;
 
 p._targets = null;
+p._delay = null;
 
 p._actionType = null;
 p._status = null;
@@ -38,6 +39,7 @@ Action.STATUS = "status";
 Action.MOVE = "move";
 Action.MOVE_WAIT = "move_wait"; // A movement that we want to wait to see the effect (eg. after knockback)
 Action.DEATH = "death";
+Action.DELAY = "delay";
 // Action.XP_GAIN = "xp_gain";
 
 //===================================================
@@ -70,8 +72,13 @@ p._init = function(_actionType, _args)
 	}
 	else if(_actionType === Action.DEATH)
 	{
-		this._targetCell = _args[0];
+		this._targets = _args[0];
 	}
+	else if(_actionType === Action.DELAY)
+	{
+		this._delay = _args[0];
+	}
+	
 	/*else if(_actionType === Action.XP_GAIN)
 	{
 		this._targetCell = _args[0];
@@ -101,3 +108,5 @@ p.getStatus = function() { return this._status; }
 p.getNewPositions = function() { return this._newPositions; }
 
 p.getLevel = function() { return this._level; }
+
+p.getDelay = function() { return this._delay; }

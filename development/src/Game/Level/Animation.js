@@ -33,18 +33,21 @@ p._animationChunks = null; // This is if the colours are attenuated between fram
 
 p.isAnimationActive = function(_frame)
 {
-	return (_frame < this.getAnimationLength());
-	// return (_frame >= this._numberChunks * AnimGlobals.framesPerChunk);
+	// Give it the extra frame to prevent the flicker at the end
+	return (_frame < this.getAnimationLength());	
 }
 
 p.getAnimationLength = function()
 {
-	return (this._numberChunks - 1) * AnimGlobals.framesPerChunk;
+	return this._numberChunks * AnimGlobals.framesPerChunk - 1;
 }
 
 p.getFrameData = function(_frame)
 {
 	var frameChunk = Math.floor(_frame/AnimGlobals.framesPerChunk);
+	
+	// This is because we go 1 extra frame at the end to avoid flicker and we need to clamp it to the max frame index
+	// frameChunk = Math.min(this._numberChunks - 1, frameChunk);
 	
 	return this._animationChunks[frameChunk];
 }
@@ -56,6 +59,9 @@ p.getCharFromFrame = function(_frame)
 
 p.getForegroundColourFromFrame = function(_frame)
 {		
+	if(!this.getFrameData(_frame) || this.getFrameData(_frame) === null)
+		Utils.console("Error, could not find frame data");
+
 	return this.getFrameData(_frame).foregroundColour;
 }
 

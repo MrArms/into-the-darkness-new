@@ -1,23 +1,30 @@
 
 ==== Tidy up ======
 
-Need animations that work on more than one tiles
+FIX THE ANIMATION STUFF, THE NAMES FOR HP<0 and isActorAlive() DONE
 
+Then code review - think about anims and stuff pondered below.
+	Look at where the test for actor death is in ActionGod and see if there is anywhere that is better for it.
+
+Can eliminate flicker if the AI waits before making their move	
+	
+
+Tidy up animation stuff - make all anims in the new style and tidy up the renderer
+Tidy up the isActorAlive() and HP < 0 tests to unify them into something a bit nicer (perhaps a DEAD flag?)
+	If properly dead then don't render it at all (prevents grotty flicker at the end where it goes back to the standard character for 1 frame before disappearing)
+		I THINK IT ALREADY DOES THIS, BUT STILL HAS THE BUG :(
+		
+Fix the "flicker" after death for actors when the death animation has finished
+	
 Need to unify names for gameEvent, actions and animations - also a faster way of creating them would be good
 
-Possibly need the ability to "play" two or more actions at the same time
-	Then will not need multiple targets in particular actions 
-		THAT IS WHAT THE GameEvents are for in the first place, playing multiple animations at the same time
-			Just make an Action create more GameEvents if you want more animations at the same time
-			
-Could do with a MULTIPLE DEATH animation for all the dead actors in that moment
-	Then it won't look so annoying when you kill multiple monsters in one go
-		Add all the deaths up in ActionGod._resolveAction and then send the gameEvent an array rather than a singular things
 		
-HOW'S ABOUT
-	GameEvents just take multiple animations on multiple actors - that way damage and death can happen together?
-		Would need to redo how DEATH actions are created however - I don't mind them getting attacked and then dying
-			Or create a DAMAGE_DEATH gameEvent instead of having them separate
+The attack anims only seem to last one frame now
+Also the last frame seems to last less time than the rest for the xp_gain anim
+
+Need animations that work on more than one tiles - do we really need this? Could make gameEvents for each cells  that is used and that might be easier
+	Then cells could have multiple gameEvents on them and you pick the one with the highest priority - nah horrible as you'll need to create actors for each of them
+		Need the renderer to combine them intelligently
 			
 We will need an overview thingy to combine multiple gameEvents that take up more than one tile
 	

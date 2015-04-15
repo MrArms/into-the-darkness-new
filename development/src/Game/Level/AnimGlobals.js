@@ -5,15 +5,24 @@ Anim = {}
 Anim.MELEE = "melee";
 Anim.DEATH = "death";
 Anim.XP_GAIN = "xp_gain";
+Anim.POISON_DAMAGE = "poison_damage";
+Anim.HEAL = "heal";
 
 AnimGlobals = {};
 
 // Animations aren't updated every frame, but this often
-AnimGlobals.framesPerChunk = 3;
+AnimGlobals.framesPerChunk = 5; //3;
 
 // Need to store character, foreground colour, background colour for frames
 // Default character is null for all three fields
 // If not specified then assume the last value is the current one
+
+AnimGlobals[Anim.ATTACK] = {	gradualAnim:true,
+							numberChunks:6,							
+							chunk0:{charType:null, backgroundColour:"#333333", foregroundColour:"#FFFFFF"}, 
+							chunk2:{charType:null, backgroundColour:"#555555", foregroundColour:"#FFFFFF"},
+							chunk4:{charType:null, backgroundColour:"#888888", foregroundColour:"#FFFFFF"} 
+						  };
 
 AnimGlobals[Anim.MELEE] = {	gradualAnim:true,
 							numberChunks:6,							
@@ -31,7 +40,24 @@ AnimGlobals[Anim.DEATH] = {	gradualAnim:true,
 						  
 AnimGlobals[Anim.XP_GAIN] = {	
 							gradualAnim:true,
-							numberChunks:4,							
-							chunk0:{charType:"+", backgroundColour:"#FF0000", foregroundColour:"#DDDDDD"}, 
-							chunk2:{charType:"+", backgroundColour:"#00FF00", foregroundColour:"#FFFFFF"}							
+							numberChunks:6,							
+							chunk0:{charType:null, backgroundColour:null, foregroundColour:null}, 
+							chunk2:{charType:"+", backgroundColour:"#FF0000", foregroundColour:"#DDDDDD"}, 
+							chunk4:{charType:"+", backgroundColour:"#00FF00", foregroundColour:"#FFFFFF"}							
+						  };
+						  
+AnimGlobals[Anim.POISON_DAMAGE] = {	
+							gradualAnim:true,
+							numberChunks:6,							
+							chunk0:{charType:null, backgroundColour:null, foregroundColour:null}, 
+							chunk2:{charType:null, backgroundColour:"#00BB00", foregroundColour:"#000000"}, 
+							chunk4:{charType:null, backgroundColour:"#000000", foregroundColour:"#00BB00"}							
+						  };
+						  
+AnimGlobals[Anim.HEAL] = {	
+							gradualAnim:true,
+							numberChunks:6,							
+							chunk0:{charType:null, backgroundColour:null, foregroundColour:null}, 
+							chunk2:{charType:null, backgroundColour:"#00FF00", foregroundColour:"#000000"}, 
+							chunk4:{charType:null, backgroundColour:"#000000", foregroundColour:"#00FF00"}							
 						  };

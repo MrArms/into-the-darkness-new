@@ -53,7 +53,16 @@ p.init = function()
 	
 	this._currentScreen = null;
 	
-	this._display = new ROT.Display({width: Globals.SCREEN_WIDTH, height: Globals.SCREEN_HEIGHT, fontSize:Globals.FONT_SIZE});
+	var options = {
+		width: Globals.SCREEN_WIDTH,
+		height: Globals.SCREEN_HEIGHT,
+		fontSize: Globals.FONT_SIZE,
+		fontFamily:"Georgia", //Georgia", //Verdana", //Lucida Console", // Verdana", //"Courier New", //monospace",
+		fontStyle:"bold",
+		forceSquareRatio:true}
+	
+	
+	this._display = new ROT.Display(options); //width: Globals.SCREEN_WIDTH, height: Globals.SCREEN_HEIGHT, fontSize:Globals.FONT_SIZE});
 	document.body.appendChild(this._display.getContainer());
 	
 	setInterval(this._onTimerTick.bind(this), 1000 / Globals.FPS); // 33 milliseconds = ~ 30 frames per sec

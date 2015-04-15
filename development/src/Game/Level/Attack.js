@@ -96,6 +96,8 @@ Attack.testAndProcessCounterAttack = function(_actionGod, _level, _attacker, _de
 		// If the attacker is able to knockback the defender then the defender cannot counter attack 
 		if(!_attacker.hasEffect(Effect.KNOCKBACK) || !Attack.isKnockbackCellFree(_level, _attacker, _defender)) 
 		{
+			
+			// _actionGod.addAction(new Action(_defender, Action.DELAY, [Globals.DELAY_BEFORE_COUNTER_ATTACK]) ); 
 			_actionGod.addAction(new Action(_defender, Action.ATTACK, [ _attacker.getPosition() ]) ); 
 
 			// If the defender has double move then they get two counter attacks, but not if the defender can knock them back
@@ -163,10 +165,13 @@ Attack.calculateBaseDamage = function(_attacker, _defender)
 
 Attack.getAttackTargets = function(_attacker, _actors, _targetCell)
 {
-	var targets = null;
+	//var targets = null;
 
 	// Eventually will get this from the actors effects etc.
 	var _attackType = Attack.SINGLE_TARGET_PATTERN;
+	
+	if(_attacker.isPlayer() === true)
+		_attackType = Attack.SURROUND_PATTERN;
 	
 	if(_attackType === Attack.SINGLE_TARGET_PATTERN)
 	{	
@@ -174,7 +179,7 @@ Attack.getAttackTargets = function(_attacker, _actors, _targetCell)
 	}
 	else if(_attackType === Attack.SURROUND_PATTERN)
 	{
-	
+		return Attack.getSurroundTargets(_attacker, _actors, _targetCell);
 	}
 }
 
@@ -188,5 +193,26 @@ Attack.getSingleTarget = function(_attacker, _actors, _targetCell)
 	if(newTarget !== null && newTarget.isActorAlive() === true)	
 		targets.push( newTarget );
 		
+	return targets;
+}
+
+Attack.getSurroundTargets = function(_attacker, _actors, _targetCell)
+{
+	var targets = [];
+
+	var startPosition = _attacker.getPosition();
+	
+	for(var i=-1; i<=1; i++)
+		for(var j=-1; j<=1; j++)
+		{
+			if(i !== 0 || j !== 0)
+			{
+				var newTarget = _actors.getElementFromValues(startPosition[0] + i, startPosition[1] + j);
+				
+				if(newTarget !== null && newTarget.isActorAlive() === true)	
+					targets.push( newTarget );				
+			}		
+		}
+	
 	return targets;
 }

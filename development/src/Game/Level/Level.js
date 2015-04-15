@@ -348,19 +348,29 @@ p._nextTurn = function()
 	// Otherwise get the AI move and start to perform it
 	else
 	{
-		var monsterMove = AI.getMove(this._currentActor, this._actors, this._player, this, this._map);
+		var monsterAction = AI.getMove(this._currentActor, this._actors, this._player, this, this._map);
 	
 		// If the monster is going to move then start the move here
-		if(monsterMove !== null)
-		{				
-			this._actionGod.addAction(monsterMove);
-			this._actionGod.startAction(this._turnActionFinished.bind(this) );
+		if(monsterAction !== null)
+		{			
+			// We want a delay before a monster does anything but move
+			if(monsterAction.getActionType() === Action.MOVE)
+				this._startAIAction(monsterAction);
+			else		
+				// Need a test to see if the monster is visible here before doing the move
+				TweenMax.delayedCall(Globals.DELAY_BEFORE_AI_MOVE, this._startAIAction, [monsterAction], this);					
 		}
 		// Here the monster is not going to move so just call end turn 
 		else
 			this._turnFinished();
 	}					
 }	
+
+p._startAIAction = function(_monsterAction)
+{
+	this._actionGod.addAction(_monsterAction);
+	this._actionGod.startAction(this._turnActionFinished.bind(this) );
+}
 
 // This says the action the actor performed during their turn has finished
 p._turnActionFinished = function()
@@ -412,7 +422,7 @@ p._removeDeadActors = function()
 
 p._createMonsters = function()
 {
-	var testNumberMonsters = 1;
+	var testNumberMonsters = 5;
 
 	for(var i=0; i<testNumberMonsters; i++)
 	{

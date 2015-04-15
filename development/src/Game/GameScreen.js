@@ -396,11 +396,11 @@ p._toggleCharmSelection = function(_charmKey)
 
 p.onTimerTick = function(e)
 {		
-	if(this._getCurrentLevel() && this._getCurrentLevel() !== null)
-		this._render();
-
 	if( this._gameLocked === false )
-		this._updateLevel(e);					
+		this._updateLevel(e);	
+
+	if(this._getCurrentLevel() && this._getCurrentLevel() !== null)
+		this._render();					
 }
 
 p.keydownHandler = function(e)
