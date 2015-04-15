@@ -354,6 +354,7 @@ p._nextTurn = function()
 		if(monsterAction !== null)
 		{			
 			// We want a delay before a monster does anything but move
+			// WE WANT A DELAY HERE TOO ONCE WE CAN DETERMINE IF THE MONSTER IS VISIBLE TO THE PLAYER OR NOT *** 
 			if(monsterAction.getActionType() === Action.MOVE)
 				this._startAIAction(monsterAction);
 			else		
@@ -422,7 +423,7 @@ p._removeDeadActors = function()
 
 p._createMonsters = function()
 {
-	var testNumberMonsters = 5;
+	var testNumberMonsters = 1;
 
 	for(var i=0; i<testNumberMonsters; i++)
 	{

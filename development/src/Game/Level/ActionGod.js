@@ -138,6 +138,12 @@ p._processAction = function()
 		this._currentAction.getActor().addGameEvent(newGameEvent);
 		this.addGameEvent( newGameEvent );
 	}
+	else if(this._currentAction.getActionType() === Action.STATUS_START)
+	{
+		var newGameEvent = new GameEvent(this._currentAction.getActor(), GameEvent.STATUS_START, [this._currentAction.getStatusType(), this._currentAction.getStatusTimer()]);
+		this._currentAction.getActor().addGameEvent(newGameEvent);
+		this.addGameEvent( newGameEvent );	
+	}
 	// The targets are what moves here and not the actor making the action (it could be knockback for example)
 	else if(this._currentAction.getActionType() === Action.MOVE || this._currentAction.getActionType() === Action.MOVE_WAIT)
 	{
@@ -260,7 +266,9 @@ p._resolveAction = function()
 		// var tempWaitTime = Globals.DELAY_BETWEEN_ACTIONS; // + this._afterAnimWaitTime / Globals.FPS;
 	
 		// We put a slight delay between actions
-		TweenMax.delayedCall( Globals.DELAY_BETWEEN_ACTIONS, this._processAction, [], this);				
+		TweenMax.delayedCall( Globals.DELAY_BETWEEN_ACTIONS, this._processAction, [], this);	
+
+		//this._processAction();
 	}
 	// Otherwise tell the game that the "turn" that contained all the actions in the actionQueue (and any ones subsequently added to it) has completely finished
 	else

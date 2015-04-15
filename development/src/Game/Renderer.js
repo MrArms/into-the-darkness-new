@@ -73,9 +73,7 @@ p._renderMapCell = function(_map, _col, _row)
 	var currentViewableCells = _map.getCurrentViewableMapCells();
 	var viewedMapCells = _map.getViewedMapCells();
 
-	//var viewedValue = viewedMapCells.getElementFromValues(this._map_camera_col + i, this._map_camera_row + j);
-	var viewedValue = viewedMapCells.getElementFromValues(this._map_camera_col + _col, this._map_camera_row + _row);
-	//var viewableValue = currentViewableCells.getElementFromValues(this._map_camera_col + i, this._map_camera_row + j);
+	var viewedValue = viewedMapCells.getElementFromValues(this._map_camera_col + _col, this._map_camera_row + _row);	
 	var viewableValue = currentViewableCells.getElementFromValues(this._map_camera_col + _col, this._map_camera_row + _row);
 
 	if(viewableValue && viewableValue !== null)
@@ -111,36 +109,15 @@ p._renderActorCell = function(_map, _actorsCellObject, _col, _row)
 		
 		var tempColour = tempActor.getColour();
 	
-		//if(gameEvent !== null && gameEvent.animationOrTimerActive() === true)
 		if(gameEvent !== null && gameEvent.hasAnimation() === true)
-		{
-			// Just draw the attacker as normal here
-			// if(gameEvent.getEventType() === GameEvent.ATTACK)
-			// 	this._drawCell(_col, _row, tempChar, ColourGlobals.getColour(ColourGlobals.COLOUR_BLACK), tempColour );
+		{		
+			tempChar = gameEvent.getChar();
 				
-			// Draw the number over the defenders head here
-			// else if(gameEvent.getEventType() === GameEvent.DAMAGE)			
-				// this._drawCell(_col, _row, gameEvent.getDamage(), ColourGlobals.getColour(ColourGlobals.COLOUR_RED)); //, ColourGlobals.getColour(ColourGlobals.COLOUR_BLACK));
-			// 	this._drawCell(_col, _row, gameEvent.getChar(), gameEvent.getForegroundColour(), gameEvent.getBackgroundColour()); //, ColourGlobals.getColour(ColourGlobals.COLOUR_BLACK));			
-			// Draw the number over the actors head here
-			/*if(gameEvent.getEventType() === GameEvent.HEAL)
-				this._drawCell(_col, _row, gameEvent.getHealAmount(), ColourGlobals.getColour(ColourGlobals.COLOUR_GREEN_HEAL)); //, ColourGlobals.getColour(ColourGlobals.COLOUR_BLACK));
+			var tempForegroundColour = gameEvent.getForegroundColour() !== null ? gameEvent.getForegroundColour() : tempColour;
+			var tempBackgroundColour = gameEvent.getBackgroundColour() !== null ? gameEvent.getBackgroundColour() : null;
 				
-			else if(gameEvent.getEventType() === GameEvent.POISON_DAMAGE)
-				this._drawCell(_col, _row, gameEvent.getDamage(), ColourGlobals.getColour(ColourGlobals.COLOUR_GREEN_POISON)); //, ColourGlobals.getColour(ColourGlobals.COLOUR_BLACK));
-				*/
-			// Just showing a normal background for actors "animating" their move for the moment
-			// Note you can get the new position by calling gameEvent.getNewPosition() if needed
-			//else if(gameEvent.getEventType() === GameEvent.MOVEMENT || gameEvent.getEventType() === GameEvent.MOVEMENT_WAIT)			
-				//this._drawCell(gameEvent.getNewPosition()[0], gameEvent.getNewPosition()[1], tempChar, tempColour); //, ColourGlobals.getColour(ColourGlobals.COLOUR_BLACK) );
-			//	this._drawCell(_col, _row, tempChar, tempColour); //, ColourGlobals.getColour(ColourGlobals.COLOUR_BLACK) );
-			//else		
-			//{					
-				var tempForegroundColour = gameEvent.getForegroundColour() !== null ? gameEvent.getForegroundColour() : tempColour;
-				var tempBackgroundColour = gameEvent.getBackgroundColour() !== null ? gameEvent.getBackgroundColour() : null;
-					
-				this._drawCell(_col, _row, gameEvent.getChar(), gameEvent.getForegroundColour(), tempBackgroundColour);				
-			//}				
+			this._drawCell(_col, _row, gameEvent.getChar(), gameEvent.getForegroundColour(), tempBackgroundColour);				
+							
 		}	
 		// No game event so just draw the actor as usual
 		else if(tempActor.waitingToDie() === false)

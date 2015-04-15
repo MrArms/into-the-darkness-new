@@ -1,7 +1,29 @@
 
 ==== Tidy up ======
 
-FIX THE ANIMATION STUFF, THE NAMES FOR HP<0 and isActorAlive() DONE
+
+Tidy up renderer more DONE
+
+Create gameEvents for starting or extending a status effect and perhaps create an animation for them too DONE (FOR POISON)
+
+Small flicker (of the normal char actor) between double move and poison start actions (it was the delay between actions being zero and the next function called by TweenMax)
+
+Think about how actions and gameEvents work - perhaps it is a little clunky to have both with all the same names? (although they do serve different purposes)
+
+
+======= Stuff that isn't animations (will come back to it later on) ========
+
+What needs doing that's easy?
+	Add some more charms and their effects
+	Start adding stats to the player eg. strength etc.
+
+
+
+A slight pause after your turn might be good to see monsters actually move (could use a pause when they are onscreen)
+
+Multiple cell gameEvent animations, think about what happens if two overlap etc.
+
+
 
 Then code review - think about anims and stuff pondered below.
 	Look at where the test for actor death is in ActionGod and see if there is anywhere that is better for it.

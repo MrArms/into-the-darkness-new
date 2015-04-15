@@ -4,6 +4,9 @@ Action - an action that an actor performs - eg. attack, move etc. The command th
 			perhaps a better definition of an Action is of a timing where animations take place (at once) where other actions have to wait
 				So when an actor attacks multiple enemies that is one action
 				
+	The start of a status effect is also an Action as we want to play an action showing the status has taken effect
+		Eg. Action.POISON_STATUS_START
+				
 GameEvent - something that happens to an actor eg. Take damage, die, movement - this is the effect on the actor
 	GameEvents are used to animate stuff before resolving on the actor - you can give one Action multiple GameEvents which means you can have multiple animations happening at the same time
 		This happens when multiple actors die in the same turn and also when you multiple targets are attacked

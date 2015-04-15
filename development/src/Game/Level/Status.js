@@ -77,7 +77,7 @@ p.getGameEventFromStatus = function(_actor)
 	}
 	else if(this._statusType === Status.POISON)
 	{		
-		return (new GameEvent(_actor, GameEvent.POISON_DAMAGE, [this._getPoisonDamage()]));
+		return (new GameEvent(_actor, GameEvent.POISON_STATUS_DAMAGE, [this._getPoisonDamage()]));
 	}
 	else
 	{

@@ -111,6 +111,28 @@ Attack.testAndProcessCounterAttack = function(_actionGod, _level, _attacker, _de
 	}
 }
 
+Attack.applyPoisonBrand = function(_actionGod, _attacker, _defender, _damage)
+{
+	if(_attacker.hasEffect(Effect.POISON_BRAND))	
+		_actionGod.addActionAtFront(new Action(_defender, Action.STATUS_START, [Status.POISON, _damage]) ); 			
+}
+
+Attack.createAttackAndDamageGameEvents = function(_actionGod, _attacker, _defender, _damage)
+{
+	// Show the attacker is attacking
+	var newAttackGameEvent = new GameEvent(_attacker, GameEvent.ATTACK, []);	
+	// Add it to the actor so the renderer can display the gameEvent 
+	_attacker.addGameEvent(newAttackGameEvent);			
+	_actionGod.addGameEvent( newAttackGameEvent );
+	
+	// Show the target is hit
+	var newDamageGameEvent = new GameEvent(_defender, GameEvent.DAMAGE, [_damage]);				
+	// Add it to the actor so the renderer can display the gameEvent 			
+	_defender.addGameEvent(newDamageGameEvent);	
+	_actionGod.addGameEvent( newDamageGameEvent );	
+
+}
+
 Attack.processOneAttackTarget = function(_level, _actionGod, _attacker, _defender)
 {
 	var damage = Attack.calculateBaseDamage(_attacker, _defender);
@@ -119,24 +141,10 @@ Attack.processOneAttackTarget = function(_level, _actionGod, _attacker, _defende
 	if(_attacker.hasEffect(Effect.KNOCKBACK))			
 		damage = Attack.resolveKnockback(_level, _actionGod, _attacker, _defender, damage);
 											
-	// Show the attacker is attacking
-	var newAttackGameEvent = new GameEvent(_attacker, GameEvent.ATTACK, []);	
-	// Add it to the actor so the renderer can display the gameEvent 
-	_attacker.addGameEvent(newAttackGameEvent);			
-	_actionGod.addGameEvent( newAttackGameEvent );
+	Attack.createAttackAndDamageGameEvents(_actionGod, _attacker, _defender, damage);
 	
-	// Show the target is hit
-	var newDamageGameEvent = new GameEvent(_defender, GameEvent.DAMAGE, [damage]);				
-	// Add it to the actor so the renderer can display the gameEvent 			
-	_defender.addGameEvent(newDamageGameEvent);	
-	_actionGod.addGameEvent( newDamageGameEvent );	
-
-	/*if(damage >= _defender.getCurrentHP())	
-	{	
-		//_attacker.madeKill();		
-		//_actionGod.addAction(new Action(_defender, Action.DEATH, []) ); 
-	}*/
-			
+	Attack.applyPoisonBrand(_actionGod, _attacker, _defender, damage);
+	
 	Attack.testAndProcessCounterAttack(_actionGod, _level, _attacker, _defender);	
 
 }

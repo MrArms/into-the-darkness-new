@@ -22,12 +22,12 @@ GameGlobals.actorsData = {};
 
 /*GameGlobals.actorsData["@"] = {max_hp:50, base_attack:3, base_defence:1, speed:Actor.NORMAL_SPEED, alignment:"GOOD", name:"Player", colour:Globals.COLOUR_WHITE, 
 																															effects:[
-																																	{Effect.ATTACK, value:1},
-																																	{Effect.COUNTER_ATTACK},
+																																	{name:Effect.ATTACK, value:1},
+																																	{name:Effect.COUNTER_ATTACK},
 																																	]};*/
 																																
 GameGlobals.actorsData["@"] = {max_hp:50, base_attack:3, base_defence:1, speed:Actor.NORMAL_SPEED, alignment:"GOOD", name:"Player", colour:ColourGlobals.COLOUR_WHITE, effects:[]};
 																																				
-GameGlobals.actorsData["A"] = {max_hp:8, base_attack:2, base_defence:1, speed:Actor.NORMAL_SPEED, alignment:"BAD", name:"Alan", colour:ColourGlobals.COLOUR_CYAN, effects:[{name:Effect.COUNTER_ATTACK}]};
+GameGlobals.actorsData["A"] = {max_hp:8, base_attack:2, base_defence:1, speed:Actor.NORMAL_SPEED, alignment:"BAD", name:"Alan", colour:ColourGlobals.COLOUR_CYAN, effects:[]}; //{name:Effect.COUNTER_ATTACK}]};
 
 

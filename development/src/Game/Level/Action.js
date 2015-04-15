@@ -22,7 +22,6 @@ var p = Action.prototype;
 
 p._actor = null;
 
-// For Action.ATTACK
 p._targetCell = null;
 //p._attackPattern = null;
 
@@ -30,16 +29,26 @@ p._targets = null;
 p._delay = null;
 
 p._actionType = null;
+
 p._status = null;
+
+p._statusType = null;
+p._statusTimer = null;
+
 p._newPositions = null;
 p._level = null;
 
 Action.ATTACK = "attack";
-Action.STATUS = "status";
+
 Action.MOVE = "move";
 Action.MOVE_WAIT = "move_wait"; // A movement that we want to wait to see the effect (eg. after knockback)
 Action.DEATH = "death";
 Action.DELAY = "delay";
+
+Action.STATUS = "status";
+Action.STATUS_START = "status_start";
+
+// Action.POISON_STATUS_START = "poison_status_start";
 // Action.XP_GAIN = "xp_gain";
 
 //===================================================
@@ -63,6 +72,11 @@ p._init = function(_actionType, _args)
 	{		
 		this._targets = _args[0];
 		this._status = _args[1];
+	}
+	else if(_actionType === Action.STATUS_START)
+	{	
+		this._statusType = _args[0];
+		this._statusTimer = _args[1];		
 	}
 	else if(_actionType === Action.MOVE || _actionType === Action.MOVE_WAIT)
 	{		
@@ -104,6 +118,10 @@ p.getTargetCell = function() { return this._targetCell; }
 p.getTargets = function() { return this._targets; }
 
 p.getStatus = function() { return this._status; }
+
+p.getStatusType = function() { return this._statusType; }
+
+p.getStatusTimer = function() { return this._statusTimer; }
 
 p.getNewPositions = function() { return this._newPositions; }
 

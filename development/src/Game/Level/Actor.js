@@ -120,7 +120,7 @@ p.addInnateEffects = function()
 	}
 }
 
-// Get the current actions associated with active status' and return them all in order to be processed by the actionGod
+// Called from Level to get the current actions associated with active status' and return them all in order to be processed by the actionGod
 p.getEndTurnStatusActions = function()
 {
 	var returnActionArray = [];
@@ -208,6 +208,7 @@ p.turnFinished = function()
 	{
 		
 	}
+		
 }
 
 
