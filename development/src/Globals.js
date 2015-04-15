@@ -28,13 +28,13 @@ Globals.DELAY_BEFORE_COUNTER_ATTACK = 0.2; //0.2; //0.25;
 Globals.MAP_START_COL = 5;
 Globals.MAP_START_ROW = 5;
 
-Globals.MAP_WINDOW_WIDTH = 50;
+Globals.MAP_WINDOW_WIDTH = 40; //50;
 Globals.MAP_WINDOW_HEIGHT = 36;
 
-Globals.SCREEN_WIDTH = 120;
-Globals.SCREEN_HEIGHT = 40;
+Globals.SCREEN_WIDTH = 105; //120;
+Globals.SCREEN_HEIGHT = 50;
 
-Globals.FONT_SIZE = 16; //18;
+Globals.FONT_SIZE = 16; //16; //18;
 
 Globals.FPS = 60;
 

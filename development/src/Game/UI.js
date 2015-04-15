@@ -19,8 +19,8 @@ var p = UI.prototype;
 // Variables
 //===================================================
 
-p.X_START = 80;
-p.X_SECOND_COL = 97;
+p.X_START = 68; //80;
+p.X_SECOND_COL = 85; //97;
 p.Y_START = 10;
 p.Y_CHARM_DISPLAY_START = 20; //p.Y_START + 20;
 p.CHARM_DISPLAY_WIDTH = 15; //p.Y_START + 20;
@@ -30,11 +30,11 @@ p.CHARM_DISPLAY_WIDTH = 15; //p.Y_START + 20;
 // Public Methods
 //===================================================
 
-p.update = function(_player, _inventory, _currentMouseCell, _charmIndicesSelectedArray)
+p.update = function(_player, _inventory, _currentMouseCell, _charmKeysSelectedArray)
 {
 	this._updateStatDisplay(_player);
 	
-	this._updateCharmDisplay(_inventory, _currentMouseCell, _charmIndicesSelectedArray);	
+	this._updateCharmDisplay(_inventory, _currentMouseCell, _charmKeysSelectedArray);	
 }
 
 // This just returns the index of a charm if it is clicked on
@@ -94,7 +94,7 @@ p._updateStatDisplay = function(_player)
 	
 }
 
-p._updateCharmDisplay = function(_inventory, _currentMouseCell, _charmIndicesSelectedArray)
+p._updateCharmDisplay = function(_inventory, _currentMouseCell, _charmKeysSelectedArray)
 {
 	var charmObjectArray = _inventory.getCharmObjectArray();
 
@@ -105,7 +105,7 @@ p._updateCharmDisplay = function(_inventory, _currentMouseCell, _charmIndicesSel
 	// The first colomn of charms 
 	for(var i=0; i< Math.min(numberInCol, charmObjectArray.length); i++)
 	{			
-		var isSelected = (Utils.arrayContainsElement(_charmIndicesSelectedArray, charmObjectArray[i].key) !== null);
+		var isSelected = (Utils.arrayContainsElement(_charmKeysSelectedArray, charmObjectArray[i].key) !== null);
 	
 		this._showCharmItem(this.X_START, currentYPosition, charmObjectArray[i], _currentMouseCell, isSelected);	
 
@@ -119,12 +119,22 @@ p._updateCharmDisplay = function(_inventory, _currentMouseCell, _charmIndicesSel
 				
 		for(var i=0; i< charmObjectArray.length - numberInCol; i++)
 		{			
-			var isSelected = (Utils.arrayContainsElement(_charmIndicesSelectedArray, charmObjectArray[i+numberInCol].key) !== null);
+			var isSelected = (Utils.arrayContainsElement(_charmKeysSelectedArray, charmObjectArray[i+numberInCol].key) !== null);
 	
 			this._showCharmItem(this.X_SECOND_COL, currentYPosition, charmObjectArray[i+numberInCol], _currentMouseCell, isSelected);	
 
 			currentYPosition += 1;			
 		}		
+	}
+	
+	for(var i=0; i<_charmKeysSelectedArray.length; i++)
+	{				
+		var tempKey = _charmKeysSelectedArray[i];
+		
+		
+		// var tempKey = charmObjectArray[tempIndex].key
+						
+		this._display.drawText(this.X_START, this.Y_CHARM_DISPLAY_START + numberInCol + 1 + i, "%c{#3F3}" + CharmGlobals.data[tempKey].name + " (" + (i+1) + ")");					
 	}
 	
 	if(charmObjectArray.length > GameGlobals.MAX_DIFFERENT_CHARMS)
@@ -153,7 +163,8 @@ p._showCharmItem = function(_xPos, _yPos, _charmItem, _currentMouseCell, _isSele
 	}
 		
 
-	this._display.drawText(_xPos, _yPos, currentColourText + _charmItem.key + " " + _charmItem.number);
+	// this._display.drawText(_xPos, _yPos, currentColourText + _charmItem.key + " " + _charmItem.number);
+	this._display.drawText(_xPos, _yPos, currentColourText + CharmGlobals.data[_charmItem.key].name + " " + _charmItem.number);
 }
 
 p._init = function()

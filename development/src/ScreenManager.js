@@ -57,9 +57,11 @@ p.init = function()
 		width: Globals.SCREEN_WIDTH,
 		height: Globals.SCREEN_HEIGHT,
 		fontSize: Globals.FONT_SIZE,
-		fontFamily:"Georgia", //Georgia", //Verdana", //Lucida Console", // Verdana", //"Courier New", //monospace",
-		fontStyle:"bold",
-		forceSquareRatio:true}
+		//fontFamily:"Georgia", //Georgia", //Verdana", //Lucida Console", // Verdana", //"Courier New", //monospace",
+		fontFamily:"Verdana", //Georgia", //Verdana", //Lucida Console", // Verdana", //"Courier New", //monospace",
+		// fontStyle:"bold",
+		forceSquareRatio:false
+		}
 	
 	
 	this._display = new ROT.Display(options); //width: Globals.SCREEN_WIDTH, height: Globals.SCREEN_HEIGHT, fontSize:Globals.FONT_SIZE});

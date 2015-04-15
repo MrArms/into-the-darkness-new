@@ -6,7 +6,7 @@ Tidy up renderer more DONE
 
 Create gameEvents for starting or extending a status effect and perhaps create an animation for them too DONE (FOR POISON)
 
-Small flicker (of the normal char actor) between double move and poison start actions (it was the delay between actions being zero and the next function called by TweenMax)
+Small flicker (of the normal char actor) between double move and poison start actions (it was the delay between actions being zero and the next function called by TweenMax) FIXED
 
 Think about how actions and gameEvents work - perhaps it is a little clunky to have both with all the same names? (although they do serve different purposes)
 
@@ -14,9 +14,29 @@ Think about how actions and gameEvents work - perhaps it is a little clunky to h
 ======= Stuff that isn't animations (will come back to it later on) ========
 
 What needs doing that's easy?
+	Fix the screen so you can see all the cards to choose DONE
 	Add some more charms and their effects
 	Start adding stats to the player eg. strength etc.
+	
+	
 
+Make the UI reflect the order cards are selected DONE
+Can make objects the player can pick up
+	Need a cellDataObject for objects on the map - they are an array of objects 
+	
+Can create a simple class object that holds the items on the map - contains an array of objects, can add/remove stuff from it etc. 
+	
+	
+===== Pickup-able objects =========
+
+Multiple objects in one place?
+Need a UI thing for picking up objects? As if the floor is part of the inventory you can move between.
+
+Need an object holder class - that can hold multiple items on the floor of the dungeon
+	
+	
+	
+	
 
 
 A slight pause after your turn might be good to see monsters actually move (could use a pause when they are onscreen)
