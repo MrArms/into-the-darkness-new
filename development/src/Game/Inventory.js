@@ -27,6 +27,12 @@ p._charmObjectArray = null;
 // Public Methods
 //===================================================
 
+p.addObjectInformation = function(_objectInformation)
+{
+	if(_objectInformation.getObjectType() === ObjectInformation.CHARM)
+		this.addCharms(_objectInformation.getKey(), _objectInformation.getNumber());
+}
+
 // This is just a list of the keys and numbers of each charm type
 p.getCharmObjectArray = function()
 {
@@ -37,11 +43,11 @@ p.addCharms = function(_charmKey, _number)
 {
 	var numberCharmsAdded = 0;
 
-	if(this._getTotalNumberCharms() < GameGlobals.MAX_CHARMS && this._charmObjectArray.length < GameGlobals.MAX_DIFFERENT_CHARMS)
+	if(this.getTotalNumberCharms() < GameGlobals.MAX_CHARMS && this._charmObjectArray.length < GameGlobals.MAX_DIFFERENT_CHARMS)
 	{
 		var charmIndex = this._hasCharm(_charmKey);
 		
-		numberCharmsAdded = Math.min(GameGlobals.MAX_CHARMS - this._getTotalNumberCharms(), _number);
+		numberCharmsAdded = Math.min(GameGlobals.MAX_CHARMS - this.getTotalNumberCharms(), _number);
 	
 		// We already have some of this charm type already, so just add more (up to the GameGlobals.MAX_CHARMS limit)
 		if(charmIndex !== null)
@@ -67,6 +73,24 @@ p.removeSelectedCharms = function(_charmKeyDeleteArray)
 		this._removeCharm(_charmKeyDeleteArray[i]);
 	}
 	
+}
+
+// Returns how many more charms we can store here
+p.getCharmsStorageSpace = function()
+{
+	return GameGlobals.MAX_CHARMS - this.getTotalNumberCharms();
+}
+
+p.getTotalNumberCharms = function()
+{
+	var numberCharms = 0;
+
+	for(var i=0; i<this._charmObjectArray.length; i++)
+	{	
+		numberCharms += this._charmObjectArray[i].number;	
+	}
+	
+	return numberCharms;
 }
 
 p.create = function()
@@ -107,18 +131,6 @@ p._initialiseCharms = function()
 		
 		this.addCharms(tempCharmKey, 1);
 	}
-}
-
-p._getTotalNumberCharms = function()
-{
-	var numberCharms = 0;
-
-	for(var i=0; i<this._charmObjectArray.length; i++)
-	{	
-		numberCharms += this._charmObjectArray[i].number;	
-	}
-	
-	return numberCharms;
 }
 
 p._hasCharm = function(_charmKey)

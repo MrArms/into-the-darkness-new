@@ -29,7 +29,7 @@ CharmGlobals.data[Charm.BRAVERY] = {name:"Bravery", description:"+1 attack for e
 																							//{name:Effect.ATTACK, value:1},
 																							] };
 																				
-// Not implemented yet																				
+																		
 CharmGlobals.data[Charm.DOUBLE_MOVE] = {name:"Double move", description:"Performs two moves", effects:[{name:Effect.DOUBLE_MOVE}] };
 																							
 CharmGlobals.data[Charm.KNOCKBACK] = {name:"Knockback", description:"Knocks opponent back if possible, otherwise damages opponent", effects:[{name:Effect.KNOCKBACK}] };

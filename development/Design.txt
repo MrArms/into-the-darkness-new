@@ -75,4 +75,23 @@ Starting gear
 A randomly generated title screen would be cool (like that latin jobby)
 
 Evasion versus absorption similar to Sil
+
+
+
+Cards 
+Swap adjacent monsters def/att values around
+
+Ranged attacks become harder to hit things with something in between (+ a chance of hitting that monster too)
+
+Great review of Brogue
+http://ohnovideogames.com/cool-story-brogue
+
+Monsters that you want to fight in different places (from brogue)
+Jellies split into more jellies in the open
+Conjurers/summoners summon monsters between you and them
+Some things touch to damage your stats/equipment etc.
+
+
+Status
+Effects that reduce effectiveness of certain things - eg. reduce accuracy, magic power, prayer power, attack amount etc.
 	

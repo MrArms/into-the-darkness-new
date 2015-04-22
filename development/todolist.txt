@@ -1,4 +1,42 @@
 
+======= CHECK IN NEXT ======
+
+Quick review/tidy up of changes and check in
+Don't forget to add new object classes
+
+==== Adding objects to the Level =====
+
+In UI tell the player when mousing over charms on floor whether they can be picked up or not DONE
+Show total charms too DONE
+	
+Think about whether we want an object class for all objects rather than just objectInformation for charms etc.
+
+Load/Save floor objects DONE
+
+Objects needs to be displayed on the floor even if not currently visible? Not sure LEAVE FOR NOW
+
+Think about how we want to drop items and pickup particular amounts of things - how do other games do it? LEAVE FOR NOW
+
+
+Created an ObjectContainer class - now need to think of how this interacts with the Level and the UI	
+	Level will go between the two I think
+Start with charms and then do Load/SAVE
+Then can add more complex objects like equipment - create an equipment object and stick some dummy fields on it
+
+Can we combine this method of storing objects with how they will be stored in the inventory?
+
+DON'T BOTHER WITH OBJECT CLASS EXCEPT FOR OBJECTS THAT DIVERGE FROM THE DEFAULT (eg. randomly generated objects)
+
+	Make a custom object that diverges from the default and load/save it too
+
+We haven't listed GameObject types properly yet (using "charm" rather than GameObject.Charm)
+
+Think we need an "object" class for all objects including charms :/
+	Because they will all have different chars and colours 
+		THIS CAN BE PUT ON THE CHARM INFORMATION IN THE GLOBALS!!!!
+	
+Object information can just have the object and number of them and can be used in the inventory and on the level in the ObjectContainers
+
 ==== Tidy up ======
 
 
@@ -25,6 +63,31 @@ Can make objects the player can pick up
 	Need a cellDataObject for objects on the map - they are an array of objects 
 	
 Can create a simple class object that holds the items on the map - contains an array of objects, can add/remove stuff from it etc. 
+	Needs to be saveable
+	Just hold the object type and key and quantity 
+	
+	Need an objectCellDataObject like the other ones for the map
+		
+Then need a way of interacting with the UI with it	
+	
+DO SAVE/LOAD AFTER IMPLEMENTATION!!!
+
+Should we save the actual objects, or just describe them with objectType, key ?
+	The latter would mean we have to create/delete the objects themselves every time we put down or pick up an items
+		Also it means if you want an object that can be changed (such as a sword that can be enchanted) then this is not possible
+	Could keep objects simple then we don't have to worry about this at all - although can never have say random artifacts which are cool.
+
+	
+OK LET'S SAVE THE OBJECTS THEMSELVES - how the flip are we going to do this?
+	Charms are easy as they are just a description (a key)
+		
+	Need to actually save each object - the same way we do for actors etc. simple as that BUT LUCKILY NOT FOR NOW !!!!
+		Could do this next after doing the charms load/save - just put some dummy fields (field 1 = 4, field 2 = 0 etc.) in and a simple ui thing to test
+	
+	
+	
+
+	
 	
 	
 ===== Pickup-able objects =========

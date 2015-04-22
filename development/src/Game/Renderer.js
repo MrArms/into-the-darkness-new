@@ -29,11 +29,9 @@ p._map_camera_row = null;
 //===================================================
 
 // Will eventually send map, the camera position and the actors here
-p.update = function(_map, _actors)
+p.update = function(_level)
 {
-	this._renderAll(_map, _actors);
-
-	//this._renderActors(_actors);
+	this._renderAll(_level.getMap(), _level.getObjectContainers(), _level.getActors());
 }
 
 p.setMapCameraPosition = function(_col, _row)
@@ -93,15 +91,25 @@ p._renderMapCell = function(_map, _col, _row)
 	}	
 }
 
-p._renderActorCell = function(_map, _actorsCellObject, _col, _row) 
+p._renderObjectContainerCell = function(_map, _objectContainers, _col, _row)
 {
-	var currentViewableCells = _map.getCurrentViewableMapCells();
-	var viewedCellValue = currentViewableCells.getElementFromValues(this._map_camera_col + _col, this._map_camera_row + _row);
+	var tempObject = _objectContainers.getElementFromValues(this._map_camera_col + _col, this._map_camera_row + _row);
 
-	var tempActor = _actorsCellObject.getElementFromValues(this._map_camera_col + _col, this._map_camera_row + _row);
+	if(tempObject !== null && tempObject.hasObjects() === true)
+	{
+		this._drawCell(_col, _row, "*", "#FFFFFF");
+	}
+}
+
+p._renderActorCell = function(_map, _actors, _col, _row) 
+{
+	// var currentViewableCells = _map.getCurrentViewableMapCells();
+	// var viewedCellValue = currentViewableCells.getElementFromValues(this._map_camera_col + _col, this._map_camera_row + _row);
+	
+	var tempActor = _actors.getElementFromValues(this._map_camera_col + _col, this._map_camera_row + _row);
 	
 	// Check the actor exists, is alive and is in a viewable part of the map
-	if(tempActor !== null && tempActor.isActorAlive() === true && viewedCellValue !== null)
+	if(tempActor !== null && tempActor.isActorAlive() === true) // && viewedCellValue !== null)
 	{
 		var gameEvent = tempActor.getGameEvent();
 		
@@ -125,16 +133,23 @@ p._renderActorCell = function(_map, _actorsCellObject, _col, _row)
 	}	
 }
 
-p._renderAll = function(_map, _actorsCellObject)
+p._renderAll = function(_map, _objectContainers, _actors)
 {		
+	var currentViewableCells = _map.getCurrentViewableMapCells();
+
 	// Get the viewed map here and go through and draw currently viewable cells and if there aren't there draw viewed cells
 	for(var i=0; i < Globals.MAP_WINDOW_WIDTH; i++)	
 		for(var j=0; j < Globals.MAP_WINDOW_HEIGHT; j++)
-		{						
-			// this._renderMapCell(_map, this._map_camera_col + i, this._map_camera_row + j);
+		{									
+			var viewedCellValue = currentViewableCells.getElementFromValues(this._map_camera_col + i, this._map_camera_row + j);
+		
 			this._renderMapCell(_map, i, j);
-			// this._renderActorCell(_actorsCellObject, this._map_camera_col + i, this._map_camera_row + j);				
-			this._renderActorCell(_map, _actorsCellObject, i, j);				
+			
+			if(viewedCellValue !== null)
+			{
+				this._renderObjectContainerCell(_map, _objectContainers, i, j)
+				this._renderActorCell(_map, _actors, i, j);		
+			}
 		}	
 }
 

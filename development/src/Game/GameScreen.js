@@ -302,13 +302,12 @@ p._render = function(e)
 	if(this._getCurrentLevel().getMap().canDraw() === true)		
 	{
 		this._display.clear();
-		this._UI.update(this._player, this._inventory, this._currentMouseCell, this._charmKeysSelectedArray);
+		this._UI.update(this._player, this._inventory, this._currentMouseCell, this._charmKeysSelectedArray, this._getCurrentLevel() );
 		
 		// Set the camera to point at the player here
 		this._renderer.setMapCameraPosition(this._player.getPosition()[0], this._player.getPosition()[1]);
-		
-		// Need to tidy this up a bit THIS COULD BE IMPROVED SOMETIME
-		this._renderer.update(this._getCurrentLevel().getMap(), this._getCurrentLevel().getActors());
+				
+		this._renderer.update(this._getCurrentLevel()); 
 	}
 }
 
@@ -390,6 +389,27 @@ p._toggleCharmSelection = function(_charmKey)
 	this._player.updateSelectedCharms(this._getCurrentLevel(), this._charmKeysSelectedArray);
 }
 
+// This takes an index for an object information the player is standing on and adds it to their inventory
+// This needs to be here rather than Level since it works with the inventory of the player 
+p._pickupFloorObjectInformation = function(_index)
+{
+	var floorObjectContainer = this._getCurrentLevel().getObjectContainers().getElementFromValues( this._player.getPosition()[0], this._player.getPosition()[1] );
+			
+	var numberObjectsPickedup = floorObjectContainer.getObjects()[_index].getNumber();
+	
+	numberObjectsPickedup = Math.min(numberObjectsPickedup, this._inventory.getCharmsStorageSpace());		
+	
+	if(numberObjectsPickedup > 0)
+	{	
+		var newObjectInformation = floorObjectContainer.removeObjectInformation(_index, numberObjectsPickedup);
+		
+		if(!floorObjectContainer.hasObjects())
+			this._getCurrentLevel().getObjectContainers().removeElementFromValues(this._player.getPosition()[0], this._player.getPosition()[1]);
+		
+		this._inventory.addObjectInformation(newObjectInformation);
+	}
+}
+
 //===================================================
 // Events
 //===================================================
@@ -444,13 +464,23 @@ p.mouseDownHandler = function(e)
 {
 	if(this._testControlConditions() === true)
 	{
-		var charmIndex = this._UI.checkMouseDown(this._inventory, this._currentMouseCell);
+		var charmIndex = this._UI.checkMouseDownOnCharm(this._inventory, this._currentMouseCell);
 		
 		if(charmIndex !== null)
 		{
 			var charmKey = this._inventory.getCharmObjectArray()[charmIndex].key;
 		
 			this._toggleCharmSelection(charmKey);			
+		}
+		
+		var floorObjectInformationIndex = this._UI.checkMouseDownOnFloorObject(this._currentMouseCell, this._getCurrentLevel() );
+		
+		if(floorObjectInformationIndex !== null)
+		{
+			// Need to attempt to "pick up" item here			
+			this._pickupFloorObjectInformation(floorObjectInformationIndex);
+			
+			// Utils.console("floorObjectIndex = " + floorObjectIndex);
 		}
 	}
 }

@@ -1,6 +1,10 @@
 
 goog.provide( "tt.Level" );
 
+goog.require( "tt.ObjectContainer" );
+goog.require( "tt.ObjectInformation" );
+
+
 //===================================================
 // Constructor
 //===================================================
@@ -19,6 +23,9 @@ var p = Level.prototype;
 //===================================================
 
 p._actors = null;
+p._objectContainers = null;
+
+
 p._levelIndex = null;
 
 p._game = null;
@@ -46,8 +53,10 @@ p.create = function(_levelIndex)
 
 	this._map = new LevelMap(); //this._levelIndex);
 	this._map.create(this._levelIndex);
-			
-	this._createMonsters();
+		
+	this._createObjects();
+		
+	this._createMonsters();		
 }
 
 p.joinLevel = function(_player, _atStart)
@@ -436,6 +445,56 @@ p._createMonsters = function()
 	}
 }
 
+p._addObjectAtPosition = function(_objectInformation, _col, _row)
+{
+	var currentElement = this._objectContainers.getElementFromValues(_col, _row);
+
+	if(currentElement === null)
+	{
+		var newObjectElement = new ObjectContainer();
+		newObjectElement.addObjectInformation(_objectInformation);
+		
+		this._objectContainers.setElement(newObjectElement, _col, _row);		
+		newObjectElement.setPosition(_col, _row);		
+	}
+	else
+	{
+		currentElement.addObjectInformation(_objectInformation);		
+	}				
+}
+
+p._getRandomCharmInformation = function()
+{
+	var totalNumCharms = Utils.getNumberItemsInObject(CharmGlobals.data);
+		
+	var tempCharmKey = Utils.getRandomKeyFromObject(CharmGlobals.data, totalNumCharms);	
+
+	var randomNumberCharms = Math.floor(ROT.RNG.getUniform() * 3) + 1;
+			
+	var newObjectInformation = new ObjectInformation();	
+	newObjectInformation.create(ObjectInformation.CHARM, tempCharmKey, null, randomNumberCharms);
+	
+	return (newObjectInformation);
+}
+
+p._createObjects = function()
+{
+	var testNumberObjects = 6;
+
+	for(var i=0; i<testNumberObjects; i++)
+	{
+		var cellPosition = this._map.getFreeCell();
+		
+		var numObjects = Math.floor(ROT.RNG.getUniform() * 3) + 1;
+		
+		for(var j=0; j<numObjects; j++)
+		{
+			var newObjectInformation = this._getRandomCharmInformation();			
+			this._addObjectAtPosition(newObjectInformation, cellPosition[0], cellPosition[1]);	
+		}
+	}	
+}
+
 p._init = function()
 {	
 	this._setControlLock(true);
@@ -444,7 +503,9 @@ p._init = function()
 
 	this._actionGod = new ActionGod(this);
 	
-	this._actors = new CellDataObject();		
+	this._actors = new CellDataObject();	
+
+	this._objectContainers = new CellDataObject();
 }
 
 //===================================================
@@ -461,6 +522,7 @@ p.getControlLock = function() { return this._controlsLocked; }
 p.getMap = function() {	return this._map; }
 
 p.getActors = function() { return this._actors; }
+p.getObjectContainers = function() { return this._objectContainers; }
 p.getPlayer = function() { return this._player; }
 
 p.isLevelActive = function() { return this._isActive; }
@@ -486,6 +548,16 @@ p.getSaveObject = function()
 		// Only bother with actors that are alive still
 		if(this._actors.getElementFromKey(key).isActorAlive())	
 			saveObject._actors.push( this._actors.getElementFromKey(key).getSaveObject() );						
+	}
+	
+	// We are saving the objectContainers in an array even though they're in a cellDataObject when stored on the level
+	saveObject._objectContainers = []; 
+	
+	for(var key in this._objectContainers.getData())
+	{
+		// Only bother with objectContainers that aren't empty (the empty ones should have been deleted already)
+		if(this._objectContainers.getElementFromKey(key).hasObjects() )	
+			saveObject._objectContainers.push( this._objectContainers.getElementFromKey(key).getSaveObject() );						
 	}
 	
 	saveObject._map = this._map.getSaveObject();
@@ -514,6 +586,15 @@ p.restoreFromSaveObject = function(_saveObject, _player)
 			this._actors.setElement(this._player, this._player.getPosition()[0],this._player.getPosition()[1]);				 		
 		else
 			this._actors.setElement(actor, actor.getPosition()[0],actor.getPosition()[1]);				 		
+	}
+	
+	for(var i=0; i<_saveObject._objectContainers.length; i++)
+	{
+		// Recreate the actor from the saved data
+		var objectContainer = new ObjectContainer();
+		objectContainer.restoreFromSaveObject(_saveObject._objectContainers[i]);	
+
+		this._objectContainers.setElement(objectContainer, objectContainer.getPosition()[0],objectContainer.getPosition()[1]);				 		
 	}
 	
 	this._map = new LevelMap();
