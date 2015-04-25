@@ -69,14 +69,23 @@ p.joinLevel = function(_player, _atStart)
 	// Update the visible part of the map
 	this._updateVisibleMapFromPlayerPosition();
 			
-	this.startLevel();
-}
-
-p.startLevel = function()
-{
+	//this.startLevel();
+	
 	this._isActive = true;		
 			
-	this._nextTurn();	
+	this._nextTurn(true);	
+}
+
+/*p.startLevel = function()
+{
+	
+}*/
+
+p.restartLevel = function()
+{
+	this._isActive = true;	
+	
+	this._nextTurn(false);	
 }
 
 p.moveActor = function(_actor, _newPosition)
@@ -324,7 +333,10 @@ p._initialiseActorTimers = function()
 	}
 }
 
-p._nextTurn = function()
+// This gets the next actor to move
+// The _preUpdateActor parameter determines whether we call the this._currentActor.turnStarted() method on the actor to move next
+// 		it is not called after reloading the game since the method has already been called for that particular turn
+p._nextTurn = function(_preUpdateActor)
 {		
 	// if the level is not active then don't continue with the turns
 	if(!this._isActive)
@@ -342,7 +354,9 @@ p._nextTurn = function()
 	this._doubleMoveAction = null;
 		
 	this._currentActor = TurnManager.getNextActor(this._player, this._actors);	
-	this._currentActor.turnStarted();
+	
+	if(_preUpdateActor)
+		this._currentActor.turnStarted();
 	
 	this.updateActors();
 	
@@ -385,11 +399,16 @@ p._startAIAction = function(_monsterAction)
 // This says the action the actor performed during their turn has finished
 p._turnActionFinished = function()
 {	
-	var newActions = this._currentActor.getEndTurnStatusActions();
+	// Add any end turn actions (eg. damage from self sacrifice)
+	var newActions = this._currentActor.getEndTurnEffectActions();
+	var newActions2 = this._currentActor.getEndTurnStatusActions();
+	
+	for(var i=0; i<newActions2.length; i++)	
+		newActions.push(newActions2);
 	
 	for(var i=0; i<newActions.length; i++)	
 		this._actionGod.addAction(newActions[i]);
-	
+			
 	// If we have status actions to perform then do this here, otherwise just end the turn
 	if(newActions.length > 0)	
 		this._actionGod.startAction(this._turnFinished.bind(this));		
@@ -408,17 +427,8 @@ p._turnFinished = function()
 	// Need to update the map viewable tiles here
 	this._updateVisibleMapFromPlayerPosition();
 			
-	// Check for delay after the actions have been resolved - only have a delay for some actions (not move as it would be too annoying)
-	/*if(this._actionGod.getAfterAnimWaitTime() > 0)
-	{
-		TweenMax.delayedCall(this._actionGod.getAfterAnimWaitTime, this._game.actorTurnEndsCallback, [this._currentActor], this);	
-		TweenMax.delayedCall(this._actionGod.getAfterAnimWaitTime, this._nextTurn, [], this);	
-	}
-	else
-	{*/
-		this._game.actorTurnEndsCallback(this._currentActor);
-		this._nextTurn();			
-	//}
+	this._game.actorTurnEndsCallback(this._currentActor);
+	this._nextTurn(true);			
 }
 
 p._removeDeadActors = function()

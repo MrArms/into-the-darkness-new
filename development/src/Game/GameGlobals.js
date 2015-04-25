@@ -26,8 +26,9 @@ GameGlobals.actorsData = {};
 																																	{name:Effect.COUNTER_ATTACK},
 																																	]};*/
 																																
-GameGlobals.actorsData["@"] = {max_hp:50, base_attack:3, base_defence:1, speed:Actor.NORMAL_SPEED, alignment:"GOOD", name:"Player", colour:ColourGlobals.COLOUR_WHITE, effects:[]};
-																																				
-GameGlobals.actorsData["A"] = {max_hp:8, base_attack:2, base_defence:1, speed:Actor.NORMAL_SPEED, alignment:"BAD", name:"Alan", colour:ColourGlobals.COLOUR_CYAN, effects:[]}; //{name:Effect.COUNTER_ATTACK}]};
+GameGlobals.actorsData["@"] = {max_hp:50, base_strength:2, base_defence:1, base_magic:1, base_faith:1, base_will:1, base_speed:Actor.NORMAL_SPEED, alignment:"GOOD", name:"Player", colour:ColourGlobals.COLOUR_WHITE, effects:[]};
+																																			
+GameGlobals.actorsData["A"] = {max_hp:3, base_strength:2, base_defence:1, base_magic:1, base_faith:1, base_will:1, base_speed:Actor.NORMAL_SPEED, alignment:"BAD", name:"Alan", colour:ColourGlobals.COLOUR_CYAN, effects:[]}; //{name:Effect.COUNTER_ATTACK}]};
+
 
 

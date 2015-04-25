@@ -1,244 +1,42 @@
 
-======= CHECK IN NEXT ======
+NEED TO link up Actor.damageDealt function with the correct game event DONE
+Need to test with self sacrifice (need a damage gameEvent for the attacker) DONE
+Need to save/load new stats DONE
 
-Quick review/tidy up of changes and check in
-Don't forget to add new object classes
+Bug - use adrenelin + self sacrifice - kill a monster, the next turn you use self sacrifice again (effects should be cleared) FIXED
 
-==== Adding objects to the Level =====
+Check in 
 
-In UI tell the player when mousing over charms on floor whether they can be picked up or not DONE
-Show total charms too DONE
+Move _turnActionFinished and _turnFinished from Level to actor (or tidy it up properly)
+
+
+====== Basic stats ====
+
+Add strength
+Magic
+Wisdom
+Will 
+
+Strength - each point adds one point of damage 
+
+Constitution - difficult one this, perhaps it is only valid for the player since we want to set monster HP explicitly.
+	Could just have Constitution = number of HP - yes do this for now KEEPING AS _maxHP FOR THE MOMENT!!!
+
+Calculated stats
 	
-Think about whether we want an object class for all objects rather than just objectInformation for charms etc.
+NEED TO ADD ALL NEW STATS TO THE LOAD/SAVE STUFF ***********
 
-Load/Save floor objects DONE
+Defence
 
-Objects needs to be displayed on the floor even if not currently visible? Not sure LEAVE FOR NOW
-
-Think about how we want to drop items and pickup particular amounts of things - how do other games do it? LEAVE FOR NOW
+Picking stuff up takes a turn? LEAVE FOR THE MOMENT
 
 
-Created an ObjectContainer class - now need to think of how this interacts with the Level and the UI	
-	Level will go between the two I think
-Start with charms and then do Load/SAVE
-Then can add more complex objects like equipment - create an equipment object and stick some dummy fields on it
+Things we need before we have a game
 
-Can we combine this method of storing objects with how they will be stored in the inventory?
+-- Loads more charm types
+-- Loads more monster types
+-- Monsters spawning
+-- Equipment you can wield
+-- Objects on floor (not just charms)
+-- Magic ranged attacks
 
-DON'T BOTHER WITH OBJECT CLASS EXCEPT FOR OBJECTS THAT DIVERGE FROM THE DEFAULT (eg. randomly generated objects)
-
-	Make a custom object that diverges from the default and load/save it too
-
-We haven't listed GameObject types properly yet (using "charm" rather than GameObject.Charm)
-
-Think we need an "object" class for all objects including charms :/
-	Because they will all have different chars and colours 
-		THIS CAN BE PUT ON THE CHARM INFORMATION IN THE GLOBALS!!!!
-	
-Object information can just have the object and number of them and can be used in the inventory and on the level in the ObjectContainers
-
-==== Tidy up ======
-
-
-Tidy up renderer more DONE
-
-Create gameEvents for starting or extending a status effect and perhaps create an animation for them too DONE (FOR POISON)
-
-Small flicker (of the normal char actor) between double move and poison start actions (it was the delay between actions being zero and the next function called by TweenMax) FIXED
-
-Think about how actions and gameEvents work - perhaps it is a little clunky to have both with all the same names? (although they do serve different purposes)
-
-
-======= Stuff that isn't animations (will come back to it later on) ========
-
-What needs doing that's easy?
-	Fix the screen so you can see all the cards to choose DONE
-	Add some more charms and their effects
-	Start adding stats to the player eg. strength etc.
-	
-	
-
-Make the UI reflect the order cards are selected DONE
-Can make objects the player can pick up
-	Need a cellDataObject for objects on the map - they are an array of objects 
-	
-Can create a simple class object that holds the items on the map - contains an array of objects, can add/remove stuff from it etc. 
-	Needs to be saveable
-	Just hold the object type and key and quantity 
-	
-	Need an objectCellDataObject like the other ones for the map
-		
-Then need a way of interacting with the UI with it	
-	
-DO SAVE/LOAD AFTER IMPLEMENTATION!!!
-
-Should we save the actual objects, or just describe them with objectType, key ?
-	The latter would mean we have to create/delete the objects themselves every time we put down or pick up an items
-		Also it means if you want an object that can be changed (such as a sword that can be enchanted) then this is not possible
-	Could keep objects simple then we don't have to worry about this at all - although can never have say random artifacts which are cool.
-
-	
-OK LET'S SAVE THE OBJECTS THEMSELVES - how the flip are we going to do this?
-	Charms are easy as they are just a description (a key)
-		
-	Need to actually save each object - the same way we do for actors etc. simple as that BUT LUCKILY NOT FOR NOW !!!!
-		Could do this next after doing the charms load/save - just put some dummy fields (field 1 = 4, field 2 = 0 etc.) in and a simple ui thing to test
-	
-	
-	
-
-	
-	
-	
-===== Pickup-able objects =========
-
-Multiple objects in one place?
-Need a UI thing for picking up objects? As if the floor is part of the inventory you can move between.
-
-Need an object holder class - that can hold multiple items on the floor of the dungeon
-	
-	
-	
-	
-
-
-A slight pause after your turn might be good to see monsters actually move (could use a pause when they are onscreen)
-
-Multiple cell gameEvent animations, think about what happens if two overlap etc.
-
-
-
-Then code review - think about anims and stuff pondered below.
-	Look at where the test for actor death is in ActionGod and see if there is anywhere that is better for it.
-
-Can eliminate flicker if the AI waits before making their move	
-	
-
-Tidy up animation stuff - make all anims in the new style and tidy up the renderer
-Tidy up the isActorAlive() and HP < 0 tests to unify them into something a bit nicer (perhaps a DEAD flag?)
-	If properly dead then don't render it at all (prevents grotty flicker at the end where it goes back to the standard character for 1 frame before disappearing)
-		I THINK IT ALREADY DOES THIS, BUT STILL HAS THE BUG :(
-		
-Fix the "flicker" after death for actors when the death animation has finished
-	
-Need to unify names for gameEvent, actions and animations - also a faster way of creating them would be good
-
-		
-The attack anims only seem to last one frame now
-Also the last frame seems to last less time than the rest for the xp_gain anim
-
-Need animations that work on more than one tiles - do we really need this? Could make gameEvents for each cells  that is used and that might be easier
-	Then cells could have multiple gameEvents on them and you pick the one with the highest priority - nah horrible as you'll need to create actors for each of them
-		Need the renderer to combine them intelligently
-			
-We will need an overview thingy to combine multiple gameEvents that take up more than one tile
-	
-Create and TEST multiple hits (whirlwind attack for the moment)
-
-Need to rename MOVE_WAIT to something more appropriate
-
-
-Need to work out when actors die - calculate in Attack?
-
-Need a death animation regardless of how the actor dies (could be an attack, status effect etc.)
-	The gameEvent needs to tell the ActionGod a new Death action has been created. NAH
-	
-Could add on xp ups to the player where relevant
-
-
-
-	
-When you create the damage event also add a death action to the ActionGod.
-	Same with status effects (will need to test this out afterwards)
-	
-This is better because all the actions get created automatically 
-	Want the gameEvent that causes damage to also create a DEATH action if necessary
-		Also adds to the number of actors the player has killed this turn (if it isn't the player)
-		
-THE LEVEL CAN CREATE THE DEATH ACTIONS! No that's bad too as if you kill an actor and then continue your turn the dead actor will still be sitting there
-	PUT IT IN THE ACTION GOD
-
-Problem is that GameEvents and Actors are dumb regarding the ActionGod currently		
-		
-
-Need dying animation
-	Create an action? Or a gameEvent?
-		An action I think.
-Need status "contracted" animation
-
-
-Melee animation 
-
-
-Add some more charms with effects
-Get poison working again - FIND OUT HOW IT WORKED BEFORE !!!!!!!!!!!!!!!!!
-
-	Here's how it was done before
-		_actor.addStatus(Status.POISON, 3);
-		
-	Maybe need a create status effect or action? The timing might be quite tricky however
-		Perhaps actors can have multiple effects rather than just one and they take different lengths of time
-			Or even one after the other
-				So an actor that is hit and then shows that they are poisoned
-		
-		Or perhaps keep it simple and combine the two somehow			Hit + paralysis
-			Hit + poison etc.
-			
-	Need to think about ranged effects and animations that span multiple tiles too :/
-		The renderer can grab an actor but still render multiple tiles at once
-		
-	Need to keep going backwards and forwards with the animation making it look good
-	
-	I think a separate action for causing status effects might be good
-	Also an animation for death too
-	
-	Also getting the lighting in might be good - for now just a general ambient light and light surrounding the player (and perhaps some monsters)
-	
-	
-	Need an animation class that has timer, char, foreground colour and background colour values that change over time
-	Then need something to control all the animations - the renderer grabs the animations
-		Perhaps a gameEvent could be this? It has an update function that gets updated every frame (not by the renderer itself)
-			The actionGod could update all the gameEvents and also check that they are finished before continuing
-	
-	Change it so the wait at the end is just part of the animation?
-	
-	The end turn wait is done twice currently, once in the actionGod and once in the Level afterwards
-	
-Melee animation - 
-
-BUG currently still counters twice with double_move and counter_attack even if the defender dies on the first counter FIXED
-
-Should possibly think about an animation pass - get things working and remember how stuff you've written works
-	Get some cool animations going - write up how it all works
-		Need to get the visuals going as we go along to avoid massive rewrites later on
-
-Think about animations and how we will want to implement them from where we are
-	Will probably do them in terms of frames - so 10 frames of this colour/char combo then 15 of this etc.
-		Could change the frame rate to the same as the animation? Might make moving annoying
-	Could make an animation "frame" 10 normal frames or something
-
-
-Poison - how does this work again? Added poison charm/effect, but it isn't implemented yet - need an animation for actually getting poisoned? Is it a separate action?
-	Could just keep it simple for now I guess
-	Make the attack itself poison green showing it has poisoned the defender - create a POISON_ATTACK action and that can be animated differently
-	
-Let's make some interesting animations for what we've got
-	Attack
-	Death	
-	Poison attack - could be two stage so normal damage and then a green * or something showing that they are poisoned
-	The "Add status" could be an ACTION 
-	Poison status damage
-
-====== Level Generation ======
-
-When we do level generation, want to create a series of level seeds and send them to the levels when they are generated
-		Also want to save previous monsters (especially uniques), towns, treasures and drops from previous level creation to make sure we have variety in the levels
-			The game uses random seed AND the previous level data to create a new level
-Could save the level seeds at the start
-Also could use that seed to generate contents for chests and drops for monsters when they are created.
-
-
-
-
-THINK ABOUT SECURITY!!!
-	

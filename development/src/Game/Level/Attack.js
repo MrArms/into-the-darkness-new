@@ -120,7 +120,7 @@ Attack.applyPoisonBrand = function(_actionGod, _attacker, _defender, _damage)
 Attack.createAttackAndDamageGameEvents = function(_actionGod, _attacker, _defender, _damage)
 {
 	// Show the attacker is attacking
-	var newAttackGameEvent = new GameEvent(_attacker, GameEvent.ATTACK, []);	
+	var newAttackGameEvent = new GameEvent(_attacker, GameEvent.ATTACK, [_damage]);	
 	// Add it to the actor so the renderer can display the gameEvent 
 	_attacker.addGameEvent(newAttackGameEvent);			
 	_actionGod.addGameEvent( newAttackGameEvent );

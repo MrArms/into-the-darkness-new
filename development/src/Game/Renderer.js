@@ -124,7 +124,7 @@ p._renderActorCell = function(_map, _actors, _col, _row)
 			var tempForegroundColour = gameEvent.getForegroundColour() !== null ? gameEvent.getForegroundColour() : tempColour;
 			var tempBackgroundColour = gameEvent.getBackgroundColour() !== null ? gameEvent.getBackgroundColour() : null;
 				
-			this._drawCell(_col, _row, gameEvent.getChar(), gameEvent.getForegroundColour(), tempBackgroundColour);				
+			this._drawCell(_col, _row, gameEvent.getChar(), tempForegroundColour, tempBackgroundColour);				
 							
 		}	
 		// No game event so just draw the actor as usual

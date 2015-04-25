@@ -71,7 +71,7 @@ p.resolveGameEvent = function()
 		
 	else if(this._eventType === GameEvent.ATTACK)
 	{
-		// Do nothing as the actor hasn't changed after attacking
+		this._actor.dealsDamage(this._damage);
 	}
 	else if(this._eventType === GameEvent.DAMAGE)
 	{					
@@ -163,9 +163,9 @@ p._init = function(_eventType, _args)
 	this._timer = 0;
 
 	if(_eventType === GameEvent.ATTACK)
-	{
-		// Don't need any variables for the this event
-		
+	{	
+		this._damage = _args[0];
+	
 		// Set anim timer								
 		this._animation = new Animation(Anim.ATTACK);	
 		this._endTimer = this._animation.getAnimationLength(); 

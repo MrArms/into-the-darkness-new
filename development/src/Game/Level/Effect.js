@@ -27,6 +27,8 @@ Effect.COUNTER_ATTACK = "counter_attack";
 Effect.DEFENCE = "defence_effect";
 Effect.ADRENALINE = "adrenaline";
 Effect.POISON_BRAND = "poison_brand";
+Effect.SELF_SACRIFICE = "self_sacrifice";
+Effect.REVENGE = "revenge";
 
 // Not implemented yet
 Effect.DOUBLE_MOVE = "double_move";
@@ -57,13 +59,26 @@ p.reduceTimer = function()
 p.applyEffectToActor = function(_actor)
 {
 	if(this._effectType === Effect.ATTACK)
-		_actor.setCurrentAttackBonus(_actor.getCurrentAttackBonus() + this._value);
+		_actor.setCurrentAttack(_actor.getCurrentAttack() + this._value);
 		
 	else if(this._effectType === Effect.DEFENCE)
-		_actor.setCurrentDefenceBonus(_actor.getCurrentDefenceBonus() + this._value);
+		_actor.setCurrentDefence(_actor.getCurrentDefence() + this._value);
 
 	else if(this._effectType === Effect.BRAVERY)
-		_actor.setCurrentAttackBonus(_actor.getCurrentAttackBonus() + _actor.getNumberActorsAdjacent() );		
+		_actor.setCurrentAttack(_actor.getCurrentAttack() + _actor.getNumberActorsAdjacent() );		
+		
+	else if(this._effectType === Effect.REVENGE)
+		_actor.setCurrentAttack(_actor.getCurrentAttack() + _actor.getDamageDealtLastTurn() );		
+}
+
+// This is for actions created by effects
+p.getAction = function(_actor)
+{		
+	if(this._effectType === Effect.SELF_SACRIFICE)
+		return (new Action(_actor, Action.DAMAGE, [[_actor], this._value]));
+		
+	return null;
+		
 }
 
 //===================================================

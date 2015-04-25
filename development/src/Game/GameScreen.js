@@ -217,7 +217,7 @@ p._restart = function(_saveGameObject)
 	// Set no charms selected
 	this._resetCharms();
 	
-	this._getCurrentLevel().startLevel();				
+	this._getCurrentLevel().restartLevel();				
 }
 
 // This is purely to be able to load/save in game for debug purposes

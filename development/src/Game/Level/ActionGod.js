@@ -23,13 +23,6 @@ var p = ActionGod.prototype;
 //===================================================
 
 p._level = null;
-// p._currentState = null;
-
-// This stores whether to wait for an animation or not (if it is more than 0)
-// If you just let it run to 0 frames then it takes an extra frame to process the next stage causing a nasty flicker
-// p._waitForAnim = null;
-
-// p._afterAnimWaitTime = null;
 
 p._actionQueue = null;
 
@@ -96,8 +89,7 @@ p.update = function()
 
 p.addGameEvent = function(_gameEvent)
 {
-	this._gameEventList.push( _gameEvent );
-	// this._setMaxAnimTime( _gameEvent );
+	this._gameEventList.push( _gameEvent );	
 }
 
 //===================================================
@@ -131,6 +123,12 @@ p._processAction = function()
 	if(this._currentAction.getActionType() === Action.ATTACK)
 	{				
 		Attack.processAttack(this._level, this, this._currentAction);
+	}
+	else if(this._currentAction.getActionType() === Action.DAMAGE)
+	{
+		var newDamageGameEvent = new GameEvent(this._currentAction.getActor(), GameEvent.DAMAGE, [this._currentAction.getValue()]);							
+		this._currentAction.getActor().addGameEvent(newDamageGameEvent);	
+		this.addGameEvent( newDamageGameEvent );	
 	}
 	else if(this._currentAction.getActionType() === Action.STATUS)
 	{			
@@ -189,23 +187,23 @@ p._processAction = function()
 				this._currentAction.getActor().madeKill();	
 			}			
 		}
-			
+						
 		if(playerXPGain === true)
 		{						
-			var newXPGainEvent = new GameEvent(this._currentAction.getActor(), GameEvent.XP_GAIN, []);
+			// ==================== if we want an animation to play for XP gain then uncomment this =========================
+			//				(although it doesn't look right with self sacrifice currently so that would need fixing)
+		
+			/*var newXPGainEvent = new GameEvent(this._currentAction.getActor(), GameEvent.XP_GAIN, []);
 			this._currentAction.getActor().addGameEvent(newXPGainEvent);							
-			this.addGameEvent( newXPGainEvent );
+			this.addGameEvent( newXPGainEvent );*/
 		}		
 	}
 	else if(this._currentAction.getActionType() === Action.DELAY)
 	{
 		var newDelayGameEvent = new GameEvent(this._currentAction.getActor(), GameEvent.DELAY, [this._currentAction.getDelay()]);
-	
-		//TweenMax.delayedCall(this._currentAction.getDelay(), this._resolveAction, [], this);
-		
-		//return;	
 	}
 	
+	// ==================== Might make this an action again  =========================
 	/*else if(currentAction.getActionType() === Action.XP_GAIN)
 	{
 		var newXPGainEvent = new GameEvent(currentAction.getActor(), GameEvent.XP_GAIN, []);
@@ -263,12 +261,8 @@ p._resolveAction = function()
 	{						
 		this._actionRound += 1;
 	
-		// var tempWaitTime = Globals.DELAY_BETWEEN_ACTIONS; // + this._afterAnimWaitTime / Globals.FPS;
-	
 		// We put a slight delay between actions
-		TweenMax.delayedCall( Globals.DELAY_BETWEEN_ACTIONS, this._processAction, [], this);	
-
-		//this._processAction();
+		TweenMax.delayedCall( Globals.DELAY_BETWEEN_ACTIONS, this._processAction, [], this);		
 	}
 	// Otherwise tell the game that the "turn" that contained all the actions in the actionQueue (and any ones subsequently added to it) has completely finished
 	else
@@ -290,7 +284,5 @@ p._init = function()
 //===================================================
 // GETTERS & SETTERS
 //===================================================
-
-//p.getAfterAnimWaitTime = function() {return this._afterAnimWaitTime;}
 
 p.getActionRound = function() {return this._actionRound;}

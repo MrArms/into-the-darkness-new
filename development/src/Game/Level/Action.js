@@ -27,6 +27,7 @@ p._targetCell = null;
 
 p._targets = null;
 p._delay = null;
+p._value = null;
 
 p._actionType = null;
 
@@ -45,6 +46,8 @@ Action.MOVE_WAIT = "move_wait"; // A movement that we want to wait to see the ef
 Action.DEATH = "death";
 Action.DELAY = "delay";
 
+Action.DAMAGE = "damage"; // This is for damage that isn't associated with an attack or status effect (eg. self sacrifice)
+
 Action.STATUS = "status";
 Action.STATUS_START = "status_start";
 
@@ -54,7 +57,6 @@ Action.STATUS_START = "status_start";
 //===================================================
 // Public Methods
 //===================================================
-
 
 
 //===================================================
@@ -67,6 +69,11 @@ p._init = function(_actionType, _args)
 	{
 		this._targetCell = _args[0];
 		//this._attackPattern = _args[1];
+	}	
+	else if(_actionType === Action.DAMAGE)
+	{
+		this._targets = _args[0];
+		this._value = _args[1];	
 	}
 	else if(_actionType === Action.STATUS)
 	{		
@@ -118,6 +125,8 @@ p.getTargetCell = function() { return this._targetCell; }
 p.getTargets = function() { return this._targets; }
 
 p.getStatus = function() { return this._status; }
+
+p.getValue = function() { return this._value; }
 
 p.getStatusType = function() { return this._statusType; }
 

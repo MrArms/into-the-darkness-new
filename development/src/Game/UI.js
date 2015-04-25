@@ -19,14 +19,14 @@ var p = UI.prototype;
 // Variables
 //===================================================
 
-p.X_START = 68; //80;
-p.X_SECOND_COL = 85; //97;
-p.Y_START = 10;
-p.Y_CHARM_DISPLAY_START = 20; //p.Y_START + 20;
-p.CHARM_DISPLAY_WIDTH = 15; //p.Y_START + 20;
+p.X_START = 68; 
+p.X_SECOND_COL = 85; 
+p.Y_START = 3; //10;
+p.Y_CHARM_DISPLAY_START = 20; 
+p.CHARM_DISPLAY_WIDTH = 15;
 
-p.Y_FLOOR_OBJECTS_START = 30; //p.Y_START + 20;
-p.FLOOR_OBJECTS_SELECT_WIDTH = 15; //p.Y_START + 20;
+p.Y_FLOOR_OBJECTS_START = 30; 
+p.FLOOR_OBJECTS_SELECT_WIDTH = 15; 
 
 
 //===================================================
@@ -56,15 +56,8 @@ p.checkMouseDownOnCharm = function(_inventory, _currentMouseCell)
 // This just returns the index of a floor object if it is clicked on
 p.checkMouseDownOnFloorObject = function(_currentMouseCell, _level)
 {
-	if(_currentMouseCell !== null)
-	{
-		return this._getFloorObjectIndexFromCell(_currentMouseCell[0], _currentMouseCell[1], _level);
-	
-		/*if(floorObjectCell !== null)
-			this._floorCellTooltip(floorObjectCell, _inventory);*/
-	
-		//return floorObjectCell;
-	}
+	if(_currentMouseCell !== null)	
+		return this._getFloorObjectIndexFromCell(_currentMouseCell[0], _currentMouseCell[1], _level);		
 
 	return null;
 }
@@ -88,8 +81,7 @@ p._floorCellTooltip = function(_objectInformation, _inventory)
 // This takes a screen cell coordinate and returns an index of a floor object if it is "over" the text of the floor object
 // Used for mousing over and clicking floor object names
 p._getFloorObjectIndexFromCell = function(_col, _row, _level)
-{
-	// var objectContainer = this._getObjectContainerAtPosition(_level.getPlayer.getPosition(), _level);
+{	
 	var objectContainer = this._getObjectContainerAtPosition(_level.getPlayer().getPosition(), _level);
 	
 	if(objectContainer && objectContainer !== null)
@@ -216,10 +208,7 @@ p._updateCharmDisplay = function(_inventory, _currentMouseCell, _charmKeysSelect
 	for(var i=0; i<_charmKeysSelectedArray.length; i++)
 	{				
 		var tempKey = _charmKeysSelectedArray[i];
-		
-		
-		// var tempKey = charmObjectArray[tempIndex].key
-						
+				
 		this._display.drawText(this.X_START, this.Y_CHARM_DISPLAY_START + numberInCol + 1 + i, "%c{#3F3}" + CharmGlobals.data[tempKey].name + " (" + (i+1) + ")");					
 	}
 	
@@ -247,8 +236,7 @@ p._showCharmItem = function(_xPos, _yPos, _charmItem, _currentMouseCell, _isSele
 		else
 			currentColourText = tempMouseOverColour;				
 	}
-		
-	// this._display.drawText(_xPos, _yPos, currentColourText + _charmItem.key + " " + _charmItem.number);
+			
 	this._display.drawText(_xPos, _yPos, currentColourText + CharmGlobals.data[_charmItem.key].name + " " + _charmItem.number);
 }
 
@@ -256,12 +244,27 @@ p._showCharmItem = function(_xPos, _yPos, _charmItem, _currentMouseCell, _isSele
 
 p._updateStatDisplay = function(_player)
 {
-	this._display.drawText(this.X_START, this.Y_START, "Attack Bonus " + _player.getCurrentAttackBonus() );
-	this._display.drawText(this.X_START, this.Y_START + 1, "Defence Bonus " + _player.getCurrentDefenceBonus() );
-	this._display.drawText(this.X_START, this.Y_START + 2, "Kills this turn " + _player.getEnemiesKilledThisTurn() );
-		
+	p.getCurrentStrength = function() { return this._data._baseStrength; }
+	p.getCurrentMagic = function() { return this._data._baseMagic; }
+	p.getCurrentFaith = function() { return this._data._baseFaith; }
+	p.getCurrentWill = function() { return this._data._baseWill; }	
+
+	this._display.drawText(this.X_START, this.Y_START, "Strength " + _player.getCurrentStrength() );
+	this._display.drawText(this.X_START, this.Y_START + 1, "Magic " + _player.getCurrentMagic() );
+	this._display.drawText(this.X_START, this.Y_START + 2, "Faith " + _player.getCurrentFaith() );
+	this._display.drawText(this.X_START, this.Y_START + 3, "Will " + _player.getCurrentWill() );
+	
+	this._display.drawText(this.X_START, this.Y_START + 5, "Attack " + _player.getCurrentAttack() );
+	this._display.drawText(this.X_START, this.Y_START + 6, "Defence " + _player.getCurrentDefence() );
+	
+	this._display.drawText(this.X_START, this.Y_START + 7, "Kills this turn " + _player.getEnemiesKilledThisTurn() );
+	this._display.drawText(this.X_START, this.Y_START + 8, "Damage dealt this turn " + _player.getDamageDealtThisTurn() );
+	this._display.drawText(this.X_START, this.Y_START + 9, "Damage taken this turn " + _player.getDamageTakenThisTurn() );
+	this._display.drawText(this.X_START, this.Y_START + 10, "Damage dealt last turn " + _player.getDamageDealtLastTurn() );
+	this._display.drawText(this.X_START, this.Y_START + 11, "Damage taken last turn " + _player.getDamageTakenLastTurn() );
+			
 	if(_player.hasEffect(Effect.ADRENALINE))
-		this._display.drawText(this.X_START, this.Y_START + 3, "ADRENALINE");			
+		this._display.drawText(this.X_START, this.Y_START + 12, "ADRENALINE");			
 }
 
 p._init = function()

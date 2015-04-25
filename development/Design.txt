@@ -91,6 +91,8 @@ Jellies split into more jellies in the open
 Conjurers/summoners summon monsters between you and them
 Some things touch to damage your stats/equipment etc.
 
+Monster with very high defence, but with self sacrifice that you need to battle n number of turns before it dies (or get very high attack value)
+
 
 Status
 Effects that reduce effectiveness of certain things - eg. reduce accuracy, magic power, prayer power, attack amount etc.
