@@ -29,6 +29,12 @@ Effect.ADRENALINE = "adrenaline";
 Effect.POISON_BRAND = "poison_brand";
 Effect.SELF_SACRIFICE = "self_sacrifice";
 Effect.REVENGE = "revenge";
+Effect.SPIKED_ARMOUR = "spiked_armour";
+Effect.FIRE_BRAND = "fire_brand";
+Effect.RECKLESS_ATTACK = "reckless_attack";
+Effect.REINFORCE = "reinforce";
+Effect.TACTICS = "tactics";
+Effect.SURROUND_ATTACK = "surround_attack";
 
 // Not implemented yet
 Effect.DOUBLE_MOVE = "double_move";
@@ -67,8 +73,21 @@ p.applyEffectToActor = function(_actor)
 	else if(this._effectType === Effect.BRAVERY)
 		_actor.setCurrentAttack(_actor.getCurrentAttack() + _actor.getNumberActorsAdjacent() );		
 		
+	else if(this._effectType === Effect.REINFORCE)
+		_actor.setCurrentDefence(_actor.getCurrentDefence() + _actor.getNumberActorsAdjacent() );	
+		
 	else if(this._effectType === Effect.REVENGE)
-		_actor.setCurrentAttack(_actor.getCurrentAttack() + _actor.getDamageDealtLastTurn() );		
+		_actor.setCurrentAttack(_actor.getCurrentAttack() + _actor.getDamageTakenLastTurn() );	
+		
+	else if(this._effectType === Effect.TACTICS)
+		_actor.setCurrentAttack(_actor.getCurrentAttack() + _actor.getAdjacentDefenceDiff() );	
+		
+	else if(this._effectType === Effect.RECKLESS_ATTACK)
+	{
+		_actor.setCurrentAttack(_actor.getCurrentAttack() + _actor.getCurrentDefence() );
+		_actor.setCurrentDefence(0);
+	}
+		
 }
 
 // This is for actions created by effects

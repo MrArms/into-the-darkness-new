@@ -9,9 +9,9 @@ var GameGlobals = {};
 
 GameGlobals.visionRadius = 10;
 
-GameGlobals.MAX_CHARMS = 50;
-GameGlobals.START_CHARMS = 40;
-GameGlobals.MAX_DIFFERENT_CHARMS = 10;
+GameGlobals.MAX_CHARMS = 100;
+GameGlobals.START_CHARMS = 100;
+GameGlobals.MAX_DIFFERENT_CHARMS = 16;
 
 GameGlobals.MAX_CHARMS_SELECTED = 3;
 
@@ -26,9 +26,9 @@ GameGlobals.actorsData = {};
 																																	{name:Effect.COUNTER_ATTACK},
 																																	]};*/
 																																
-GameGlobals.actorsData["@"] = {max_hp:50, base_strength:2, base_defence:1, base_magic:1, base_faith:1, base_will:1, base_speed:Actor.NORMAL_SPEED, alignment:"GOOD", name:"Player", colour:ColourGlobals.COLOUR_WHITE, effects:[]};
+GameGlobals.actorsData["@"] = {max_hp:50, base_strength:4, base_defence:2, base_magic:1, base_faith:1, base_will:1, base_speed:Actor.NORMAL_SPEED, alignment:"GOOD", name:"Player", colour:ColourGlobals.COLOUR_WHITE, effects:[]};
 																																			
-GameGlobals.actorsData["A"] = {max_hp:3, base_strength:2, base_defence:1, base_magic:1, base_faith:1, base_will:1, base_speed:Actor.NORMAL_SPEED, alignment:"BAD", name:"Alan", colour:ColourGlobals.COLOUR_CYAN, effects:[]}; //{name:Effect.COUNTER_ATTACK}]};
+GameGlobals.actorsData["A"] = {max_hp:7, base_strength:3, base_defence:1, base_magic:1, base_faith:1, base_will:1, base_speed:Actor.NORMAL_SPEED, alignment:"BAD", name:"Alan", colour:ColourGlobals.COLOUR_CYAN, effects:[]}; //{name:Effect.COUNTER_ATTACK}]};
 
 
 

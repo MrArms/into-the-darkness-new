@@ -25,7 +25,6 @@ var p = Level.prototype;
 p._actors = null;
 p._objectContainers = null;
 
-
 p._levelIndex = null;
 
 p._game = null;
@@ -68,18 +67,11 @@ p.joinLevel = function(_player, _atStart)
 			
 	// Update the visible part of the map
 	this._updateVisibleMapFromPlayerPosition();
-			
-	//this.startLevel();
-	
+
 	this._isActive = true;		
 			
 	this._nextTurn(true);	
 }
-
-/*p.startLevel = function()
-{
-	
-}*/
 
 p.restartLevel = function()
 {
@@ -136,7 +128,8 @@ p.updateActors = function()
 {
 	for(var key in this._actors.getData())
 	{
-		this._actors.getElementFromKey(key).updateValuesFromLevel(this); //this._map, this._actors)
+		this._actors.getElementFromKey(key).resetActorData(this); 
+		this._actors.getElementFromKey(key).updateValuesFromLevel(this); 
 	}
 }
 
@@ -404,7 +397,7 @@ p._turnActionFinished = function()
 	var newActions2 = this._currentActor.getEndTurnStatusActions();
 	
 	for(var i=0; i<newActions2.length; i++)	
-		newActions.push(newActions2);
+		newActions.push(newActions2[i]);
 	
 	for(var i=0; i<newActions.length; i++)	
 		this._actionGod.addAction(newActions[i]);
@@ -442,7 +435,7 @@ p._removeDeadActors = function()
 
 p._createMonsters = function()
 {
-	var testNumberMonsters = 1;
+	var testNumberMonsters = 5;
 
 	for(var i=0; i<testNumberMonsters; i++)
 	{

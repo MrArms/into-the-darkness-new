@@ -229,16 +229,7 @@ p._saveGameCheat = function()
 		
 	// This is purely to be able to load/save in game for debug purposes
 	this._callbackFunction(ScreenManager.SAVE_GAME, [this._saveGameObject]);
-	// this._callbackFunction(ScreenManager.SAVE_GAME, [this._getSaveObject()]);
-
 	this._gameLocked = false;
-
-
-	/*this._gameLocked = true;
-				
-	this._saveGameObject = this._getSaveObject();
-	
-	this._gameLocked = false;*/
 }
 
 // This is purely to be able to load/save in game for debug purposes
@@ -316,12 +307,6 @@ p._updateLevel = function(e)
 	if( this._getCurrentLevel() !== null && this._getCurrentLevel().isLevelActive() )		
 		this._getCurrentLevel().update();			
 }
-
-/*p._testUpdateConditions = function()
-{
-	// return (this._gameLocked === false && this._inGame === true);
-	return (this._gameLocked === false);
-}*/
 
 p._testControlConditions = function()
 {

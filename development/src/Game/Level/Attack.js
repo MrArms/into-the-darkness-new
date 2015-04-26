@@ -95,9 +95,7 @@ Attack.testAndProcessCounterAttack = function(_actionGod, _level, _attacker, _de
 	{
 		// If the attacker is able to knockback the defender then the defender cannot counter attack 
 		if(!_attacker.hasEffect(Effect.KNOCKBACK) || !Attack.isKnockbackCellFree(_level, _attacker, _defender)) 
-		{
-			
-			// _actionGod.addAction(new Action(_defender, Action.DELAY, [Globals.DELAY_BEFORE_COUNTER_ATTACK]) ); 
+		{					
 			_actionGod.addAction(new Action(_defender, Action.ATTACK, [ _attacker.getPosition() ]) ); 
 
 			// If the defender has double move then they get two counter attacks, but not if the defender can knock them back
@@ -111,26 +109,33 @@ Attack.testAndProcessCounterAttack = function(_actionGod, _level, _attacker, _de
 	}
 }
 
-Attack.applyPoisonBrand = function(_actionGod, _attacker, _defender, _damage)
+Attack.applyPoisonBrand = function(_actionGod, _attacker, _defender, _damage, _attackerHealthChange)
 {
 	if(_attacker.hasEffect(Effect.POISON_BRAND))	
-		_actionGod.addActionAtFront(new Action(_defender, Action.STATUS_START, [Status.POISON, _damage]) ); 			
+		_actionGod.addActionAtFront(new Action(_defender, Action.STATUS_START, [Status.POISON, _damage]) ); 	
+
+	if(_attackerHealthChange < 0 && _defender.hasEffect(Effect.POISON_BRAND))
+		_actionGod.addActionAtFront(new Action(_attacker, Action.STATUS_START, [Status.POISON, -_attackerHealthChange]) ); 			
 }
 
-Attack.createAttackAndDamageGameEvents = function(_actionGod, _attacker, _defender, _damage)
+Attack.createAndApplyGameEvents = function(_actionGod, _actor, _gameEventType, _argArray)
 {
-	// Show the attacker is attacking
-	var newAttackGameEvent = new GameEvent(_attacker, GameEvent.ATTACK, [_damage]);	
+	var newGameEvent = new GameEvent(_actor, _gameEventType, _argArray);	
 	// Add it to the actor so the renderer can display the gameEvent 
-	_attacker.addGameEvent(newAttackGameEvent);			
-	_actionGod.addGameEvent( newAttackGameEvent );
-	
-	// Show the target is hit
-	var newDamageGameEvent = new GameEvent(_defender, GameEvent.DAMAGE, [_damage]);				
-	// Add it to the actor so the renderer can display the gameEvent 			
-	_defender.addGameEvent(newDamageGameEvent);	
-	_actionGod.addGameEvent( newDamageGameEvent );	
+	_actor.addGameEvent(newGameEvent);			
+	_actionGod.addGameEvent( newGameEvent );
+}
 
+Attack.createAttackAndDamageGameEvents = function(_actionGod, _attacker, _defender, _damage, _attackerHealthChange)
+{
+	if(_attackerHealthChange === 0)	
+		Attack.createAndApplyGameEvents(_actionGod, _attacker, GameEvent.ATTACK, [_damage]);			
+	else if(_attackerHealthChange > 0)
+		Attack.createAndApplyGameEvents(_actionGod, _attacker, GameEvent.HEAL, [_attackerHealthChange]);		
+	else if(_attackerHealthChange < 0)		
+		Attack.createAndApplyGameEvents(_actionGod, _attacker, GameEvent.DAMAGE, [-_attackerHealthChange]);
+		
+	Attack.createAndApplyGameEvents(_actionGod, _defender, GameEvent.DAMAGE, [_damage]);	
 }
 
 Attack.processOneAttackTarget = function(_level, _actionGod, _attacker, _defender)
@@ -140,13 +145,20 @@ Attack.processOneAttackTarget = function(_level, _actionGod, _attacker, _defende
 	// Need to test if the attacker has knockback here
 	if(_attacker.hasEffect(Effect.KNOCKBACK))			
 		damage = Attack.resolveKnockback(_level, _actionGod, _attacker, _defender, damage);
-											
-	Attack.createAttackAndDamageGameEvents(_actionGod, _attacker, _defender, damage);
+						
+	var attackerHealthChange = 0;
 	
-	Attack.applyPoisonBrand(_actionGod, _attacker, _defender, damage);
+	if(_defender.hasEffect(Effect.SPIKED_ARMOUR))	
+		var  attackerHealthChange = -Math.max(0, _defender.getCurrentDefence() - _attacker.getCurrentDefence());
+		
+	if(_attacker.hasEffect(Effect.FIRE_BRAND))	
+		damage = damage * 2;
+						
+	Attack.createAttackAndDamageGameEvents(_actionGod, _attacker, _defender, damage, attackerHealthChange);
+
+	Attack.applyPoisonBrand(_actionGod, _attacker, _defender, damage, attackerHealthChange);
 	
 	Attack.testAndProcessCounterAttack(_actionGod, _level, _attacker, _defender);	
-
 }
 
 Attack.processAttack = function(_level, _actionGod, _action)
@@ -168,7 +180,7 @@ Attack.processAttack = function(_level, _actionGod, _action)
 // Currently just returns the damage of the attack - later will include status effects etc.
 Attack.calculateBaseDamage = function(_attacker, _defender)
 {
-	return 3;		
+	return Math.max(0, _attacker.getCurrentAttack() - _defender.getCurrentDefence());		
 }
 
 Attack.getAttackTargets = function(_attacker, _actors, _targetCell)
@@ -178,7 +190,9 @@ Attack.getAttackTargets = function(_attacker, _actors, _targetCell)
 	// Eventually will get this from the actors effects etc.
 	var _attackType = Attack.SINGLE_TARGET_PATTERN;
 	
-	if(_attacker.isPlayer() === true)
+	// if(_attacker.isPlayer() === true)
+	
+	if(_attacker.hasEffect(Effect.SURROUND_ATTACK) === true)
 		_attackType = Attack.SURROUND_PATTERN;
 	
 	if(_attackType === Attack.SINGLE_TARGET_PATTERN)

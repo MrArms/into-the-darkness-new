@@ -74,8 +74,7 @@ p.create = function(_char)
 	this._data._baseMagic = GameGlobals.actorsData[this.getChar()].base_magic;
 	this._data._baseFaith = GameGlobals.actorsData[this.getChar()].base_faith;
 	this._data._baseWill = GameGlobals.actorsData[this.getChar()].base_will;		
-		
-	//this._data._baseAttack = GameGlobals.actorsData[this.getChar()].base_attack;	
+			
 	this._data._currentAttack = this._data._baseStrength;
 	
 	this._data._baseDefence = GameGlobals.actorsData[this.getChar()].base_defence;	
@@ -205,7 +204,6 @@ p._updateTurnStartValues = function()
 	this._updateAdrenalineData();		
 }
 
-
 // Made much more complicated by adrenaline
 p.turnStarted = function()
 {	
@@ -234,10 +232,7 @@ p._processPostTurnEffects = function()
 	{			
 		// Reset the move counter
 		this._resetMoveTimer(); 
-	}
-	
-	
-		
+	}				
 }
 
 p.turnFinished = function()
@@ -293,9 +288,6 @@ p.damage = function(_amount)
 	this._data._damageTakenThisTurn += _amount;
 
 	this._data._currentHP = Math.max(0, this._data._currentHP - _amount);
-	
-	//if(this._data._currentHP <= 0)
-	//	this._kill();
 }
 
 // Called by using a gameEvent from ActionGod
@@ -304,17 +296,21 @@ p.heal = function(_amount)
 	this._data._currentHP = Math.min(this._data._maxHP, this._data._currentHP + _amount);
 }
 
+// This resets data for the actor
+p.resetActorData = function()
+{
+	// Reset values first	
+	this._data._currentAttack = this._data._baseStrength;
+	this._data._currentDefence = this._data._baseDefence;
+}
+
+
 // This updates all derived values (at the moment just attack and defence) from the status effects, 
 //					current charms selected, extra bonuses (monsters killed last turn etc.) and bonuses from the map (eg. number actors adjacent)
 // Charms are only applied temporarily until the end of the turn when they are added to this._charmEffects to continue to work until the start of the next turn
 p.updateValuesFromLevel = function(_level) 
-{
-	// Reset values first
-	//this._data._baseAttack = this._data._baseStrength;
-	this._data._currentAttack = this._data._baseStrength;
-	this._data._currentDefence = this._data._baseDefence;
-	
-	this._updateNumberAdjacentActors(_level.getActors());
+{		
+	this._updateAdjacentActorData(_level.getActors());
 			
 	// =====  IF WE WANT TO APPLY STATUSES TO THE ACTORS HERE TOO *** ========
 	// this.updateValuesFromStatus
@@ -389,7 +385,10 @@ p.updateSelectedCharms = function(_level, _charmsList)
 		}
 	}
 	
-	this.updateValuesFromLevel(_level);
+	// Update all the actors
+	_level.updateActors();
+	
+	// this.updateValuesFromLevel(_level);
 }
 
 //===================================================
@@ -435,9 +434,12 @@ p._getAllEffects = function()
 	return allEffects;
 }
 
-p._updateNumberAdjacentActors = function(_actors)
+p._updateAdjacentActorData = function(_actors)
 {
 	this._data._numberActorsAdjacent = 0;
+	this._data._maxAdjacentDefence = 0;
+	this._data._maxAdjacentAttack = 0;
+	this._data._adjacentDefenceDiff = 0; // This stores the (positive) different between your defence and any adjacent enemies defence
 
 	var adjacentCellKeys = Utils.getCellsSurroundingCell(this._data._col, this._data._row);
 	
@@ -445,8 +447,16 @@ p._updateNumberAdjacentActors = function(_actors)
 	{
 		var actorTest = _actors.getElementFromKey(adjacentCellKeys[i]);
 	
-		if(actorTest !== null && actorTest.isActorAlive() === true)		
-			this._data._numberActorsAdjacent += 1;		
+		if(actorTest !== null && actorTest.isActorAlive() === true && actorTest.isVisible() )		
+		{
+			this._data._numberActorsAdjacent += 1;	
+			
+			this._data._maxAdjacentDefence = Math.max(this._data._maxAdjacentDefence, actorTest.getCurrentDefence());
+			this._data._maxAdjacentAttack = Math.max(this._data._maxAdjacentAttack, actorTest.getCurrentAttack());
+			
+			if(this._data._currentDefence > actorTest.getCurrentDefence())
+				this._data._adjacentDefenceDiff += (this._data._currentDefence - actorTest.getCurrentDefence() );
+		}
 	}
 }
 
@@ -485,6 +495,8 @@ p.isActorAlive = function() { return this._data._isAlive; }
 
 p.getPosition = function() { return [this._data._col, this._data._row]; }
 
+p.isVisible = function() { return true; }
+
 p.setPosition = function(_col, _row)
 {		
 	this._data._col = _col;
@@ -508,6 +520,8 @@ p.setCurrentAttack = function(_value) { this._data._currentAttack = _value; }
 p.setCurrentDefence = function(_value) { this._data._currentDefence = _value; }
 
 p.getNumberActorsAdjacent = function() { return this._data._numberActorsAdjacent; }
+
+p.getAdjacentDefenceDiff = function() { return this._data._adjacentDefenceDiff; }
 
 p.getEnemiesKilledThisTurn = function(){ return this._data._enemiesKilledThisTurn; }
 

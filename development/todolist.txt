@@ -1,13 +1,26 @@
 
-NEED TO link up Actor.damageDealt function with the correct game event DONE
-Need to test with self sacrifice (need a damage gameEvent for the attacker) DONE
-Need to save/load new stats DONE
+Fix revenge charm - DONE
 
-Bug - use adrenelin + self sacrifice - kill a monster, the next turn you use self sacrifice again (effects should be cleared) FIXED
+Get maximum of all defence values adjacent to you  DONE
+	Could temporarily store all actors adjacent to the actor (and later all those in line of sight)
+		pros - can easily update values for the actor
+		cons - don't like storing pointers to other actors
+		conclusion - don't bovver - just create variables for each possible thing you need and use them
 
-Check in 
 
+Don't really want to do this just yet, brain isn't working quite right :/
 Move _turnActionFinished and _turnFinished from Level to actor (or tidy it up properly)
+
+In Attack we really need the same logic applied to both attacker and defender when damaged/healed
+
+Need to decide how we want attack patterns to work - do they stack etc.? DONE FOR NOW
+	Need a brief design of ranged + surround etc.
+		Surround = each surrounding cell
+		Ranged + surround = target + each surrounding cell
+
+Change double move to record the controls? That way you can move then attack etc. - would cause complications with effect length, charms selected etc. PROBABLY BEST TO LEAVE FOR NOW
+
+Make a list of everything that is needed for version 0.2 and then work your way through it all (with deadlines etc.)
 
 
 ====== Basic stats ====

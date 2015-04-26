@@ -14,6 +14,12 @@ Charm.ADRENALINE = "adrenaline";
 Charm.POISON_BRAND = "poison";
 Charm.SELF_SACRIFICE = "self_sacrifice";
 Charm.REVENGE = "revenge";
+Charm.SPIKED_ARMOUR = "spiked_armour";
+Charm.FIRE_BRAND = "fire_brand";
+Charm.RECKLESS_ATTACK = "reckless_attack";
+Charm.REINFORCE = "reinforce";
+Charm.TACTICS = "tactics";
+Charm.SURROUND_ATTACK = "surround_attack";
 
 var CharmGlobals = {};
 
@@ -38,4 +44,11 @@ CharmGlobals.data[Charm.SELF_SACRIFICE] = {name:"Self Sacrifice", description:"I
 																																		{name:Effect.SELF_SACRIFICE, value:2}] };
 
 CharmGlobals.data[Charm.REVENGE] = {name:"Revenge", description:"Increase attack by the amount you were damaged by last turn", effects:[{name:Effect.REVENGE}] };																					
+CharmGlobals.data[Charm.SPIKED_ARMOUR] = {name:"Spiked Armour", description:"Damages the attacker by the amount your defence is higher than theirs", effects:[{name:Effect.SPIKED_ARMOUR}] };																					
+CharmGlobals.data[Charm.FIRE_BRAND] = {name:"Fire Brand", description:"Doubles damage", effects:[{name:Effect.FIRE_BRAND}] };																					
+CharmGlobals.data[Charm.RECKLESS_ATTACK] = {name:"Reckless Attack", description:"Adds your defence to your attack and reduces defence to 0", effects:[{name:Effect.RECKLESS_ATTACK}] };		
+																			
+CharmGlobals.data[Charm.REINFORCE] = {name:"Reinforce", description:"Increase defence by each surrounding enemy", effects:[{name:Effect.REINFORCE}] };																					
+CharmGlobals.data[Charm.TACTICS] = {name:"Tactics", description:"Increase attack by each point of defence higher than any adjacent enemy defence", effects:[{name:Effect.TACTICS}] };																					
+CharmGlobals.data[Charm.SURROUND_ATTACK] = {name:"Surround", description:"Attacks each adjacent square to the attacker", effects:[{name:Effect.SURROUND_ATTACK}] };																					
 																																													
